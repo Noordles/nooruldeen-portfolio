@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#11110f" />
+    <meta name="description" content="Piano listening room on Al Sammarraie Nooruldeen’s personal site." />
+    <title>Piano — Al Sammarraie Nooruldeen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Roboto+Slab:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+    <script src="piano-melting.js" defer></script>
+    <script src="piano-player.js" defer></script>
+  </head>
+  <body class="detail-page piano-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="progress-track" aria-hidden="true"><span id="reading-progress"></span></div>
+    <header class="topline">
+      <a class="brand" href="index.html#top" aria-label="Al Sammarraie Nooruldeen, home">
+        <span class="portrait-frame"><img class="portrait" src="assets/noor-portrait.png" alt="Portrait of Noor" /></span>
+        <span class="brand-name"><span class="full-name">Al Sammarraie<br /><span class="name-highlight">Noor</span>uldeen</span></span>
+      </a>
+      <div class="topline-note"><span class="signal-dot"></span> PIANO ROOM <span class="topline-divider">/</span> PLAY · LISTEN · REPEAT</div>
+      <a class="topline-contact" href="index.html#contact">CONTACT <span aria-hidden="true" class="arrow-glyph">↗</span></a>
+    </header>
+    <nav class="side-rail" aria-label="Main navigation">
+      <a class="rail-logo" href="index.html#top" aria-label="Back to Noor’s site"><img src="assets/noor-portrait.png" alt="" /></a>
+      <a class="rail-link" href="index.html#top"><span class="rail-icon" aria-hidden="true">⌂</span><span>HOME</span></a>
+      <a class="rail-link" href="index.html#about"><span class="rail-icon" aria-hidden="true">◉</span><span>ABOUT</span></a>
+      <a class="rail-link" href="index.html#work"><span class="rail-icon" aria-hidden="true">▤</span><span>WORK</span></a>
+      <a class="rail-link active" href="#piano-room" aria-current="location"><span class="rail-icon" aria-hidden="true">♫</span><span>PIANO</span></a>
+      <a class="rail-link" href="index.html#contact"><span class="rail-icon arrow-glyph" aria-hidden="true">↗</span><span>CONTACT</span></a>
+      <div class="rail-bottom"><span class="rail-rule"></span><span>LISTEN<br />CLOSELY</span></div>
+    </nav>
+    <main id="main">
+      <section class="detail-hero piano-detail-hero" id="top" aria-labelledby="piano-page-title">
+        <div class="hero-city" aria-hidden="true"><img src="assets/night-city.svg" alt="" /></div>
+        <div class="hero-overlay" aria-hidden="true"></div>
+        <div class="detail-hero-copy">
+          <div class="hero-kicker"><span class="index">NOOR / 02</span><span class="kicker-line"></span><span>MUSIC</span></div>
+          <h1 id="piano-page-title"><span class="title-line">Noor at the</span><span class="title-line title-last"><span class="name-highlight">Piano</span></span></h1>
+          <p>Melting, a piece Noor has learned, alongside three improvised piano pieces by Noor. Press play and watch the notes move with the sound.</p>
+          <a class="detail-return" href="index.html#hobbies"><span>BACK TO NOOR’S SITE</span><b aria-hidden="true" class="arrow-glyph">↙</b></a>
+        </div>
+        <div class="hero-caption"><span>MUSIC / NOOR</span><span>ONE LEARNED PIECE · THREE SKETCHES</span></div>
+      </section>
+      <section class="piano-room" id="piano-room" aria-labelledby="piano-room-title">
+        <div class="section-marker section-marker-dark"><span>01 / LISTEN</span><span>USE HEADPHONES FOR DETAIL</span></div>
+        <div class="piano-room-heading">
+          <p class="overline">PIANO</p>
+          <h2 id="piano-room-title">Melting,<br /><span class="highlight-word">and three sketches.</span></h2>
+          <p class="piano-intro">“Melting” by Evgeny Grinko is a piece Noor has learned. Its MIDI note sequence plays at the file’s original tempo, alongside three improvised piano pieces by Noor.</p>
+        </div>
+        <div class="visualizer-panel">
+          <div class="visualizer-label"><span id="piano-status" aria-live="polite">READY TO PLAY</span><span>LIVE AUDIO DISPLAY</span></div>
+          <canvas id="piano-visualizer" width="960" height="150" aria-hidden="true"></canvas>
+          <div class="visualizer-baseline" aria-hidden="true"></div>
+          <div class="keyboard-heading"><span>88-KEY MIDI VIEW</span><span>NOTES LIGHT UP WITH THE TRACK</span></div>
+          <div class="keyboard-scroll" aria-label="Piano roll and 88-key keyboard">
+            <canvas id="piano-roll" class="piano-roll" width="970" height="148" aria-hidden="true"></canvas>
+            <div id="piano-keyboard" class="midi-keyboard" role="img" aria-label="88-key piano keyboard; played notes illuminate as each track plays"></div>
+          </div>
+        </div>
+        <div class="track-list">
+          <article class="track-card track-card-featured" data-track-card="melting">
+            <span class="track-number">01</span>
+            <div class="track-info"><h3>Melting</h3><p>LEARNED PIECE · EVGENY GRINKO · 150 BPM</p><a class="midi-download-link" href="assets/piano/melting-evgeny-grinko.mid" download="Melting-Evgeny-Grinko.mid">DOWNLOAD MIDI <span aria-hidden="true" class="arrow-glyph">↓</span></a></div>
+            <span class="track-duration">2:38</span>
+            <button class="track-button" type="button" data-track="melting" aria-label="Play Melting by Evgeny Grinko" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>
+            <div class="track-progress" role="slider" tabindex="0" data-track-seek="melting" aria-label="Seek in Melting" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+          </article>
+          <article class="track-card" data-track-card="baghdad">
+            <span class="track-number">02</span>
+            <div class="track-info"><h3>Baghdad at dusk</h3><p>IMPROVISED PIECE BY NOOR · 80 BPM</p><a class="midi-download-link" href="#" data-midi-download="baghdad">DOWNLOAD MIDI <span aria-hidden="true" class="arrow-glyph">↓</span></a></div>
+            <span class="track-duration">0:13</span>
+            <button class="track-button" type="button" data-track="baghdad" aria-label="Play Baghdad at dusk" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>
+            <div class="track-progress" role="slider" tabindex="0" data-track-seek="baghdad" aria-label="Seek in Baghdad at dusk" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+          </article>
+          <article class="track-card" data-track-card="obor">
+            <span class="track-number">03</span>
+            <div class="track-info"><h3>After Piața Obor</h3><p>IMPROVISED PIECE BY NOOR · 88 BPM</p><a class="midi-download-link" href="#" data-midi-download="obor">DOWNLOAD MIDI <span aria-hidden="true" class="arrow-glyph">↓</span></a></div>
+            <span class="track-duration">0:11</span>
+            <button class="track-button" type="button" data-track="obor" aria-label="Play After Piața Obor" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>
+            <div class="track-progress" role="slider" tabindex="0" data-track-seek="obor" aria-label="Seek in After Piața Obor" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+          </article>
+          <article class="track-card" data-track-card="three-cities">
+            <span class="track-number">04</span>
+            <div class="track-info"><h3>Three cities</h3><p>IMPROVISED PIECE BY NOOR · 92 BPM</p><a class="midi-download-link" href="#" data-midi-download="three-cities">DOWNLOAD MIDI <span aria-hidden="true" class="arrow-glyph">↓</span></a></div>
+            <span class="track-duration">0:12</span>
+            <button class="track-button" type="button" data-track="three-cities" aria-label="Play Three cities" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>
+            <div class="track-progress" role="slider" tabindex="0" data-track-seek="three-cities" aria-label="Seek in Three cities" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+          </article>
+        </div>
+        <p class="audio-note"><span>ABOUT THE AUDIO</span> Melting follows the notes and tempo in the supplied MIDI file, rendered by the browser’s piano sound. The other three pieces were improvised by Noor and are available as MIDI downloads.</p>
+      </section>
+      <footer class="detail-footer"><span>© <span id="year">2026</span> <span class="footer-name">Al Sammarraie <span class="name-highlight">Noor</span>uldeen</span></span><span>PIANO ROOM</span><a href="index.html#top">BACK TO SITE ↑</a></footer>
+    </main>
+  </body>
+</html>
