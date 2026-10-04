@@ -271,6 +271,7 @@ a.text-link:hover span { transform: translate(3px,-3px); }
 .contact-content { position:relative;z-index:2;width:min(880px,100%);margin:78px auto 75px; }
 .contact-content h2 { max-width:800px;color:var(--paper);font-size:clamp(3.5rem,7vw,6.8rem); }
 .contact-fullname { display:inline-block;margin-top:5px;font-size:.63em;line-height:1.06; }
+.contact-name-part { display:inline-block;white-space:nowrap; }
 .contact-copy { margin:19px 0 31px;color:#c4beaf;font-size:14px; }
 .contact-links { max-width:760px;border-top:1px solid var(--rule); }
 .contact-links > a { display:grid;grid-template-columns:.7fr 2fr 20px;align-items:center;gap:16px;padding:13px 2px;color:var(--paper);text-decoration:none;border-bottom:1px solid var(--rule);transition:padding .2s,color .2s; }
