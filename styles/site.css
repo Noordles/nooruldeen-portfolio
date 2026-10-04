@@ -916,8 +916,8 @@ main { animation:page-arrival .42s cubic-bezier(.2,.68,.26,1) both; }
 .piano-detail-hero { background-color:#101514;background-image:var(--grain-image),radial-gradient(ellipse at 79% 38%,rgba(116,38,60,.18),transparent 34%),linear-gradient(125deg,#111817,#111514 52%,#1e171a);background-size:180px 180px,auto,auto;background-blend-mode:soft-light,normal,normal; }
 .piano-detail-hero .hero-city img { opacity:0; }
 .piano-detail-hero .hero-overlay { background:linear-gradient(90deg,rgba(9,13,12,.8),rgba(10,14,13,.45) 65%,rgba(10,12,12,.12)),linear-gradient(0deg,rgba(8,11,10,.66),transparent 70%); }
-.piano-detail-hero .hero-city::before { content:"";position:absolute;right:8%;bottom:9%;width:min(48vw,620px);height:66px;border:1px solid rgba(236,228,210,.2);background:linear-gradient(180deg,transparent 0 72%,rgba(236,228,210,.18) 73%,transparent 74%),repeating-linear-gradient(90deg,rgba(236,228,210,.14) 0 1px,transparent 1px 34px);box-shadow:0 9px 35px rgba(0,0,0,.2);opacity:.62; }
-.piano-detail-hero .hero-city::after { content:"♪     ♫";position:absolute;right:11%;top:19%;color:rgba(88,213,187,.24);font:700 clamp(2.5rem,5vw,4.5rem)/1 var(--display);letter-spacing:.23em;transform:rotate(-8deg); }
+.piano-detail-hero .hero-city::before { content:"";position:absolute;right:8%;bottom:9%;width:min(56vw,720px);height:94px;border:1px solid rgba(236,228,210,.28);background:linear-gradient(180deg,transparent 0 70%,rgba(236,228,210,.3) 70% 71%,transparent 72%),linear-gradient(90deg,transparent 0 24px,rgba(7,10,9,.92) 24px 34px,transparent 34px 58px,rgba(7,10,9,.92) 58px 68px,transparent 68px 126px,rgba(7,10,9,.92) 126px 136px,transparent 136px 160px,rgba(7,10,9,.92) 160px 170px,transparent 170px 194px,rgba(7,10,9,.92) 194px 204px,transparent 204px 238px) 0 0 /238px 62% repeat-x,repeating-linear-gradient(90deg,rgba(236,228,210,.2) 0 1px,transparent 1px 34px),linear-gradient(180deg,rgba(236,228,210,.06),rgba(236,228,210,.025));box-shadow:5px 7px 0 rgba(116,38,60,.25),10px 10px 0 rgba(48,196,160,.14);opacity:.65;}
+.piano-detail-hero .hero-city::after { content:"♪     ♫";position:absolute;right:11%;top:17%;color:rgba(88,213,187,.3);font:700 clamp(3rem,6vw,5.5rem)/1 var(--display);letter-spacing:.2em;transform:rotate(-8deg);}
 .piano-room::after { content:"";position:absolute;z-index:-1;right:0;bottom:0;width:min(48%,620px);height:132px;pointer-events:none;opacity:.15;background:linear-gradient(180deg,transparent 0 71%,rgba(236,228,210,.55) 72%,transparent 73%),repeating-linear-gradient(90deg,rgba(236,228,210,.45) 0 1px,transparent 1px 34px);mask-image:linear-gradient(90deg,transparent,black 28%,black); }
 .track-downloads { display:flex;flex-wrap:wrap;gap:5px 7px;margin-top:7px; }
 .midi-download-link,.audio-download-link { margin-top:0; }
@@ -969,7 +969,7 @@ main { animation:page-arrival .42s cubic-bezier(.2,.68,.26,1) both; }
   .piano-label { top:16px;left:16px; }
   .photos-detail-hero .hero-city::before { right:3%;top:12%;bottom:auto;width:68vw; }
   .photos-detail-hero .hero-city::after { right:8%;top:19%;width:59vw; }
-  .piano-detail-hero .hero-city::before { right:4%;bottom:13%;width:72vw;height:50px; }
+  .piano-detail-hero .hero-city::before { right:3%;bottom:12%;width:82vw;height:64px; }
   .piano-detail-hero .hero-city::after { right:8%;top:13%; }
   .piano-room::after { width:70%;height:96px; }
   .project-spatial-results { margin-top:18px;padding:16px 12px; }
