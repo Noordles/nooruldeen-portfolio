@@ -124,7 +124,7 @@ def add_site_metadata(document: str, route: str) -> str:
         markup = "\n".join(f"  {item}" for item in additions)
         document = re.sub(r"</head\s*>", lambda match: f"{markup}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
     if not re.search(r'<script\s+[^>]*src=["\']/language-switcher\.js(?:\?[^"\']*)?["\']', document, re.IGNORECASE):
-        script = '<script src="/language-switcher.js?v=1" defer></script>'
+        script = '<script src="/language-switcher.js?v=2" defer></script>'
         document = re.sub(r"</body\s*>", lambda match: f"  {script}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
     return document
 
