@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import re
@@ -71,7 +72,7 @@ def public_route(output_path: Path) -> str:
     return "/" + output_path.as_posix()[: -len("index.html")]
 
 
-def rewrite_url(value: str, page_routes: dict[str, str]) -> str:
+def rewrite_url(value: str, page_routes: dict[str, str], stylesheet_version: str) -> str:
     parsed = urlsplit(value)
     if parsed.scheme or parsed.netloc or value.startswith("//"):
         return value
@@ -85,22 +86,27 @@ def rewrite_url(value: str, page_routes: dict[str, str]) -> str:
             f"#{parsed.fragment}" if parsed.fragment else ""
         )
 
+    if path == "styles.css":
+        query = "&".join(item for item in (parsed.query, f"v={stylesheet_version}") if item)
+        suffix = f"#{parsed.fragment}" if parsed.fragment else ""
+        return f"/styles.css?{query}{suffix}"
+
     if raw_path.startswith("/"):
         return value
-    if path.startswith(("assets/", "research-assets/")) or path in PUBLIC_SCRIPT_NAMES | {"styles.css"}:
+    if path.startswith(("assets/", "research-assets/")) or path in PUBLIC_SCRIPT_NAMES:
         return "/" + path + (f"?{parsed.query}" if parsed.query else "") + (
             f"#{parsed.fragment}" if parsed.fragment else ""
         )
     return value
 
 
-def rewrite_html_references(document: str, page_routes: dict[str, str]) -> str:
+def rewrite_html_references(document: str, page_routes: dict[str, str], stylesheet_version: str) -> str:
     def replace_attribute(match: re.Match[str]) -> str:
         value = match.group("value")
         if match.group("prefix").strip().lower().startswith("srcset"):
-            value = re.sub(r"[^\s,]+", lambda item: rewrite_url(item.group(0), page_routes), value)
+            value = re.sub(r"[^\s,]+", lambda item: rewrite_url(item.group(0), page_routes, stylesheet_version), value)
         else:
-            value = rewrite_url(value, page_routes)
+            value = rewrite_url(value, page_routes, stylesheet_version)
         return match.group("prefix") + match.group("quote") + value + match.group("quote")
 
     return HTML_ATTRIBUTE.sub(replace_attribute, document)
@@ -165,6 +171,8 @@ def main() -> int:
     if missing:
         return fail("Required site input is missing: " + ", ".join(missing))
 
+    stylesheet_version = hashlib.sha256(STYLE_SOURCE.read_bytes()).hexdigest()[:12]
+
     input_roots = [ROOT / name for name in INPUT_DIRECTORIES]
     for directory in input_roots:
         if not directory.is_dir():
@@ -204,7 +212,7 @@ def main() -> int:
         destination = OUTPUT / output_path
         destination.parent.mkdir(parents=True, exist_ok=True)
         document = source.read_text(encoding="utf-8")
-        document = rewrite_html_references(document, page_routes)
+        document = rewrite_html_references(document, page_routes, stylesheet_version)
         if route == "/":
             document = add_homepage_alias_redirect(document)
         document = add_site_metadata(document, route)
