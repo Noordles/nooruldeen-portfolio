@@ -115,7 +115,7 @@ def rewrite_html_references(document: str, page_routes: dict[str, str], styleshe
     return HTML_ATTRIBUTE.sub(replace_attribute, document)
 
 
-def add_site_metadata(document: str, route: str) -> str:
+def add_site_metadata(document: str, route: str, language_version: str) -> str:
     additions = []
     if not re.search(r'<link\s+[^>]*rel=["\']canonical["\']', document, re.IGNORECASE):
         additions.append(f'<link rel="canonical" href="https://nooruldeen.com{route}" />')
@@ -125,7 +125,7 @@ def add_site_metadata(document: str, route: str) -> str:
         markup = "\n".join(f"  {item}" for item in additions)
         document = re.sub(r"</head\s*>", lambda match: f"{markup}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
     if not re.search(r'<script\s+[^>]*src=["\']/language-switcher\.js(?:\?[^"\']*)?["\']', document, re.IGNORECASE):
-        script = '<script src="/language-switcher.js?v=3" defer></script>'
+        script = f'<script src="/language-switcher.js?v={language_version}" defer></script>'
         document = re.sub(r"</body\s*>", lambda match: f"  {script}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
     return document
 
@@ -178,6 +178,10 @@ def main() -> int:
         return fail("Required site input is missing: " + ", ".join(missing))
 
     stylesheet_version = hashlib.sha256(STYLE_SOURCE.read_bytes()).hexdigest()[:12]
+    language_script = BROWSER_SCRIPT_ROOT / "language-switcher.js"
+    if not language_script.is_file():
+        return fail("Required browser script is missing: scripts/browser/language-switcher.js")
+    language_version = hashlib.sha256(language_script.read_bytes()).hexdigest()[:12]
 
     input_roots = [ROOT / name for name in INPUT_DIRECTORIES]
     for directory in input_roots:
@@ -221,7 +225,7 @@ def main() -> int:
         document = rewrite_html_references(document, page_routes, stylesheet_version)
         if route == "/":
             document = add_homepage_alias_redirect(document)
-        document = add_site_metadata(document, route)
+        document = add_site_metadata(document, route, language_version)
         destination.write_text(document, encoding="utf-8")
 
         if route != "/":
