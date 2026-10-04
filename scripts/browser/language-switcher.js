@@ -402,6 +402,63 @@
   ];
 
   entries.forEach((entry) => add(entry[0], entry[1], entry[2]));
+  ["SOURCE-BASED DESIGN RECORD","DOSAR DE DESIGN BAZAT PE SURSĂ","سجل تصميم مستند إلى المصدر"],
+  ["The actual Figma","Artboardurile reale din Figma","إطارات Figma الفعلية"],
+  ["artboards and palette.","și paleta de culori.","ولوحة الألوان."],
+  ["The values shown here come from the project’s real frames and color selections. The editable working file is kept private.","Valorile provin din cadrele și selecțiile reale de culori ale proiectului. Fișierul editabil de lucru rămâne privat.","القيم مأخوذة من الإطارات واختيارات الألوان الفعلية في المشروع. يظل ملف العمل القابل للتحرير خاصًا."],
+  ["A COMPLETE MULTI-PAGE WEBSITE DESIGN","UN DESIGN COMPLET DE SITE CU MAI MULTE PAGINI","تصميم موقع كامل متعدد الصفحات"],
+  ["I designed the complete INCSMPS website as a connected set of desktop and mobile pages. This case study records the actual frame names, dimensions, and colors from my Figma work.","Am proiectat întregul site INCSMPS ca un set coerent de pagini desktop și mobile. Acest studiu de caz consemnează numele, dimensiunile și culorile reale ale cadrelor din proiectul meu Figma.","صممت موقع INCSMPS بالكامل كمجموعة مترابطة من صفحات سطح المكتب والهاتف. توثق دراسة الحالة أسماء الإطارات وأبعادها وألوانها الفعلية من عملي على Figma."],
+  ["Complete website design","Design complet de site","تصميم الموقع بالكامل"],
+  ["Design nearly complete · not launched","Design aproape finalizat · nelansat","التصميم شبه مكتمل · لم يُطلق بعد"],
+  ["02 / ARTBOARD INDEX","02 / INDEXUL CADRELOR","02 / فهرس الإطارات"],
+  ["Seven page frames.","Șapte cadre de pagină.","سبعة إطارات للصفحات."],
+  ["One complete site.","Un site complet.","موقع متكامل."],
+  ["These are the page names used in the original Figma file. Six desktop and mobile pairs have verified dimensions; the Contact Us frame is also present in the source.","Acestea sunt numele paginilor din fișierul Figma original. Șase perechi desktop și mobile au dimensiuni verificate; cadrul Contact Us este prezent și el în sursă.","هذه أسماء الصفحات في ملف Figma الأصلي. تم التحقق من أبعاد ستة أزواج لسطح المكتب والهاتف؛ كما يظهر إطار Contact Us في المصدر."],
+  ["07 / CONTACT","07 / CONTACT","07 / التواصل"],
+  ["Separate page frame in the source file.","Cadru separat de pagină în fișierul sursă.","إطار صفحة منفصل في الملف الأصلي."],
+  ["03 / SOURCE PALETTE","03 / PALETA DIN SURSĂ","03 / لوحة ألوان المصدر"],
+  ["The colours","Culorile","الألوان"],
+  ["from the file.","din fișier.","من الملف."],
+  ["These values were read from the Figma selection colors in the original design. They are shown as source swatches, not as colors guessed from a recreated interface.","Aceste valori au fost citite din culorile selectate în Figma pentru designul original. Sunt mostre reale din sursă, nu nuanțe ghicite dintr-o interfață recreată.","قُرئت هذه القيم من ألوان التحديد في تصميم Figma الأصلي. تُعرض كعينات من المصدر وليست ألوانًا مخمّنة من واجهة معاد تصميمها."],
+  ["INCSMPS · FIGMA COLOR SELECTIONS","INCSMPS · CULORI SELECTATE ÎN FIGMA","INCSMPS · ألوان محددة في FIGMA"],
+  ["13 VISIBLE VALUES","13 VALORI VIZIBILE","13 قيمة ظاهرة"],
+  ["04 / RESPONSIVE FRAME SIZES","04 / DIMENSIUNILE CADRELOR RESPONSIVE","04 / أبعاد إطارات التصميم المتجاوب"],
+  ["Desktop and mobile,","Desktop și mobil,","سطح المكتب والهاتف،"],
+  ["in the source file.","în fișierul sursă.","في الملف الأصلي."],
+  ["The dimensions below match the measured Figma frames. They show the scale of the six paired page designs; Contact Us is listed separately because its dimensions were not recorded here.","Dimensiunile corespund cadrelor măsurate în Figma. Ele arată scara celor șase perechi de pagini; Contact Us este listat separat, deoarece dimensiunile sale nu au fost înregistrate.","تطابق الأبعاد إطارات Figma المقاسة، وتوضح حجم تصميمات الصفحات الست المتزاوجة؛ أما Contact Us فمذكور منفصلًا لأن أبعاده لم تُسجل."],
+  ["FIGMA PAGE","PAGINĂ FIGMA","صفحة FIGMA"],
+  ["DESKTOP FRAME","CADRU DESKTOP","إطار سطح المكتب"],
+  ["MOBILE FRAME","CADRU MOBIL","إطار الهاتف"],
+  ["ALSO IN THE SOURCE","PREZENT ȘI ÎN SURSĂ","موجود أيضًا في المصدر"],
+  ["The frame is present in Figma; its dimensions have not been included in this measurement set.","Cadrul este prezent în Figma; dimensiunile sale nu sunt incluse în acest set de măsurători.","الإطار موجود في Figma، ولم تُدرج أبعاده في مجموعة القياسات هذه."],
+  ["A complete website design,","Un design complet de site,","تصميم موقع كامل،"],
+  ["ready for its next chapter.","pregătit pentru următorul capitol.","جاهز لمرحلته التالية."],
+  ["The INCSMPS design is close to complete, but the website has not been launched. This case study shares verified information from the original Figma work while the full editable design file stays private.","Designul INCSMPS este aproape finalizat, dar site-ul nu a fost lansat. Acest studiu de caz prezintă informații verificate din proiectul Figma original, iar fișierul complet, editabil, rămâne privat.","تصميم INCSMPS قريب من الاكتمال، لكن الموقع لم يُطلق. تعرض دراسة الحالة معلومات مؤكدة من عمل Figma الأصلي، بينما يظل ملف التصميم الكامل القابل للتحرير خاصًا."],
+  ["ACTUAL FIGMA FRAME INDEX","INDEXUL REAL AL CADRELOR FIGMA","فهرس إطارات FIGMA الفعلية"],
+  ["7 page frames","7 cadre de pagină","7 إطارات للصفحات"],
+  ["6 desktop + mobile pairs","6 perechi desktop + mobile","6 أزواج سطح مكتب + هاتف"],
+  ["ACASA","ACASA","ACASA"],
+  ["MOBILE","MOBIL","الهاتف"],
+  ["OFFICIAL PROJECT / WEBSITE + IDENTITY","PROIECT OFICIAL / SITE + IDENTITATE","مشروع رسمي / موقع + هوية"],
+  ["I designed the complete IDRL website as well as its visual identity, bringing the lab’s research into one clear digital experience.","Am proiectat întregul site IDRL, precum și identitatea sa vizuală, aducând cercetarea laboratorului într-o experiență digitală clară.","صممت موقع IDRL بالكامل وهويته البصرية، وجمعت أبحاث المختبر في تجربة رقمية واضحة."],
+  ["EXPLORE IDRL WEBSITE + IDENTITY","EXPLOREAZĂ SITE-UL ȘI IDENTITATEA IDRL","استكشف موقع IDRL وهويته"],
+  ["OFFICIAL WORK · WEBSITE + IDENTITY","LUCRĂRI OFICIALE · SITE + IDENTITATE","أعمال رسمية · موقع + هوية"],
+  ["WEBSITE · IDENTITY · MOTION","SITE · IDENTITATE · ANIMAȚIE","الموقع · الهوية · الحركة"],
+  ["A research website","Un site de cercetare","موقع للأبحاث"],
+  ["EXPLORE THE PROJECT","EXPLOREAZĂ PROIECTUL","استكشف المشروع"],
+  ["WEBSITE / IDENTITY / TYPE / MOTION","SITE / IDENTITATE / TIPOGRAFIE / ANIMAȚIE","الموقع / الهوية / الخط / الحركة"],
+  ["IDRL website and visual identity case study","Studiu de caz: site-ul și identitatea vizuală IDRL","دراسة حالة موقع IDRL وهويته البصرية"],
+  ["WEBSITE DESIGN","DESIGN DE SITE","تصميم الموقع"],
+  ["The complete website,","Întregul site,","الموقع الكامل،"],
+  ["designed as one system.","proiectat ca un sistem unitar.","مصمم كنظام واحد."],
+  ["I designed the full IDRL website alongside its visual identity. The website brings the lab’s research into a clear, connected digital experience.","Am proiectat întregul site IDRL împreună cu identitatea sa vizuală. Site-ul prezintă cercetarea laboratorului într-o experiență digitală clară și coerentă.","صممت موقع IDRL بالكامل إلى جانب هويته البصرية، ويعرض الموقع أبحاث المختبر ضمن تجربة رقمية واضحة ومترابطة."],
+  ["OFFICIAL WORK / WEBSITE DESIGN + VISUAL IDENTITY","LUCRARE OFICIALĂ / DESIGN DE SITE + IDENTITATE VIZUALĂ","عمل رسمي / تصميم الموقع + الهوية البصرية"],
+  ["This case study presents selected work while the full editable project files remain private.","Acest studiu de caz prezintă lucrări selectate; fișierele complete editabile rămân private.","تعرض دراسة الحالة أعمالًا مختارة بينما تظل ملفات المشروع الكاملة القابلة للتحرير خاصة."],
+  ["VISIT THE IDRL WEBSITE","VIZITEAZĂ SITE-UL IDRL","زُر موقع IDRL"],
+  ["ANIMATION PREVIEW","PREVIZUALIZARE ANIMAȚIE","معاينة الحركة"],
+  ["The animation,","Animația,","الحركة،"],
+  ["shown in context.","prezentată în context.","معروضة ضمن سياقها."],
+  ["The logo animation can be played here as an MP4 preview.","Animația logo-ului poate fi redată aici ca previzualizare MP4.","يمكن تشغيل حركة الشعار هنا كمعاينة MP4."].forEach((entry) => add(entry[0], entry[1], entry[2]));
 
   add("LANGUAGES", "LIMBI", "اللغات");
   add("ENGLISH", "ENGLEZĂ", "الإنجليزية");
@@ -525,9 +582,9 @@
       ar: ["Al Sammarraie Nooruldeen — تصميم وتطوير الويب", "تصميم وتطوير ورسوم متحركة وتصوير واهتمامات بالإحصاء والاقتصاد الخفي في العراق."]
     },
     "/design/": {
-      en: ["Design & Digital Work — Al Sammarraie Nooruldeen", "Websites, interfaces, visual identity, animation, and official website and identity projects for IDRL and INCSMPS."],
-      ro: ["Design și lucrări digitale — Al Sammarraie Nooruldeen", "Site-uri, interfețe, identitate vizuală, animație și proiecte oficiale pentru IDRL și INCSMPS, alături de studii de design independente."],
-      ar: ["التصميم والأعمال الرقمية — Al Sammarraie Nooruldeen", "مواقع وواجهات وهوية بصرية ورسوم متحركة ومشاريع رسمية لمختبر IDRL ومعهد INCSMPS، إلى جانب دراسات تصميم مستقلة."]
+      en: ["Design & Digital Work — Al Sammarraie Nooruldeen", "Websites, interfaces, visual identity, and animation, including the complete IDRL website and visual identity."],
+      ro: ["Design și lucrări digitale — Al Sammarraie Nooruldeen", "Site-uri, interfețe, identitate vizuală și animație, inclusiv site-ul complet și identitatea vizuală IDRL."],
+      ar: ["التصميم والأعمال الرقمية — Al Sammarraie Nooruldeen", "مواقع وواجهات وهوية بصرية وحركة، بما في ذلك موقع IDRL الكامل وهويته البصرية."]
     },
     "/research/": {
       en: ["Research & Statistics — Al Sammarraie Nooruldeen", "Research and projects about economics, statistics, data, and social change."],
@@ -545,9 +602,9 @@
       ar: ["التصوير — Al Sammarraie Nooruldeen", "مشاهد شوارع وضوء متغير وتفاصيل صغيرة صورها نور."]
     },
     "/idrl/": {
-      en: ["IDRL Identity Case Study — Al Sammarraie Nooruldeen", "A case study of the identity and website work for Informality Data Research Lab."],
-      ro: ["Studiu de caz identitate IDRL — Al Sammarraie Nooruldeen", "Un studiu de caz despre identitatea și site-ul Informality Data Research Lab."],
-      ar: ["دراسة حالة هوية IDRL — Al Sammarraie Nooruldeen", "دراسة حالة لهوية وموقع مختبر أبحاث بيانات الاقتصاد غير الرسمي."]
+      en: ["IDRL Website & Visual Identity — Al Sammarraie Nooruldeen", "A case study of the complete Informality Data Research Lab website design and visual identity."],
+      ro: ["Site-ul și identitatea vizuală IDRL — Al Sammarraie Nooruldeen", "Un studiu de caz despre designul complet al site-ului și identitatea vizuală Informality Data Research Lab."],
+      ar: ["موقع IDRL وهويته البصرية — Al Sammarraie Nooruldeen", "دراسة حالة للتصميم الكامل لموقع مختبر أبحاث بيانات الاقتصاد غير الرسمي وهويته البصرية."]
     },
     "/site-story/": {
       en: ["How This Site Came Together — Nooruldeen", "How Nooruldeen.com grew into a personal place for design, development, research, music, and photography."],
@@ -555,9 +612,9 @@
       ar: ["كيف تكوّن هذا الموقع — نور الدين", "كيف أصبح Nooruldeen.com مساحة شخصية للتصميم والتطوير والأبحاث والموسيقى والتصوير."]
     },
     "/incsmps/": {
-      en: ["INCSMPS Website Design — Al Sammarraie Nooruldeen", "A near-complete, unpublished multi-page website design concept for INCSMPS, created in Figma for desktop and mobile."],
-      ro: ["Designul site-ului INCSMPS — Al Sammarraie Nooruldeen", "Un concept de design aproape complet, încă nelansat, pentru site-ul INCSMPS, realizat în Figma pentru desktop și mobil."],
-      ar: ["تصميم موقع INCSMPS — النور الدين السامرائي", "مفهوم تصميم متعدد الصفحات لموقع INCSMPS، أوشك على الاكتمال ولم يُطلق بعد، صُمم في Figma لسطح المكتب والهاتف."]
+      en: ["INCSMPS Website Design — Al Sammarraie Nooruldeen", "A source-based case study of Nooruldeen’s near-complete INCSMPS website design, including the original page set, frame sizes, and palette."],
+      ro: ["Designul site-ului INCSMPS — Al Sammarraie Nooruldeen", "Un studiu de caz bazat pe sursă despre designul aproape finalizat al site-ului INCSMPS, cu paginile originale, dimensiunile cadrelor și paleta."],
+      ar: ["تصميم موقع INCSMPS — Al Sammarraie Nooruldeen", "دراسة حالة مستندة إلى المصدر عن تصميم موقع INCSMPS شبه المكتمل، تشمل الصفحات الأصلية وأبعاد الإطارات ولوحة الألوان."]
     }
   };
   const originalText = new WeakMap();
