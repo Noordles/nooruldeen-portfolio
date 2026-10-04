@@ -61,6 +61,9 @@ def check_reference(
     if not reference or is_external(reference):
         return 0
     parsed = urlsplit(reference)
+    if parsed.path.lower().endswith(".html"):
+        errors.append(f"{source.relative_to(root)}: internal link still uses a .html address: {reference}")
+        return 1
     relative = unquote(parsed.path)
     if not relative:
         target = source
