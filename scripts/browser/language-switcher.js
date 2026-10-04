@@ -231,9 +231,9 @@
     ["BUILD A VISUAL LANGUAGE","CONSTRUIEȘTE UN LIMBAJ VIZUAL","ابنِ لغة بصرية"],
     ["Keep the structure clear and the details expressive.","Păstrează structura clară și detaliile expresive.","حافظ على وضوح البنية وتعبير التفاصيل."],
     ["Deep green-black surfaces, warm paper tones, wine-red highlights, and teal accents give the pages a shared visual rhythm. Oversized serif headings bring character; compact labels keep the interface precise.","Suprafețele verde-negru închis, tonurile calde de hârtie, accentele vișinii și detaliile turcoaz dau paginilor un ritm vizual comun. Titlurile serif mari adaugă caracter, iar etichetele compacte păstrează interfața precisă.","تمنح الخلفيات الخضراء السوداء الداكنة ودرجات الورق الدافئة ولمسات العنابي والتركواز إيقاعًا بصريًا مشتركًا للصفحات. تضيف العناوين الكبيرة ذات الزخرفة طابعًا مميزًا، وتحافظ التسميات المقتضبة على دقة الواجهة."],
-    ["MAKE SPACE TO EXPLORE","اترك مجالًا للاستكشاف","اترك مساحة للاستكشاف"],
-    ["Let every interest have a clear path.","امنح كل اهتمام مسارًا واضحًا.","امنح كل اهتمام مسارًا واضحًا."],
-    ["The side navigation stays familiar as the pages change. Sections, cards, and small labels help people understand where they are and where a link will take them.","يظل التنقل الجانبي مألوفًا مع تغيّر الصفحات. وتساعد الأقسام والبطاقات والتسميات الصغيرة على فهم الموقع الحالي والوجهة التي يقود إليها الرابط.","يبقى التنقل الجانبي مألوفًا مع تغير الصفحات. وتوضح الأقسام والبطاقات والتسميات الصغيرة مكان الزائر والوجهة التي سينقله إليها الرابط."],
+    ["MAKE SPACE TO EXPLORE","LASĂ LOC EXPLORĂRII","اترك مساحة للاستكشاف"],
+    ["Let every interest have a clear path.","Lasă fiecărui interes un drum clar.","امنح كل اهتمام مسارًا واضحًا."],
+    ["The side navigation stays familiar as the pages change. Sections, cards, and small labels help people understand where they are and where a link will take them.","Navigarea laterală rămâne familiară pe măsură ce se schimbă paginile. Secțiunile, cardurile și etichetele mici îi ajută pe oameni să înțeleagă unde sunt și unde îi duce un link.","يبقى التنقل الجانبي مألوفًا مع تغيّر الصفحات. وتساعد الأقسام والبطاقات والتسميات الصغيرة على فهم مكان الزائر والوجهة التي يقود إليها الرابط."],
     ["ADD MOVEMENT WITH PURPOSE","ADĂUGĂ MIȘCARE CU SCOP","أضف الحركة بهدف"],
     ["Let small details bring the site to life.","Lasă detaliile mici să dea viață site-ului.","دع التفاصيل الصغيرة تبث الحياة في الموقع."],
     ["Hover states, motion, the piano-note visualizer, and photography give the experience energy while keeping the content easy to read.","Stările la trecerea cursorului, animațiile, vizualizatorul notelor de pian și fotografiile dau energie experienței, păstrând conținutul ușor de citit.","تمنح حالات التمرير والحركة وعارض نغمات البيانو والتصوير التجربة حيوية مع إبقاء المحتوى سهل القراءة."],
@@ -308,6 +308,37 @@
   ];
 
   entries.forEach((entry) => add(entry[0], entry[1], entry[2]));
+
+  add("LANGUAGES", "LIMBI", "اللغات");
+  add("ENGLISH", "ENGLEZĂ", "الإنجليزية");
+  add("IDEA", "IDEE", "الفكرة");
+  add("COLOR / TYPE / DETAIL", "CULOARE / TIPOGRAFIE / DETALIU", "لون / خط / تفاصيل");
+  add("01 / COLOR", "01 / CULOARE", "01 / اللون");
+  add("02 / TYPE", "02 / TIPOGRAFIE", "02 / الخط");
+  add("03 / DETAIL", "03 / DETALIU", "03 / التفاصيل");
+  add("INK", "CERNEALĂ", "حبر");
+  add("PAPER", "HÂRTIE", "ورق");
+  add("WINE", "VIȘINIU", "عنابي");
+  add("TEAL", "TURCOAZ", "تركواز");
+  add("WEB", "WEB", "الويب");
+  add("PERSONAL", "PERSONAL", "شخصي");
+  add("DEVELOPMENT", "DEZVOLTARE", "تطوير");
+  add("DESIGN", "DESIGN", "تصميم");
+  add("CODE", "COD", "برمجة");
+  add("RESEARCH", "CERCETARE", "أبحاث");
+  add("01 / HOME", "01 / ACASĂ", "01 / الرئيسية");
+  add("02 / DESIGN", "02 / DESIGN", "02 / التصميم");
+  add("03 / RESEARCH", "03 / CERCETARE", "03 / الأبحاث");
+  add("04 / PIANO", "04 / PIAN", "04 / البيانو");
+  add("05 / PHOTOGRAPHY", "05 / FOTOGRAFIE", "05 / التصوير");
+  add("PERSONAL SITE / DESIGN / DEVELOPMENT", "SITE PERSONAL / DESIGN / DEZVOLTARE", "موقع شخصي / تصميم / تطوير");
+  add("IDEA / IDENTITY / EXPERIENCE", "IDEE / IDENTITATE / EXPERIENȚĂ", "فكرة / هوية / تجربة");
+  add("PERSONAL PROJECT · DESIGN · CODE", "PROIECT PERSONAL · DESIGN · COD", "مشروع شخصي · تصميم · برمجة");
+  add("COLOR / TYPE / DETAIL", "CULOARE / TIPOGRAFIE / DETALIU", "لون / خط / تفاصيل");
+  add("ROBOTO SLAB", "ROBOTO SLAB", "ROBOTO SLAB");
+  add("Barlow Condensed", "Barlow Condensed", "Barlow Condensed");
+  add("IBM Plex Mono", "IBM Plex Mono", "IBM Plex Mono");
+  add("Photographs", "Fotografii", "صور");
 
   const languageNames = {
     en: "Choose language",
