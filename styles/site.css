@@ -44,9 +44,9 @@ a:focus-visible { outline: 2px solid var(--teal); outline-offset: 5px; }
 .topline-contact:hover { color: var(--paper); background: var(--wine); border-color: var(--wine); }
 .topline-contact span { color: var(--wine-light); padding-left: 9px; font-size: 14px; }
 
-.side-rail { width: 68px; position: fixed; z-index: 35; inset: 0 auto 0 0; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 72px; background: #0b0b0a; border-right: 1px solid rgba(236,228,210,.12); }
+.side-rail { width: 68px; position: fixed; z-index: 35; inset: 0 auto 0 0; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 0; background: #0b0b0a; border-right: 1px solid rgba(236,228,210,.12); }
 .side-rail::before { content: ""; position: absolute; inset: 0 0 auto; height: 72px; background: #0b0b0a; border-bottom: 1px solid rgba(236,228,210,.12); pointer-events: none; }
-.rail-logo { display: block; width: 39px; height: 39px; margin: 17px 0 12px; overflow: hidden; border: 1px solid var(--wine-light); border-radius: 50%; background: var(--wine); }
+.rail-logo { position: relative; z-index: 1; display: block; width: 39px; height: 39px; margin: 10px auto 16px; overflow: hidden; border: 1px solid var(--wine-light); border-radius: 50%; background: var(--wine); }
 .rail-logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .rail-link { position: relative; width: 100%; min-height: 51px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #857f73; text-decoration: none; font: 500 7px/1 var(--mono); letter-spacing: .05em; transition: color .2s; }
 .rail-link:hover, .rail-link.active { color: var(--paper); }
@@ -885,7 +885,7 @@ main { animation:page-arrival .42s cubic-bezier(.2,.68,.26,1) both; }
 }
 
 /* Last-pass layout and page-specific background refinements */
-.rail-logo { width:52px;height:52px;margin:12px auto 16px; }
+.rail-logo { width:52px;height:52px;margin:10px auto 16px; }
 .hero-tags { width:min(100%,960px);max-width:960px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:12px;margin-top:28px; }
 .hero-tag-group { min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px; }
 .hero-tag-heading { flex-basis:100%;margin-bottom:1px;color:var(--wine-light);font:500 7px/1.35 var(--mono);letter-spacing:.15em; }

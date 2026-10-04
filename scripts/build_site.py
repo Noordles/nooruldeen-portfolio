@@ -106,11 +106,16 @@ def rewrite_html_references(document: str, page_routes: dict[str, str]) -> str:
     return HTML_ATTRIBUTE.sub(replace_attribute, document)
 
 
-def add_canonical_link(document: str, route: str) -> str:
-    canonical = f'<link rel="canonical" href="https://nooruldeen.com{route}" />'
-    if re.search(r'<link\s+[^>]*rel=["\']canonical["\']', document, re.IGNORECASE):
+def add_site_metadata(document: str, route: str) -> str:
+    additions = []
+    if not re.search(r'<link\s+[^>]*rel=["\']canonical["\']', document, re.IGNORECASE):
+        additions.append(f'<link rel="canonical" href="https://nooruldeen.com{route}" />')
+    if not re.search(r'<link\s+[^>]*rel=["\']icon["\']', document, re.IGNORECASE):
+        additions.append('<link rel="icon" type="image/svg+xml" href="/assets/brand/noor-favicon.svg" />')
+    if not additions:
         return document
-    return re.sub(r"</head\s*>", f"  {canonical}\n</head>", document, count=1, flags=re.IGNORECASE)
+    markup = "\n".join(f"  {item}" for item in additions)
+    return re.sub(r"</head\s*>", lambda match: f"{markup}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
 
 
 def add_homepage_alias_redirect(document: str) -> str:
@@ -202,7 +207,7 @@ def main() -> int:
         document = rewrite_html_references(document, page_routes)
         if route == "/":
             document = add_homepage_alias_redirect(document)
-        document = add_canonical_link(document, route)
+        document = add_site_metadata(document, route)
         destination.write_text(document, encoding="utf-8")
 
         if route != "/":
