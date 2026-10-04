@@ -44,6 +44,7 @@ def output_path_for_page(source: Path) -> Path:
         "home/index.html": Path("index.html"),
         "design/design.html": Path("design/index.html"),
         "design/idrl.html": Path("idrl/index.html"),
+        "design/incsmps.html": Path("incsmps/index.html"),
         "hobbies/photos.html": Path("photos/index.html"),
         "hobbies/piano.html": Path("piano/index.html"),
         "research/research.html": Path("research/index.html"),
