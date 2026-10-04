@@ -523,7 +523,7 @@ main { animation:page-arrival .42s cubic-bezier(.2,.68,.26,1) both; }
   .contact-section { min-height:670px;padding:22px 21px 0; }
   .contact-content { margin:59px auto 60px; }
   .contact-content h2 { font-size:clamp(3.4rem,13vw,5.1rem); }
-  .contact-fullname { font-size:.64em; }
+  .contact-fullname { font-size:clamp(.5em,10vw,.64em); }
   .contact-copy { max-width:300px;font-size:13px; }
   .contact-links > a { grid-template-columns:1fr 18px;gap:3px 11px;padding:11px 2px; }
   .contact-links > a > span { grid-column:1; }
