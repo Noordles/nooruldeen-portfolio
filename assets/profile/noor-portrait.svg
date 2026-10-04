@@ -1,41 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" fill="none">
-  <defs>
-    <linearGradient id="backdrop" x1="30" y1="20" x2="296" y2="302" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#223B36"/>
-      <stop offset=".55" stop-color="#171B19"/>
-      <stop offset="1" stop-color="#4B1E2D"/>
-    </linearGradient>
-    <linearGradient id="skin" x1="139" y1="97" x2="185" y2="248" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D7A67F"/>
-      <stop offset="1" stop-color="#A86E58"/>
-    </linearGradient>
-    <linearGradient id="shirt" x1="161" y1="223" x2="160" y2="319" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#E6DDC9"/>
-      <stop offset="1" stop-color="#AEA793"/>
-    </linearGradient>
-    <clipPath id="circle"><circle cx="160" cy="160" r="160"/></clipPath>
-  </defs>
-  <g clip-path="url(#circle)">
-    <path fill="url(#backdrop)" d="M0 0h320v320H0z"/>
-    <path stroke="#30C4A0" stroke-opacity=".4" d="M14 204 107 35m77 250L309 77M-8 132l143 176"/>
-    <circle cx="258" cy="65" r="47" fill="#74263C" fill-opacity=".85"/>
-    <circle cx="258" cy="65" r="59" stroke="#D18B98" stroke-opacity=".42"/>
-    <path fill="#111413" d="M53 326c5-46 22-71 55-85 21-9 35-14 52-14s34 5 56 15c33 15 48 40 53 84H53Z"/>
-    <path fill="url(#shirt)" d="M88 328c4-42 19-68 47-80l25 18 26-18c29 13 45 39 49 80H88Z"/>
-    <path fill="#D4CAB5" d="m134 246 26 21 27-21-9-16h-36l-8 16Z"/>
-    <path fill="#EEE6D5" d="M141 241h39v23h-39z"/>
-    <path stroke="#8E8776" stroke-opacity=".65" d="M145 244v18m8-18v19m8-19v19m8-19v19m8-19v18"/>
-    <path fill="url(#skin)" d="M113 115c0-38 19-65 48-65 30 0 51 27 51 66v40c0 44-22 71-52 71-29 0-47-27-47-70v-42Z"/>
-    <path fill="#191716" d="M108 127c-13-42 4-89 42-99 34-9 70 11 75 50 3 16 1 34-5 49-5-8-8-19-8-31-15 5-30 5-46 2-18-4-31-12-40-23-2 20-8 37-18 52Z"/>
-    <path fill="#171615" d="M113 151c3 10 6 20 9 25l1-34-10 9Zm99-3c-2 10-6 20-10 27l-1-39 11 12Z"/>
-    <path fill="#30201D" d="M126 133c8-7 18-9 28-6l-2 6c-8-2-15-1-22 4l-4-4Zm42-6c9-3 18-1 26 5l-4 5c-7-5-14-6-22-3v-7Z"/>
-    <path fill="#241C1A" d="M132 146c5-4 12-4 17 0l-2 4c-4-2-8-2-12 1l-3-5Zm40 0c5-4 12-3 16 1l-3 5c-3-3-8-3-12-1l-1-5Z"/>
-    <ellipse cx="141" cy="148" fill="#171615" rx="2.2" ry="2.5"/><ellipse cx="180" cy="148" fill="#171615" rx="2.2" ry="2.5"/>
-    <path stroke="#9B5E4E" stroke-linecap="round" stroke-width="3" d="M159 146c-1 10-4 18-5 23 3 3 7 4 11 2"/>
-    <path fill="#33201E" d="M126 178c9 8 19 11 34 11 16 0 28-4 38-12-2 30-15 47-38 47-21 0-33-16-34-46Z"/>
-    <path fill="#A46155" d="M143 184c6 3 12 4 18 4 7 0 13-1 20-4-5 8-11 11-19 11s-14-3-19-11Z"/>
-    <path fill="#1A1716" d="M115 163c3 31 10 48 20 59-20-8-29-27-30-51l10-8Zm86 1c-3 29-9 47-19 59 20-8 29-27 30-51l-11-8Z"/>
-    <path stroke="#30C4A0" stroke-opacity=".5" d="M21 266h65m148-15h70M35 42h42"/>
-    <circle cx="72" cy="266" r="3" fill="#30C4A0"/><circle cx="249" cy="251" r="3" fill="#D18B98"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+  <defs><clipPath id="avatar"><circle cx="160" cy="160" r="160"/></clipPath></defs>
+  <image href="noor-portrait.webp" width="320" height="320" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatar)"/>
 </svg>
