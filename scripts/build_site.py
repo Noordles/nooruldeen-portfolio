@@ -25,6 +25,7 @@ PUBLIC_SCRIPT_NAMES = {
     "piano-player.js",
     "piano-melting.js",
     "research-presentation.js",
+    "language-switcher.js",
 }
 HTML_ATTRIBUTE = re.compile(
     r"""(?P<prefix>\b(?:href|src|poster|action|data-src|data-poster|data-href|srcset)\s*=\s*)(?P<quote>["'])(?P<value>.*?)(?P=quote)""",
@@ -46,6 +47,7 @@ def output_path_for_page(source: Path) -> Path:
         "hobbies/photos.html": Path("photos/index.html"),
         "hobbies/piano.html": Path("piano/index.html"),
         "research/research.html": Path("research/index.html"),
+        "site-story/site-story.html": Path("site-story/index.html"),
     }
     if relative in fixed_routes:
         return fixed_routes[relative]
@@ -118,10 +120,13 @@ def add_site_metadata(document: str, route: str) -> str:
         additions.append(f'<link rel="canonical" href="https://nooruldeen.com{route}" />')
     if not re.search(r'<link\s+[^>]*rel=["\']icon["\']', document, re.IGNORECASE):
         additions.append('<link rel="icon" type="image/svg+xml" href="/assets/brand/noor-favicon.svg" />')
-    if not additions:
-        return document
-    markup = "\n".join(f"  {item}" for item in additions)
-    return re.sub(r"</head\s*>", lambda match: f"{markup}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
+    if additions:
+        markup = "\n".join(f"  {item}" for item in additions)
+        document = re.sub(r"</head\s*>", lambda match: f"{markup}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
+    if not re.search(r'<script\s+[^>]*src=["\']/language-switcher\.js(?:\?[^"\']*)?["\']', document, re.IGNORECASE):
+        script = '<script src="/language-switcher.js?v=1" defer></script>'
+        document = re.sub(r"</body\s*>", lambda match: f"  {script}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
+    return document
 
 
 def add_homepage_alias_redirect(document: str) -> str:
