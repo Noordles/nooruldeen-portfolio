@@ -339,6 +339,80 @@
   add("Barlow Condensed", "Barlow Condensed", "Barlow Condensed");
   add("IBM Plex Mono", "IBM Plex Mono", "IBM Plex Mono");
   add("Photographs", "Fotografii", "صور");
+  add("WEB DEVELOPER", "DEZVOLTATOR WEB", "مطور ويب");
+  add("AND RESEARCHER", "ȘI CERCETĂTOR", "وباحث");
+  add("DESIGN / WORK", "DESIGN / LUCRĂRI", "تصميم / أعمال");
+  add("STATISTICS / RESEARCH", "STATISTICĂ / CERCETARE", "إحصاء / أبحاث");
+  add("Web · Apps", "Web · Aplicații", "الويب · التطبيقات");
+  add("· Software · Logos", "· Software · Logouri", "· البرمجيات · الشعارات");
+  add("Statistics", "Statistică", "الإحصاء");
+  add("and economy", "și economie", "والاقتصاد");
+  add("Arabic · English", "Arabă · Engleză", "العربية · الإنجليزية");
+  add("Romanian", "Română", "الرومانية");
+  add("I’m fluent in Arabic, English and Romanian. I’m also an entrepreneur and manage my retail store in", "Vorbesc fluent araba, engleza și româna. Sunt și antreprenor și administrez magazinul meu din", "أتحدث العربية والإنجليزية والرومانية بطلاقة. وأنا رائد أعمال أدير متجري في");
+  add("02 / SELECTED WORK", "02 / LUCRĂRI SELECTATE", "02 / أعمال مختارة");
+  add("DESIGN · DEVELOPMENT · RESEARCH", "DESIGN · DEZVOLTARE · CERCETARE", "تصميم · تطوير · أبحاث");
+  add("WEBSITE", "SITE WEB", "موقع إلكتروني");
+  add("+ IDENTITY", "+ IDENTITATE", "+ هوية");
+  add("01 — WEB DESIGN / IDENTITY", "01 — DESIGN WEB / IDENTITATE", "01 — تصميم ويب / هوية");
+  add("VIEW NOOR’S PROFILE AT INFORMALITY", "VEZI PROFILUL LUI NOOR LA INFORMALITY", "شاهد ملف نور على Informality");
+  add("VIEW IDRL IDENTITY DESIGN", "VEZI IDENTITATEA VIZUALĂ IDRL", "شاهد هوية IDRL البصرية");
+  add("DATA", "DATE", "بيانات");
+  add("CORRUPTION", "CORUPȚIE", "فساد");
+  add("PROTEST", "PROTEST", "احتجاج");
+  add("MIGRATION", "MIGRAȚIE", "هجرة");
+  add("02 — ECONOMICS / STATISTICS", "02 — ECONOMIE / STATISTICĂ", "02 — اقتصاد / إحصاء");
+  add("EXPLORE RESEARCH", "EXPLOREAZĂ CERCETAREA", "استكشف الأبحاث");
+  add("WEB", "WEB", "الويب");
+  add("APP", "APLICAȚIE", "تطبيق");
+  add("MOTION", "MIȘCARE", "حركة");
+  add("03 — DESIGN / DIGITAL CRAFT", "03 — DESIGN / CREAȚIE DIGITALĂ", "03 — تصميم / إبداع رقمي");
+  add("WEB · APP · LOGO", "WEB · APLICAȚIE · LOGO", "ويب · تطبيق · شعار");
+  add("03 / OFF THE CLOCK", "03 / ÎN AFARA MUNCII", "03 / خارج أوقات العمل");
+  add("MUSIC · PHOTOGRAPHY", "MUZICĂ · FOTOGRAFIE", "موسيقى · تصوير");
+  add("01 / MUSIC", "01 / MUZICĂ", "01 / الموسيقى");
+  add("LISTEN TO MORE", "ASCULTĂ MAI MULT", "استمع إلى المزيد");
+  add("VIEW & ADMIRE", "PRIVEȘTE ȘI ADMIRĂ", "شاهد وتأمل");
+  add("02 / PHOTOGRAPHY", "02 / FOTOGRAFIE", "02 / التصوير");
+  add("ENJOY & LISTEN", "BUCURĂ-TE ȘI ASCULTĂ", "استمتع واستمع");
+  add("ALSO ON NOOR’S MIND", "ȘI ÎN GÂNDURILE LUI NOOR", "أيضًا في بال نور");
+  add("04 / CONTACT", "04 / CONTACT", "04 / التواصل");
+  add("Scroll to explore Noor’s profile", "Derulează pentru a descoperi profilul lui Noor", "مرر لاستكشاف ملف نور");
+  add("Explore Noor’s work and interests", "Explorează lucrările și interesele lui Noor", "استكشف أعمال نور واهتماماته");
+  add("Explore Noor’s research projects, data, and presentations in economics and statistics", "Explorează proiectele de cercetare, datele și prezentările lui Noor despre economie și statistică", "استكشف أبحاث نور وبياناته وعروضه في الاقتصاد والإحصاء");
+  add("Explore Noor’s design workshop, including websites, interfaces, logos, animation, and experiments", "Explorează atelierul de design al lui Noor: site-uri, interfețe, logo-uri, animații și experimente", "استكشف ورشة تصميم نور، بما فيها المواقع والواجهات والشعارات والرسوم المتحركة والتجارب");
+  add("01 / SELECTED PROJECT", "01 / PROIECT SELECTAT", "01 / مشروع مختار");
+  add("OFFICIAL WORK · VISUAL IDENTITY", "LUCRĂRI OFICIALE · IDENTITATE VIZUALĂ", "أعمال رسمية · هوية بصرية");
+  add("SELECTED PROJECT", "PROIECT SELECTAT", "مشروع مختار");
+  add("OFFICIAL WORK / IDRL", "LUCRĂRI OFICIALE / IDRL", "أعمال رسمية / IDRL");
+  add("02 / PERSONAL WORK", "02 / LUCRĂRI PERSONALE", "02 / أعمال شخصية");
+  add("INDEPENDENT PROJECTS · MADE BY NOOR", "PROIECTE INDEPENDENTE · CREATE DE NOOR", "مشاريع مستقلة · من صنع نور");
+  add("I design and build websites, apps, and visual identities.", "Creez site-uri, aplicații și identități vizuale.", "أصمم وأبني المواقع والتطبيقات والهويات البصرية.");
+  add("EXPLORE THE SITE", "EXPLOREAZĂ SITE-UL", "استكشف الموقع");
+  add("PERSONAL PROJECT / 2026", "PROIECT PERSONAL / 2026", "مشروع شخصي / 2026");
+  add("PERSONAL STUDY / FASHION WORDMARK", "STUDIU PERSONAL / WORDMARK DE MODĂ", "دراسة شخصية / شعار نصي للأزياء");
+  add("PERSONAL STUDY / 01", "STUDIU PERSONAL / 01", "دراسة شخصية / 01");
+  add("03 / OFFICIAL WORK", "03 / LUCRĂRI OFICIALE", "03 / أعمال رسمية");
+  add("OFFICIAL COLLABORATION / IDRL", "COLABORARE OFICIALĂ / IDRL", "تعاون رسمي / IDRL");
+  add("Designing for a", "Design pentru un", "تصميم من أجل");
+  add("research lab.", "laborator de cercetare.", "مختبر أبحاث.");
+  add("Professional work for Informality Data Research Lab, including its website and visual identity.", "Lucrare profesională pentru Informality Data Research Lab, inclusiv site-ul și identitatea sa vizuală.", "عمل احترافي لمختبر أبحاث بيانات الاقتصاد غير الرسمي، يشمل موقعه وهويته البصرية.");
+  add("DESIGN + IDENTITY", "DESIGN + IDENTITATE", "تصميم + هوية");
+  add("OFFICIAL PROJECT / WEB + IDENTITY", "PROIECT OFICIAL / WEB + IDENTITATE", "مشروع رسمي / ويب + هوية");
+  add("A visual identity built to give the lab a clear, recognizable presence across its website and research work.", "O identitate vizuală care oferă laboratorului o prezență clară și recognoscibilă pe site și în cercetările sale.", "هوية بصرية تمنح المختبر حضورًا واضحًا يسهل تمييزه عبر موقعه وأعماله البحثية.");
+  add("A regional study of socioeconomic measures and recorded theft-related crime across Europe’s NUTS 2 regions, using Eurostat indicators and spatial analysis.", "Un studiu regional al indicatorilor socioeconomici și al infracțiunilor de furt în regiunile NUTS 2 din Europa, folosind indicatori Eurostat și analiză spațială.", "دراسة إقليمية للمؤشرات الاجتماعية والاقتصادية والجرائم المرتبطة بالسرقة في أقاليم NUTS 2 الأوروبية، باستخدام مؤشرات Eurostat والتحليل المكاني.");
+  add("An exploratory country-level study of corruption perceptions, protest events, and emigration, with a report, descriptive analysis, and regression models.", "Un studiu exploratoriu la nivel de țară despre percepțiile privind corupția, proteste și emigrație, cu raport, analiză descriptivă și modele de regresie.", "دراسة استكشافية على مستوى البلدان لتصورات الفساد وأحداث الاحتجاج والهجرة، تتضمن تقريرًا وتحليلًا وصفيًا ونماذج انحدار.");
+  add("A 2023-context marketing study of Romania’s electric-vehicle market, with a Tesla SWOT and recommendations across the marketing mix.", "Un studiu de marketing în contextul anului 2023 despre piața vehiculelor electrice din România, cu analiză SWOT pentru Tesla și recomandări pentru mixul de marketing.", "دراسة تسويقية في سياق عام 2023 لسوق السيارات الكهربائية في رومانيا، تتضمن تحليل SWOT لشركة Tesla وتوصيات للمزيج التسويقي.");
+  add("A team presentation on Iraq’s economic structure, employment, currency and proposed routes toward diversification.", "O prezentare de echipă despre structura economică a Irakului, ocuparea forței de muncă, moneda și posibile căi de diversificare.", "عرض جماعي عن الهيكل الاقتصادي للعراق والتوظيف والعملة والمسارات المقترحة نحو التنويع.");
+  add("A descriptive look at the ILO modelled share of employed women and men in vulnerable employment. Includes the full annual series, a PowerPoint, and a note on what the indicator can and cannot show.", "O analiză descriptivă a ponderii estimate de OIM a femeilor și bărbaților angajați în condiții vulnerabile. Include seria anuală completă, o prezentare PowerPoint și o notă despre limitele indicatorului.", "نظرة وصفية إلى حصة النساء والرجال العاملين في ظروف هشّة وفق تقديرات منظمة العمل الدولية. تشمل السلسلة السنوية كاملة وعرض PowerPoint وملاحظة حول ما يمكن للمؤشر إظهاره وما لا يمكنه.");
+  add("A case study of the IDRL identity, WordPress website work and a 19-day internship workbook, with the report and workbook in DOCX and PDF.", "Un studiu de caz despre identitatea IDRL, lucrul la site-ul WordPress și caietul de practică de 19 zile, cu raport și caiet în DOCX și PDF.", "دراسة حالة لهوية IDRL والعمل على موقع WordPress ودفتر تدريب لمدة 19 يومًا، مع التقرير والدفتر بصيغتي DOCX وPDF.");
+  add("Managing Immigration Papers", "Gestionarea documentelor de imigrare", "إدارة أوراق الهجرة");
+  add("An earlier coursework database prototype for organizing clients, applications, services, documents, employees, appointments and reference countries.", "Un prototip de bază de date realizat pentru un curs, destinat organizării clienților, cererilor, serviciilor, documentelor, angajaților, programărilor și țărilor de referință.", "نموذج أولي لقاعدة بيانات ضمن عمل دراسي لتنظيم العملاء والطلبات والخدمات والوثائق والموظفين والمواعيد والبلدان المرجعية.");
+  add("Immigration database programming", "Programarea bazei de date pentru imigrare", "برمجة قاعدة بيانات الهجرة");
+  add("A separate follow-on report about an expanded Oracle schema, stored routines, triggers, cursors, exception handling and audit logic.", "Un raport ulterior separat despre o schemă Oracle extinsă, rutine stocate, declanșatoare, cursoare, tratarea excepțiilor și logica de audit.", "تقرير لاحق منفصل عن مخطط Oracle موسّع وإجراءات مخزنة ومشغلات ومؤشرات ومعالجة الاستثناءات ومنطق التدقيق.");
+  add("FRAME","CADRU","إطار");
+  add("01 FRAME · DATE NOT RECORDED","01 CADRU · DATA NU A FOST ÎNREGISTRATĂ","01 إطار · لم يُسجل التاريخ");
+
 
   const languageNames = {
     en: "Choose language",
@@ -412,6 +486,15 @@
     return new Intl.DateTimeFormat(language === "ro" ? "ro-RO" : "ar", { day:"numeric", month:"long", year:"numeric", timeZone:"UTC" }).format(date);
   }
 
+  function localizePhotoLabel(source, language) {
+    if (language === "en") return null;
+    const captured = source.match(/^CAPTURED IN (\d{4})$/);
+    if (captured) return language === "ro" ? "FOTOGRAFIAT ÎN " + captured[1] : "التقطت في " + captured[1];
+    const frame = source.match(/^FRAME (.+)$/);
+    if (frame) return (language === "ro" ? "CADRU " : "إطار ") + frame[1];
+    return null;
+  }
+
   function translateNode(node, language) {
     if (!node || node.nodeType !== Node.TEXT_NODE) return;
     if (!originalText.has(node)) originalText.set(node, node.nodeValue || "");
@@ -419,11 +502,12 @@
     if (!source.trim()) return;
     const entry = translations[normalize(source)];
     const localizedDate = language === "en" ? null : localizeDate(source.trim(), language);
-    if (language === "en" || (!entry && !localizedDate)) {
+    const localizedPhotoLabel = language === "en" ? null : localizePhotoLabel(source.trim(), language);
+    if (language === "en" || (!entry && !localizedDate && !localizedPhotoLabel)) {
       node.nodeValue = source;
       return;
     }
-    const localized = localizedDate || localizeCase(source.trim(), entry[language] || source.trim(), language);
+    const localized = localizedDate || localizedPhotoLabel || localizeCase(source.trim(), entry?.[language] || source.trim(), language);
     node.nodeValue = source.replace(source.trim(), localized);
   }
 
