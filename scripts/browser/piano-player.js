@@ -73,6 +73,7 @@ const createMidiDownload = (key) => {
 const canvas = document.querySelector("#piano-visualizer");
 const statusLine = document.querySelector("#piano-status");
 const keyboard = document.querySelector("#piano-keyboard");
+const keyboardScroll = document.querySelector(".keyboard-scroll");
 const rollCanvas = document.querySelector("#piano-roll");
 const buttons = [...document.querySelectorAll(".track-button[data-track]")];
 const seekBars = [...document.querySelectorAll(".track-progress[data-track-seek]")];
@@ -110,6 +111,16 @@ const buildKeyboard = () => {
     keyboard.append(key);
     keyboardKeys.set(midi, key);
   }
+};
+
+const centerMiddleC = () => {
+  const middleCKey = keyboardKeys.get(60);
+  if (!keyboardScroll || !middleCKey) return;
+  const keyRect = middleCKey.getBoundingClientRect();
+  const scrollRect = keyboardScroll.getBoundingClientRect();
+  const keyCenter = keyRect.left + keyRect.width / 2 - scrollRect.left + keyboardScroll.scrollLeft;
+  const maxScroll = Math.max(0, keyboardScroll.scrollWidth - keyboardScroll.clientWidth);
+  keyboardScroll.scrollLeft = Math.max(0, Math.min(maxScroll, keyCenter - keyboardScroll.clientWidth / 2));
 };
 
 const showKeyboardNotes = (notes) => {
@@ -559,10 +570,12 @@ const warmAudioOnPress = (event) => {
 };
 document.addEventListener("pointerdown", warmAudioOnPress, { passive: true });
 window.addEventListener("resize", () => {
+  centerMiddleC();
   updateMidiRollPositions();
   if (activePlayback) drawVisualizer();
   else clearVisualizer();
 });
 buildKeyboard();
+centerMiddleC();
 updateMidiRollPositions();
 clearVisualizer();
