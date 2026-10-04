@@ -1269,3 +1269,8 @@ html[dir="rtl"] .story-language-fact::after { right:auto;left:clamp(16px,3vw,34p
   html[dir="rtl"] .topline { padding:0 14px 0 16px; }
 }
 @media (max-width:390px) { .site-language-switcher button { min-width:21px;padding:5px 3px; } }
+
+/* Keep the IDRL artwork centered across viewport sizes and interaction states. */
+.idrl-topic-art .idrl-feature-image { display:grid;place-items:center; }
+.idrl-topic-art .idrl-feature-image img { display:block;width:min(100%,560px);max-height:82%;height:auto;margin:auto;object-fit:contain;object-position:50% 50%;transform-origin:50% 50%; }
+.idrl-topic-art .idrl-feature-image:hover img { transform:scale(1.025); }
