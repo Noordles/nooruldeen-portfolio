@@ -1,0 +1,18 @@
+# Generated site and local development files
+/dist/
+/work/
+
+# Local settings and private key material
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+*.key
+
+# Operating system and Python files
+.DS_Store
+Thumbs.db
+__pycache__/
+*.py[cod]
