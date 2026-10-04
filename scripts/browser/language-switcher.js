@@ -329,7 +329,7 @@
     ["05 / ABOUT THE INSTITUTE","05 / DESPRE INSTITUT","05 / عن المعهد"],
     ["An introduction to the institute gives its research work a human and organizational context.","Prezentarea institutului oferă contextul uman și organizațional al activității sale de cercetare.","تقدم نبذة عن المعهد السياق الإنساني والتنظيمي لأعماله البحثية."],
     ["06 / CONTACT","06 / CONTACT","06 / التواصل"],
-    ["A direct, low-friction route connects researchers, partners, and visitors with the institute.","O cale simplă și directă îi pune în legătură pe cercetători, parteneri și vizitatori cu institutul.","مسار مباشر وسهل يربط الباحثين والشركاء والزوار بالمعهد."]
+    ["A direct, low-friction route connects researchers, partners, and visitors with the institute.","O cale simplă și directă îi pune în legătură pe cercetători, parteneri și vizitatori cu institutul.","مسار مباشر وسهل يربط الباحثين والشركاء والزوار بالمعهد."],
     ["INCSMPS","INCSMPS","INCSMPS"],
     ["WEBSITE DESIGN","DESIGN WEB","تصميم الموقع"],
     ["NOOR / INCSMPS","NOOR / INCSMPS","نور / INCSMPS"],
