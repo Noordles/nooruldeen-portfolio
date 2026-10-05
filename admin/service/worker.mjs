@@ -94,7 +94,7 @@ async function serveMedia(request,env,path){
   }
   const object=await env.MEDIA.get(id+"/"+variant,range?{range}:undefined);
   if(!object) return no(404,"Media not found");
-  const filename=variant!=="original"&&record.kind==="image"?record.filename.replace(/\\.[^.]+$/,"")+({"image/webp":".webp","image/jpeg":".jpg","image/png":".png"}[entry.type]||""):record.filename;
+  const filename=variant!=="original"&&record.kind==="image"?record.filename.replace(/\.[^.]+$/,"")+({"image/webp":".webp","image/jpeg":".jpg","image/png":".png"}[entry.type]||""):record.filename;
   const headers=new Headers({"Content-Type":entry.type,"Cache-Control":publicFile?"public, max-age=86400":"private, no-store","ETag":object.httpEtag,"X-Content-Type-Options":"nosniff","Content-Disposition":"inline; filename="+JSON.stringify(filename.replace(/[^\w.-]/g,"_"))});
   if(request.headers.get("Origin")===env.PUBLIC_SITE_ORIGIN){headers.set("Access-Control-Allow-Origin",env.PUBLIC_SITE_ORIGIN);headers.set("Access-Control-Allow-Credentials","true");headers.set("Vary","Origin");}
   headers.set("Accept-Ranges","bytes");

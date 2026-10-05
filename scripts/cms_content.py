@@ -221,13 +221,13 @@ def piano_html(item, number):
     key=esc(item["id"])
     built=item.get("builtin","")
     button=(f'<button class="track-button" type="button" data-track="{esc(built)}" aria-label="Play {esc(item["title"])}" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>' if built and not media else f'<button class="track-button" type="button" data-cms-audio="{esc(media)}" aria-label="Play {esc(item["title"])}" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>' if media else "")
-    extra="".join(f"<p>{esc(item.get(k,''))}</p>" for k in ("notes","difficulty","learnedDate") if item.get(k))
-    video_link=f'<a class="audio-download-link" href="{esc(video)}" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>' if video else ""
+    extra="".join(f'<p data-cms-note>{esc(item.get(k,""))}</p>' for k in ("notes","difficulty","learnedDate") if item.get(k))
+    video_link=f'<a data-cms-note class="audio-download-link" href="{esc(video)}" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>' if video else ""
     midi=item.get("midi","")
     if midi and not safe_url(midi): raise ValueError("Invalid MIDI URL")
-    audio_link=f'<a class="audio-download-link" href="{esc(media)}" download>DOWNLOAD AUDIO ↓</a>' if media else ""
-    midi_link=f'<a class="audio-download-link" href="{esc(midi)}" download>DOWNLOAD MIDI ↓</a>' if midi else ""
-    thumbnail=f'<img src="{esc(item["thumbnail"])}" alt="" loading="lazy" width="120" height="120" />' if item.get("thumbnail") and safe_url(item["thumbnail"]) else ""
+    audio_link=f'<a data-cms-note class="audio-download-link" href="{esc(media)}" download>DOWNLOAD AUDIO ↓</a>' if media else ""
+    midi_link=f'<a data-cms-note class="audio-download-link" href="{esc(midi)}" download>DOWNLOAD MIDI ↓</a>' if midi else ""
+    thumbnail=f'<img data-cms-note src="{esc(item["thumbnail"])}" alt="" loading="lazy" width="120" height="120" />' if item.get("thumbnail") and safe_url(item["thumbnail"]) else ""
     description=" · ".join(x for x in (item.get("pieceStatus"),item.get("composer"),item.get("description")) if x)
     return f'<article class="track-card" data-track-card="{esc(built or item["id"])}"><span class="track-number">{number:02}</span><div class="track-info">{thumbnail}<h3>{esc(item["title"])}</h3><p>{esc(description)}</p>{extra}<div class="track-downloads">{video_link}{midi_link}{audio_link}</div></div><span class="track-duration"></span>{button}<div class="track-progress" role="slider" tabindex="0" {"data-track-seek="+chr(34)+esc(built)+chr(34) if built and not media else "data-cms-seek"} aria-label="Seek in {esc(item["title"])}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></article>'
 def replace_piano(document, items):
@@ -246,14 +246,14 @@ def replace_piano(document, items):
             raw=original["legacyHtml"]
             raw=re.sub(r'(<span class="track-number">).*?(</span>)',lambda m:m[1]+f"{number:02}"+m[2],raw,count=1)
             if item.get("thumbnail") and safe_url(item["thumbnail"]):
-                raw=raw.replace("<h3>",'<img src="'+html.escape(item["thumbnail"],quote=True)+'" alt="" loading="lazy" width="120" height="120" /><h3>',1)
+                raw=raw.replace("<h3>",'<img data-cms-note src="'+html.escape(item["thumbnail"],quote=True)+'" alt="" loading="lazy" width="120" height="120" /><h3>',1)
             raw=re.sub(r"<h3>.*?</h3>",lambda m:"<h3>"+html.escape(item["title"])+"</h3>",raw,count=1,flags=re.S)
             description=item.get("description","")
             if item.get("composer")!=original.get("composer"): description=" · ".join(x for x in (item.get("composer"),description) if x)
-            extra="".join("<p>"+html.escape(item[k])+"</p>" for k in ("notes","difficulty","learnedDate") if item.get(k))
-            if item.get("pieceStatus")!=original.get("pieceStatus") and item.get("pieceStatus"): extra+="<p>"+html.escape(item["pieceStatus"])+"</p>"
-            if item.get("video") and safe_url(item["video"]): extra+='<a class="audio-download-link" href="'+html.escape(item["video"],quote=True)+'" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>'
-            if item.get("midi") and safe_url(item["midi"]): extra+='<a class="audio-download-link" href="'+html.escape(item["midi"],quote=True)+'" download>DOWNLOAD MIDI ↓</a>'
+            extra="".join('<p data-cms-note>'+html.escape(item[k])+"</p>" for k in ("notes","difficulty","learnedDate") if item.get(k))
+            if item.get("pieceStatus")!=original.get("pieceStatus") and item.get("pieceStatus"): extra+='<p data-cms-note>'+html.escape(item["pieceStatus"])+"</p>"
+            if item.get("video") and safe_url(item["video"]): extra+='<a data-cms-note class="audio-download-link" href="'+html.escape(item["video"],quote=True)+'" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>'
+            if item.get("midi") and safe_url(item["midi"]): extra+='<a data-cms-note class="audio-download-link" href="'+html.escape(item["midi"],quote=True)+'" download>DOWNLOAD MIDI ↓</a>'
             raw=re.sub(r"<p>.*?</p>",lambda m:"<p>"+html.escape(description)+"</p>"+extra,raw,count=1,flags=re.S)
         else: raw=piano_html(item,number)
         cards.append(raw)

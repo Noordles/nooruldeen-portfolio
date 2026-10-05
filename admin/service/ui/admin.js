@@ -118,7 +118,7 @@ function uploadButton(label,kind,onUploaded,multiple=true){
 function photoFromMedia(m,gallery){return {id:crypto.randomUUID(),status:"draft",gallery,title:m.title||m.filename,caption:"",alt:m.alt||"",src:m.src,full:m.full,width:m.width||900,height:m.height||900,viewerCaption:""};}
 function editCollection(type,main){
   const photos=type==="photos",list=state.data[type];
-  main.append(...heading(photos?"Photography":"Piano",photos?"Upload photographs, edit captions, and arrange the collection. Draft and hidden items appear only in your admin preview.":"Manage pieces and recordings using the existing listening room design."));
+  main.append(...heading(photos?"Photography":"Piano",photos?"Upload photographs, edit captions, and arrange the collection. Draft items appear in preview; hidden items stay off the page.":"Manage pieces and recordings using the existing listening room design."));
   const toolbar=element("div",{class:"toolbar"});
   if(photos){
     toolbar.append(uploadButton("Upload photographs","image",m=>{list.push(photoFromMedia(m,state.gallery||new Date().getFullYear().toString()));}));

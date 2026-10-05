@@ -84,6 +84,7 @@
       if(p.thumbnail&&safeUrl(p.thumbnail))card.querySelector(".track-info").prepend(el("img",{"data-cms-note":"",src:asset(p.thumbnail),alt:"",width:"120",height:"120",loading:"lazy"}));
       if(p.midi&&safeUrl(p.midi))card.querySelector(".track-info").append(el("a",{"data-cms-note":"",class:"audio-download-link",href:asset(p.midi),download:"",text:"DOWNLOAD MIDI ↓"}));
       if(p.audio&&safeUrl(p.audio)){
+        card.querySelector(".track-info").append(el("a",{"data-cms-note":"",class:"audio-download-link",href:asset(p.audio),download:"",text:"DOWNLOAD AUDIO ↓"}));
         card.querySelector(".track-button")?.remove();
         card.append(el("button",{class:"track-button",type:"button","data-cms-audio":asset(p.audio),"aria-label":"Play "+p.title,"aria-pressed":"false"},[el("span",{class:"play-symbol","aria-hidden":"true",text:"▶"}),el("span",{class:"button-text",text:"PLAY"})]));
         const seek=card.querySelector(".track-progress");seek.removeAttribute("data-track-seek");seek.setAttribute("data-cms-seek","");

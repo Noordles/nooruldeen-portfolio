@@ -7,7 +7,7 @@ The admin is reached through **https://nooruldeen.com/admin/** after activation.
 ## Everyday controls
 
 - **Save draft** saves the complete working draft privately. It changes nothing on the live website.
-- **Preview** shows the current draft, including unpublished photographs and piano pieces, inside the existing website.
+- **Preview** shows the current draft, including draft photographs and piano pieces; hidden items remain hidden, inside the existing website.
 - **Publish** sends published content to the site repository. GitHub Pages then rebuilds the website through its existing deployment.
 - **Check deployment** reports the latest publication's deployment status. A successful repository commit and a successful website deployment are separate steps.
 
