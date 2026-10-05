@@ -62,14 +62,14 @@ function allMedia(){
     const src=assetUrl(p.src);
     if(!src.includes("/media/")&&!built.has(src))built.set(src,{id:src,kind:"image",filename:p.title,title:p.title,alt:p.alt,src,full:assetUrl(p.full),width:p.width,height:p.height,uses:["Photography"]});
   }
-  return [...state.media.map(m=>({...m,src:state.session.adminOrigin+"/media/"+m.id+"/"+(m.kind==="image"?"thumb":"full"),full:state.session.adminOrigin+"/media/"+m.id+"/full",width:m.variants?.thumb?.width,height:m.variants?.thumb?.height})),...built.values()];
+  return [...state.media.map(m=>({...m,uses:[...new Set([...(m.uses||[]),...Object.entries(state.data.pages).filter(([,v])=>JSON.stringify(v).includes("/media/"+m.id+"/")).map(([p])=>p),...["photos","piano"].flatMap(t=>state.data[t].filter(p=>JSON.stringify(p).includes("/media/"+m.id+"/")).map(p=>t+": "+p.title))])],src:state.session.adminOrigin+"/media/"+m.id+"/"+(m.kind==="image"?"thumb":"full"),full:state.session.adminOrigin+"/media/"+m.id+"/full",width:m.variants?.thumb?.width,height:m.variants?.thumb?.height})),...built.values()];
 }
 function chooseMedia(callback,kind="image"){
   pickMedia={callback,kind};$("#media-search").value="";renderChoices();$("#media-dialog").showModal();
 }
 function renderChoices(){
   const query=$("#media-search").value.toLowerCase(),grid=$("#media-choices");grid.replaceChildren();
-  const items=allMedia().filter(m=>(!pickMedia?.kind||m.kind===pickMedia.kind)&&(m.filename+" "+m.title).toLowerCase().includes(query));
+  const items=allMedia().filter(m=>(!pickMedia?.kind||m.kind===pickMedia.kind&&!(pickMedia.kind==="audio"&&m.variants?.full?.type==="audio/midi"))&&(m.filename+" "+m.title).toLowerCase().includes(query));
   for(const m of items)grid.append(mediaTile(m,()=>{pickMedia.callback(m);$("#media-dialog").close();changed();render();}));
   if(!items.length)grid.append(text("p","No matching media. Upload a file in the media library.","empty"));
 }
@@ -90,7 +90,9 @@ async function optimize(file,max){
 }
 async function uploads(files,onUploaded){
   for(let i=0;i<files.length;i++){
-    const file=files[i];
+    let file=files[i];
+    const canonical={"audio/x-wav":"audio/wav","audio/wave":"audio/wav","audio/x-midi":"audio/midi"}[file.type]||(!file.type&&/\.mid(i)?$/i.test(file.name)?"audio/midi":file.type);
+    if(canonical!==file.type)file=new File([file],file.name,{type:canonical,lastModified:file.lastModified});
     notice("Uploading "+(i+1)+" of "+files.length+" / "+file.name);
     try{
       if(file.size>25000000)throw new Error("Choose an original smaller than 25 MB");
@@ -104,7 +106,7 @@ async function uploads(files,onUploaded){
       if(onUploaded)onUploaded(allMedia().find(m=>m.id===result.media.id),file);
     }catch(error){notice(file.name+": "+error.message,true);}
   }
-  changed();render();notice("Uploads finished. Save the draft when you are ready.");
+  if(onUploaded)changed();render();notice("Uploads finished. Save the draft when you are ready.");
 }
 function uploadButton(label,kind,onUploaded,multiple=true){
   const input=element("input",{type:"file",accept:kind==="image"?"image/jpeg,image/png,image/webp":"audio/mpeg,audio/wav,audio/midi",...(multiple?{multiple:""}:{})});
@@ -120,7 +122,7 @@ function editCollection(type,main){
     toolbar.append(uploadButton("Upload photographs","image",m=>{list.push(photoFromMedia(m,state.gallery||new Date().getFullYear().toString()));}));
     toolbar.append(button("Add from media library",()=>chooseMedia(m=>list.push(photoFromMedia(m,state.gallery||"Collection")))));
     toolbar.append(field("Upload to gallery",state.gallery||new Date().getFullYear(),v=>state.gallery=v));
-  }else toolbar.append(button("Add piece",()=>{const piece={id:crypto.randomUUID(),status:"draft",title:"Untitled piece",composer:"",description:"",notes:"",pieceStatus:"learning",difficulty:"",learnedDate:"",audio:"",video:"",thumbnail:"",builtin:""};list.push(piece);state.selected=piece.id;changed();render();}));
+  }else toolbar.append(button("Add piece",()=>{const piece={id:crypto.randomUUID(),status:"draft",title:"Untitled piece",composer:"",description:"",notes:"",pieceStatus:"learning",difficulty:"",learnedDate:"",audio:"",video:"",thumbnail:"",midi:"",builtin:""};list.push(piece);state.selected=piece.id;changed();render();}));
   main.append(toolbar);
   const layout=element("div",{class:"editor-grid"});
   layout.append(rows(list,id=>{state.selected=id;render();}));
@@ -136,7 +138,7 @@ function editCollection(type,main){
       const replace=m=>Object.assign(selected,{src:m.src,full:m.full,width:m.width||900,height:m.height||900});
       editor.append(element("div",{class:"toolbar"},[button("Choose replacement",()=>chooseMedia(replace)),uploadButton("Upload replacement","image",replace,false)]));
     }else{
-      for(const [key,label] of [["composer","Composer"],["description","Description"],["notes","My notes"],["pieceStatus","Learning status"],["difficulty","Difficulty"],["learnedDate","Date learned or added"],["video","Video or performance link"]])editor.append(field(label,selected[key],v=>selected[key]=v,{multiline:["description","notes"].includes(key),type:key==="learnedDate"?"date":key==="video"?"url":"text"}));
+      for(const [key,label] of [["composer","Composer"],["description","Description"],["notes","My notes"],["pieceStatus","Learning status"],["difficulty","Difficulty"],["learnedDate","Date learned or added"],["video","Video or performance link"],["midi","MIDI download URL"]])editor.append(field(label,selected[key],v=>selected[key]=v,{multiline:["description","notes"].includes(key),type:key==="learnedDate"?"date":["video","midi"].includes(key)?"url":"text"}));
       editor.append(field("Audio URL",selected.audio,v=>selected.audio=v,{type:"url"}));
       editor.append(element("div",{class:"toolbar"},[button("Choose recording",()=>chooseMedia(m=>{selected.audio=m.full;},"audio")),uploadButton("Upload recording","audio",m=>{selected.audio=m.full;},false),button("Choose thumbnail",()=>chooseMedia(m=>selected.thumbnail=m.src))]));
     }
@@ -186,6 +188,7 @@ function render(){
       grid.replaceChildren();
       for(const m of allMedia().filter(m=>(m.title+" "+m.filename).toLowerCase().includes(search.value.toLowerCase()))){
         const tile=mediaTile(m);
+        if(/^[a-f0-9-]{36}$/.test(m.id))tile.append(element("a",{href:state.session.adminOrigin+"/media/"+m.id+"/original",download:m.filename,text:"Download private original ↗"}));
         if(/^[a-f0-9-]{36}$/.test(m.id)&&!m.uses?.length)tile.append(button("Delete unused upload",async()=>{
           if(!confirm("Permanently delete this unused upload and its private original?"))return;
           try{await api("media/"+m.id,{method:"DELETE"});state.media=state.media.filter(x=>x.id!==m.id);render();}catch(e){notice(e.message,true);}

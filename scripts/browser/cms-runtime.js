@@ -20,7 +20,7 @@
       if(typeof value!=="string")continue;
       if(field.attribute){
         if(["href","src"].includes(field.attribute)&&!safeUrl(value))continue;
-        node.setAttribute(field.attribute,value);
+        node.setAttribute(field.attribute,["href","src"].includes(field.attribute)?asset(value):value);
       }else{
         const texts=[...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.nodeValue.trim());
         const text=texts[field.slot];
@@ -76,10 +76,13 @@
       card.querySelector(".track-number").textContent=String(number).padStart(2,"0");
       card.querySelector("h3").textContent=p.title;
       const defaultPiece=(config.pianoDefaults||[]).find(x=>x.id===p.id);
-      const description=defaultPiece&&defaultPiece.composer===p.composer?p.description:[p.composer,p.description].filter(Boolean).join(" · ");
+      const description=p.builtin?(defaultPiece&&defaultPiece.composer===p.composer?p.description:[p.composer,p.description].filter(Boolean).join(" · ")):[p.pieceStatus,p.composer,p.description].filter(Boolean).join(" · ");
       card.querySelector(".track-info > p").textContent=description;
       card.querySelectorAll("[data-cms-note]").forEach(n=>n.remove());
       for(const key of ["notes","difficulty","learnedDate"])if(p[key])card.querySelector(".track-info").append(el("p",{"data-cms-note":"",text:p[key]}));
+      if(p.builtin&&p.pieceStatus&&defaultPiece?.pieceStatus!==p.pieceStatus)card.querySelector(".track-info").append(el("p",{"data-cms-note":"",text:p.pieceStatus}));
+      if(p.thumbnail&&safeUrl(p.thumbnail))card.querySelector(".track-info").prepend(el("img",{"data-cms-note":"",src:asset(p.thumbnail),alt:"",width:"120",height:"120",loading:"lazy"}));
+      if(p.midi&&safeUrl(p.midi))card.querySelector(".track-info").append(el("a",{"data-cms-note":"",class:"audio-download-link",href:asset(p.midi),download:"",text:"DOWNLOAD MIDI ↓"}));
       if(p.audio&&safeUrl(p.audio)){
         card.querySelector(".track-button")?.remove();
         card.append(el("button",{class:"track-button",type:"button","data-cms-audio":asset(p.audio),"aria-label":"Play "+p.title,"aria-pressed":"false"},[el("span",{class:"play-symbol","aria-hidden":"true",text:"▶"}),el("span",{class:"button-text",text:"PLAY"})]));
@@ -131,7 +134,7 @@
     if(active===button){stopMedia();return;}
     window.dispatchEvent(new Event("noor:stop-piano"));stopMedia();
     if(!safeUrl(button.dataset.cmsAudio))return;
-    audio=new Audio(button.dataset.cmsAudio);audio.crossOrigin="use-credentials";active=button;
+    audio=new Audio();audio.crossOrigin=new URL(button.dataset.cmsAudio,location.href).origin===config.adminOrigin&&new URLSearchParams(location.search).has("cms-preview")?"use-credentials":"anonymous";audio.src=button.dataset.cmsAudio;active=button;
     const card=button.closest(".track-card"),seek=card.querySelector(".track-progress"),status=document.getElementById("piano-status");
     audio.addEventListener("timeupdate",()=>{
       const percent=Number.isFinite(audio.duration)&&audio.duration?audio.currentTime/audio.duration*100:0;

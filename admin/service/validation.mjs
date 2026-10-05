@@ -48,10 +48,10 @@ export function validateDocument(input,catalog,env) {
       ids.add(raw.id);
       assert(["draft","published","hidden"].includes(raw.status),"Invalid publication status");
       const item={id:raw.id,status:raw.status};
-      const fields=type==="photos"?["gallery","title","caption","alt","src","full","viewerCaption"]:["title","composer","description","notes","pieceStatus","difficulty","learnedDate","audio","video","thumbnail","builtin"];
+      const fields=type==="photos"?["gallery","title","caption","alt","src","full","viewerCaption"]:["title","composer","description","notes","pieceStatus","difficulty","learnedDate","audio","video","thumbnail","midi","builtin"];
       for(const field of fields) item[field]=text(raw[field]??"",field==="description"||field==="notes"?20000:2048);
       assert(item.title.trim().length>0,"Every item needs a title");
-      for(const field of (type==="photos"?["src","full"]:["audio","video","thumbnail"])) assert(safeUrl(item[field]),"Unsafe media URL");
+      for(const field of (type==="photos"?["src","full"]:["audio","video","thumbnail","midi"])) assert(safeUrl(item[field]),"Unsafe media URL");
       if(type==="photos"){
         assert(item.src && item.full,"A photograph needs image files");
         assert(Number.isInteger(raw.width)&&Number.isInteger(raw.height)&&raw.width>0&&raw.height>0&&raw.width<=12000&&raw.height<=12000,"Invalid image dimensions");
@@ -75,12 +75,12 @@ export function inspectMedia(bytes,type) {
   const match=(offset,s)=>[...s].every((ch,i)=>a[offset+i]===ch.charCodeAt(0));
   assert(a.length>12,"Empty or invalid file");
   if(type==="image/png"){
-    assert(a[0]===137&&match(1,"PNG\r\n\x1a\n")&&match(12,"IHDR"),"PNG signature mismatch");
+    assert(a.length>=24&&a[0]===137&&match(1,"PNG\r\n\x1a\n")&&match(12,"IHDR"),"PNG signature mismatch");
     return {width:view.getUint32(16),height:view.getUint32(20)};
   }
   if(type==="image/webp"){
     assert(match(0,"RIFF")&&match(8,"WEBP"),"WebP signature mismatch");
-    if(match(12,"VP8X")) return {width:1+a[24]+(a[25]<<8)+(a[26]<<16),height:1+a[27]+(a[28]<<8)+(a[29]<<16)};
+    if(match(12,"VP8X")&&a.length>=30) return {width:1+a[24]+(a[25]<<8)+(a[26]<<16),height:1+a[27]+(a[28]<<8)+(a[29]<<16)};
     if(match(12,"VP8 ")&&a.length>30&&a[23]===157&&a[24]===1&&a[25]===42) return {width:view.getUint16(26,true)&16383,height:view.getUint16(28,true)&16383};
     if(match(12,"VP8L")&&a[20]===47&&a.length>25) {
       const bits=view.getUint32(21,true);return {width:(bits&16383)+1,height:((bits>>>14)&16383)+1};
@@ -103,6 +103,6 @@ export function inspectMedia(bytes,type) {
   }
   if(type==="audio/mpeg"){assert(match(0,"ID3")||(a[0]===255&&(a[1]&224)===224),"MP3 signature mismatch");return {};}
   if(type==="audio/wav"){assert(match(0,"RIFF")&&match(8,"WAVE"),"WAV signature mismatch");return {};}
-  if(type==="audio/midi"){assert(match(0,"MThd"),"MIDI signature mismatch");return {};}
+  if(type==="audio/midi"){assert(a.length>=14&&match(0,"MThd")&&view.getUint32(4)===6,"MIDI signature mismatch");return {};}
   throw new InputError("Use JPEG, PNG, WebP, MP3, WAV or MIDI files");
 }

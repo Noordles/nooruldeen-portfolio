@@ -43,6 +43,27 @@ async function bodyJson(request){
   const buffer=new Uint8Array(size);let offset=0;for(const part of parts){buffer.set(part,offset);offset+=part.length;}
   try{return JSON.parse(new TextDecoder().decode(buffer));}catch{throw new InputError("Invalid JSON");}
 }
+async function withWriteLock(env,fn){
+  const token=crypto.randomUUID(),now=Date.now();
+  const lock=await env.DB.prepare("INSERT INTO publish_lock(id,token,until_ms) VALUES(1,?,?) ON CONFLICT(id) DO UPDATE SET token=excluded.token,until_ms=excluded.until_ms WHERE publish_lock.until_ms<?").bind(token,now+120000,now).run();
+  if(!lock.meta.changes)return no(409,"A save, publication or media deletion is in progress. Try again in a moment.");
+  try{return await fn();}finally{await env.DB.prepare("DELETE FROM publish_lock WHERE token=?").bind(token).run();}
+}
+async function checkManagedMedia(env,data){
+  const candidates=[];
+  for(const values of Object.values(data.pages))for(const [key,langs] of Object.entries(values))if(key.endsWith("@src")||key.endsWith("@href"))for(const value of Object.values(langs))candidates.push([value,key.endsWith("@src")?"image":null]);
+  for(const p of data.photos)for(const key of ["src","full"])candidates.push([p[key],"image"]);
+  for(const p of data.piano)for(const key of ["audio","video","thumbnail","midi"])if(p[key])candidates.push([p[key],key==="thumbnail"?"image":key==="audio"?"audio":null]);
+  for(const [value,kind] of candidates){
+    const url=new URL(value,env.PUBLIC_SITE_ORIGIN);
+    if(!url.pathname.startsWith("/media/"))continue;
+    const match=url.pathname.match(/^\/media\/([a-f0-9-]{36})\/(thumb|full)$/);
+    assert(match&&url.origin===env.ADMIN_ORIGIN,"Use optimized files from this admin’s media library");
+    const row=await env.DB.prepare("SELECT * FROM media WHERE id=?").bind(match[1]).first();
+    assert(row&&(!kind||row.kind===kind),"Referenced media is missing or is the wrong file type");
+    assert(JSON.parse(row.metadata).variants[match[2]],"This media variant is unavailable");
+  }
+}
 async function audit(env,owner,action,details){
   await env.DB.prepare("INSERT INTO audit(owner,action,details) VALUES (?,?,?)").bind(owner.sub,action,JSON.stringify(details)).run();
 }
@@ -61,17 +82,35 @@ async function serveMedia(request,env,path){
   if(!publicFile && !await verifyOwner(request,env)) return no(404,"Media not found");
   const record=metadata(row),entry=record.variants[variant];
   if(!entry) return no(404,"Media not found");
-  const object=await env.MEDIA.get(id+"/"+variant);
+  let range=null,status=200;
+  const requested=request.headers.get("Range");
+  if(requested&&request.method==="GET"){
+    const parts=requested.match(/^bytes=(\d*)-(\d*)$/);
+    if(!parts||(!parts[1]&&!parts[2]))return new Response(null,{status:416,headers:{"Content-Range":"bytes */"+entry.size}});
+    const start=parts[1]?Number(parts[1]):Math.max(0,entry.size-Number(parts[2]));
+    const end=parts[1]?(parts[2]?Math.min(Number(parts[2]),entry.size-1):entry.size-1):entry.size-1;
+    if(start>=entry.size||end<start)return new Response(null,{status:416,headers:{"Content-Range":"bytes */"+entry.size}});
+    range={offset:start,length:end-start+1};status=206;
+  }
+  const object=await env.MEDIA.get(id+"/"+variant,range?{range}:undefined);
   if(!object) return no(404,"Media not found");
   const headers=new Headers({"Content-Type":entry.type,"Cache-Control":publicFile?"public, max-age=86400":"private, no-store","ETag":object.httpEtag,"X-Content-Type-Options":"nosniff","Content-Disposition":"inline; filename="+JSON.stringify(record.filename.replace(/[^\w.-]/g,"_"))});
   if(request.headers.get("Origin")===env.PUBLIC_SITE_ORIGIN){headers.set("Access-Control-Allow-Origin",env.PUBLIC_SITE_ORIGIN);headers.set("Access-Control-Allow-Credentials","true");headers.set("Vary","Origin");}
-  if(request.headers.get("If-None-Match")===object.httpEtag)return new Response(null,{status:304,headers});
-  return new Response(request.method==="HEAD"?null:object.body,{headers});
+  headers.set("Accept-Ranges","bytes");
+  headers.set("Content-Length",String(range?range.length:entry.size));
+  if(range)headers.set("Content-Range","bytes "+range.offset+"-"+(range.offset+range.length-1)+"/"+entry.size);
+  if(!range&&request.headers.get("If-None-Match")===object.httpEtag)return new Response(null,{status:304,headers});
+  return new Response(request.method==="HEAD"?null:object.body,{headers,status});
 }
 async function upload(request,env,owner){
   assert((request.headers.get("Content-Type")||"").startsWith("multipart/form-data"),"Use a file upload form");
   assert(Number(request.headers.get("Content-Length")||0)<=37000000,"Upload exceeds 35 MB");
-  const form=await request.formData(),original=form.get("original");
+  const reader=request.body?.getReader();assert(reader,"Upload body missing");
+  const chunks=[];let length=0;
+  while(true){const {value,done}=await reader.read();if(done)break;length+=value.byteLength;if(length>37000000){await reader.cancel();throw new InputError("Upload exceeds 35 MB");}chunks.push(value);}
+  const payload=new Uint8Array(length);let offset=0;for(const chunk of chunks){payload.set(chunk,offset);offset+=chunk.byteLength;}
+  const parsed=new Request(request.url,{method:"POST",headers:{"Content-Type":request.headers.get("Content-Type")},body:payload});
+  const form=await parsed.formData(),original=form.get("original");
   assert(original && typeof original.arrayBuffer==="function","Choose a file");
   const kind=original.type.startsWith("image/")?"image":"audio";
   const hashBytes=await original.arrayBuffer();
@@ -121,20 +160,21 @@ export async function handle(request,env){
   if(path==="/api/draft"&&request.method==="PUT"){
     const input=await bodyJson(request);
     assert(Number.isInteger(input.revision),"A revision is required");
+    return withWriteLock(env,async()=>{
     const validated=validateDocument(input.data,await assetJson(env,"catalog.json"),env);
+    await checkManagedMedia(env,validated);
     const result=await env.DB.prepare("UPDATE documents SET body=?,revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id='draft' AND revision=?").bind(JSON.stringify(validated),input.revision).run();
     if(!result.meta.changes)return no(409,"This draft changed in another tab. Reload before saving.");
     await audit(env,owner,"save",{revision:input.revision+1});
     return json({revision:input.revision+1});
+    });
   }
   if(path==="/api/publish"&&request.method==="POST"){
     const input=await bodyJson(request),draft=await seed(env);
     if(input.revision!==draft.revision)return no(409,"Save your latest draft before publishing");
-    const token=crypto.randomUUID(),now=Date.now();
-    const lock=await env.DB.prepare("INSERT INTO publish_lock(id,token,until_ms) VALUES(1,?,?) ON CONFLICT(id) DO UPDATE SET token=excluded.token,until_ms=excluded.until_ms WHERE publish_lock.until_ms<?").bind(token,now+120000,now).run();
-    if(!lock.meta.changes)return no(409,"A publication is already in progress");
-    try{
+    return withWriteLock(env,async()=>{
       const data=publishedDocument(validateDocument(JSON.parse(draft.body),await assetJson(env,"catalog.json"),env));
+      await checkManagedMedia(env,data);
       const released=await publish(env,data,draft.revision);
       const {results:media}=await env.DB.prepare("SELECT id FROM media").all();
       const ids=media.filter(m=>mediaUses(data,m.id).length).map(m=>m.id);
@@ -146,25 +186,35 @@ export async function handle(request,env){
       await env.DB.batch(operations);
       await audit(env,owner,"publish",{revision:draft.revision,sha:released.sha});
       return json({...released,revision:draft.revision,status:"deploying"});
-    }finally{await env.DB.prepare("DELETE FROM publish_lock WHERE token=?").bind(token).run();}
+    });
   }
   if(path==="/api/media"&&request.method==="POST")return upload(request,env,owner);
   const mediaMatch=path.match(/^\/api\/media\/([a-f0-9-]{36})$/);
   if(mediaMatch&&request.method==="DELETE"){
+    return withWriteLock(env,async()=>{
     const id=mediaMatch[1],draft=await seed(env),pub=await document(env,"published");
     if(mediaUses(JSON.parse(draft.body),id).length || (pub&&mediaUses(JSON.parse(pub.body),id).length))return no(409,"This media is still used by a draft or a published item");
     const row=await env.DB.prepare("SELECT * FROM media WHERE id=?").bind(id).first();
     if(!row)return no(404,"Media not found");
+    if(row.public){
+      const latest=await env.DB.prepare("SELECT * FROM releases ORDER BY created_at DESC LIMIT 1").first();
+      if(!latest||Date.now()-Date.parse(latest.created_at)<86400000)return no(409,"Previously published media stays available for 24 hours after publishing, so cached pages keep working");
+      const deployment=await github(env,"actions/workflows/pages.yml/runs?head_sha="+latest.sha+"&per_page=5");
+      if(!deployment.ok)return no(409,"Confirm the latest website deployment before deleting previously published media");
+      const runs=(await deployment.json()).workflow_runs;
+      if(!runs.some(r=>r.status==="completed"&&r.conclusion==="success"))return no(409,"The latest website deployment has not succeeded; this media is retained");
+    }
     await env.MEDIA.delete(Object.keys(metadata(row).variants).map(v=>id+"/"+v));
     await env.DB.prepare("DELETE FROM media WHERE id=?").bind(id).run();
     await audit(env,owner,"delete-media",{id});
     return json({deleted:true});
+    });
   }
   if(path==="/api/releases"&&request.method==="GET"){
     const {results}=await env.DB.prepare("SELECT * FROM releases ORDER BY created_at DESC LIMIT 10").all();
     const latest=results[0];
     if(latest){
-      const r=await github(env,"actions/runs?head_sha="+latest.sha+"&per_page=5");
+      const r=await github(env,"actions/workflows/pages.yml/runs?head_sha="+latest.sha+"&per_page=5");
       if(r.ok){
         const {workflow_runs}=await r.json();
         latest.runs=workflow_runs.map(r=>({name:r.name,status:r.status,conclusion:r.conclusion,url:r.html_url}));

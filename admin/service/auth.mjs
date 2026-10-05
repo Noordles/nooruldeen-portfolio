@@ -24,7 +24,7 @@ export async function verifyOwner(request, env, get = fetch) {
     if(env.OWNER_SUB && claims.sub!==env.OWNER_SUB) return null;
     let keys=cache.get(issuer);
     if(!keys || keys.until<Date.now() || !keys.keys.some(k=>k.kid===header.kid)) {
-      const response=await get(issuer+"/cdn-cgi/access/certs");
+      const response=await get(issuer+"/cdn-cgi/access/certs",{signal:AbortSignal.timeout(10000)});
       if(!response.ok) return null;
       const data=await response.json();
       if(!Array.isArray(data.keys)) return null;

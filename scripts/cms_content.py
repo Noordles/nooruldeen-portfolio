@@ -130,17 +130,33 @@ def render_fields(document, path, values, mark=True):
 
 def render_orders(document, path, orders):
     catalog = Catalog(document, path)
+    groups = {g["key"]: g for g in catalog.groups()}
+    def segment(node):
+        start, end = node["start"], node["end"] or len(document)
+        edits = []
+        group = groups.get(node["id"])
+        ordered = None
+        if group and isinstance(orders.get(group["key"]), list):
+            members = group["_nodes"]
+            mapping = {n["id"]: n for n in members}
+            ordered = [x for x in orders[group["key"]] if x in mapping]
+            if len(ordered) != len(set(ordered)): raise ValueError("Duplicate ordering member")
+            ordered.extend(n["id"] for n in members if n["id"] not in ordered)
+            if ordered == [n["id"] for n in members]: ordered = None
+            if ordered:
+                edits.append((members[0]["start"]-start, members[-1]["end"]-start, "\n".join(segment(mapping[x]) for x in ordered)))
+        moved = set(n["id"] for n in group["_nodes"]) if group and ordered else set()
+        for child in node["children"]:
+            if child["id"] in moved or not child["end"]: continue
+            before = document[child["start"]:child["end"]]
+            after = segment(child)
+            if before != after: edits.append((child["start"]-start, child["end"]-start, after))
+        return apply_edits(document[start:end], edits)
     edits = []
-    for group in catalog.groups():
-        order = orders.get(group["key"])
-        if not isinstance(order, list): continue
-        nodes = group["_nodes"]
-        mapping = {n["id"]: n for n in nodes}
-        ids = [x for x in order if x in mapping]
-        if len(ids) != len(set(ids)): raise ValueError("Duplicate ordering member")
-        ids.extend(n["id"] for n in nodes if n["id"] not in ids)
-        if ids == [n["id"] for n in nodes]: continue
-        edits.append((nodes[0]["start"], nodes[-1]["end"], "\n".join(document[mapping[x]["start"]:mapping[x]["end"]] for x in ids)))
+    for node in catalog.roots:
+        if node["end"]:
+            after = segment(node)
+            if after != document[node["start"]:node["end"]]: edits.append((node["start"],node["end"],after))
     return apply_edits(document, edits)
 
 def photo_defaults(document):
@@ -164,7 +180,7 @@ def piano_defaults(document):
     items = []
     for raw in re.findall(r'<article class="track-card.*?</article>', document, re.S):
         key = re.search(r'data-track-card="([^"]+)"',raw)[1]
-        items.append({"id": key, "status":"published", "title":html.unescape(re.search(r"<h3>(.*?)</h3>",raw,re.S)[1]), "description":html.unescape(re.search(r"<p>(.*?)</p>",raw,re.S)[1]), "composer":"Evgeny Grinko" if key=="melting" else "Noor", "notes":"", "difficulty":"", "learnedDate":"", "pieceStatus":"learned" if key=="melting" else "improvised", "audio":"", "video":"", "thumbnail":"", "builtin":key, "legacyHtml":raw})
+        items.append({"id": key, "status":"published", "title":html.unescape(re.search(r"<h3>(.*?)</h3>",raw,re.S)[1]), "description":html.unescape(re.search(r"<p>(.*?)</p>",raw,re.S)[1]), "composer":"Evgeny Grinko" if key=="melting" else "Noor", "notes":"", "difficulty":"", "learnedDate":"", "pieceStatus":"learned" if key=="melting" else "improvised", "audio":"", "video":"", "thumbnail":"", "midi":"", "builtin":key, "legacyHtml":raw})
     return items
 def clean_item(item, defaults):
     return {k: v for k, v in item.items() if k != "legacyHtml"} == {k: v for k, v in defaults.items() if k != "legacyHtml"}
@@ -207,9 +223,12 @@ def piano_html(item, number):
     button=(f'<button class="track-button" type="button" data-track="{esc(built)}" aria-label="Play {esc(item["title"])}" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>' if built and not media else f'<button class="track-button" type="button" data-cms-audio="{esc(media)}" aria-label="Play {esc(item["title"])}" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>' if media else "")
     extra="".join(f"<p>{esc(item.get(k,''))}</p>" for k in ("notes","difficulty","learnedDate") if item.get(k))
     video_link=f'<a class="audio-download-link" href="{esc(video)}" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>' if video else ""
+    midi=item.get("midi","")
+    if midi and not safe_url(midi): raise ValueError("Invalid MIDI URL")
+    midi_link=f'<a class="audio-download-link" href="{esc(midi)}" download>DOWNLOAD MIDI ↓</a>' if midi else ""
     thumbnail=f'<img src="{esc(item["thumbnail"])}" alt="" loading="lazy" width="120" height="120" />' if item.get("thumbnail") and safe_url(item["thumbnail"]) else ""
     description=" · ".join(x for x in (item.get("pieceStatus"),item.get("composer"),item.get("description")) if x)
-    return f'<article class="track-card" data-track-card="{esc(built or item["id"])}"><span class="track-number">{number:02}</span><div class="track-info">{thumbnail}<h3>{esc(item["title"])}</h3><p>{esc(description)}</p>{extra}<div class="track-downloads">{video_link}</div></div><span class="track-duration"></span>{button}<div class="track-progress" role="slider" tabindex="0" {"data-track-seek="+chr(34)+esc(built)+chr(34) if built and not media else "data-cms-seek"} aria-label="Seek in {esc(item["title"])}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></article>'
+    return f'<article class="track-card" data-track-card="{esc(built or item["id"])}"><span class="track-number">{number:02}</span><div class="track-info">{thumbnail}<h3>{esc(item["title"])}</h3><p>{esc(description)}</p>{extra}<div class="track-downloads">{video_link}{midi_link}</div></div><span class="track-duration"></span>{button}<div class="track-progress" role="slider" tabindex="0" {"data-track-seek="+chr(34)+esc(built)+chr(34) if built and not media else "data-cms-seek"} aria-label="Seek in {esc(item["title"])}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></article>'
 def replace_piano(document, items):
     existing={p["id"]:p for p in piano_defaults(document)}
     initial=list(existing.values())
@@ -231,19 +250,21 @@ def replace_piano(document, items):
             extra="".join("<p>"+html.escape(item[k])+"</p>" for k in ("notes","difficulty","learnedDate") if item.get(k))
             if item.get("pieceStatus")!=original.get("pieceStatus") and item.get("pieceStatus"): extra+="<p>"+html.escape(item["pieceStatus"])+"</p>"
             if item.get("video") and safe_url(item["video"]): extra+='<a class="audio-download-link" href="'+html.escape(item["video"],quote=True)+'" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>'
+            if item.get("midi") and safe_url(item["midi"]): extra+='<a class="audio-download-link" href="'+html.escape(item["midi"],quote=True)+'" download>DOWNLOAD MIDI ↓</a>'
             raw=re.sub(r"<p>.*?</p>",lambda m:"<p>"+html.escape(description)+"</p>"+extra,raw,count=1,flags=re.S)
         else: raw=piano_html(item,number)
         cards.append(raw)
     return document[:start]+'<div class="track-list">'+"\n".join(cards)+"</div>"+document[end:]
 
 def render(document, path, configuration):
+    piano_baseline = [{k:v for k,v in p.items() if k!="legacyHtml"} for p in piano_defaults(document)] if path=="hobbies/piano.html" else []
     bindings=[{k:v for k,v in f.items() if k in ("key","node","slot","attribute","value")} for f in Catalog(document,path).fields]
     values=configuration.get("pages",{}).get(path,{})
     document,runtime=render_fields(document,path,values)
     document=render_orders(document,path,configuration.get("orders",{}))
     if path=="hobbies/photos.html" and configuration.get("photos") is not None: document=replace_photos(document,configuration["photos"])
     if path=="hobbies/piano.html" and configuration.get("piano") is not None: document=replace_piano(document,configuration["piano"])
-    data=json.dumps({"bindings":bindings,"pianoDefaults":[{k:v for k,v in p.items() if k!="legacyHtml"} for p in piano_defaults(document)] if path=="hobbies/piano.html" else [],"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
+    data=json.dumps({"bindings":bindings,"pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
     script='<script id="cms-page-data" type="application/json">'+data+'</script><script src="/cms-runtime.js" defer></script>'
     return document.replace("</head>",script+"\n</head>",1)
 def generate(root):
