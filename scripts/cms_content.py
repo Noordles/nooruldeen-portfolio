@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
-SKIP = set("script style noscript template svg canvas".split())
+SKIP = set("script style noscript template svg canvas pre code".split())
 EDIT_ATTRS = {"a": ("href", "title", "aria-label"), "img": ("alt", "src"), "input": ("placeholder",), "textarea": ("placeholder",)}
 CARD_CLASSES = set("work-card topic-feature research-deck-card site-story-preview incsmps-page-card incsmps-gallery-card logo-piece".split())
 CONFIG = {"version": 1, "pages": {}, "orders": {}, "photos": None, "piano": None, "adminOrigin": ""}
@@ -32,7 +32,7 @@ class Catalog(HTMLParser):
         self.stack, self.roots, self.nodes, self.fields = [], [], [], []
         self.feed(document)
         self.close()
-    def offset(self): 
+    def source_offset(self): 
         row, column = self.getpos()
         return self.offsets[row - 1] + column
     def handle_starttag(self, tag, attrs):
@@ -43,7 +43,7 @@ class Catalog(HTMLParser):
         address = (parent["address"] + "/" if parent else "") + f"{tag}:{serial}"
         classes = set((attr.get("class") or "").split())
         excluded = bool(parent and parent["excluded"]) or tag in SKIP or attr.get("aria-hidden") == "true" or "photo-year-section" in classes or "track-list" in classes
-        node = {"id": uid(self.path + "/" + address), "tag": tag, "attrs": attr, "address": address, "children": [], "start": self.offset(), "openEnd": self.offset() + len(self.get_starttag_text()), "end": None, "slots": 0, "excluded": excluded, "section": (parent["section"] if parent else "Metadata"), "parent": parent}
+        node = {"id": uid(self.path + "/" + address), "tag": tag, "attrs": attr, "address": address, "children": [], "start": self.source_offset(), "openEnd": self.source_offset() + len(self.get_starttag_text()), "end": None, "slots": 0, "excluded": excluded, "section": (parent["section"] if parent else "Metadata"), "parent": parent}
         if tag in ("section", "article") and attr.get("id"): node["section"] = attr["id"]
         siblings.append(node)
         self.nodes.append(node)
@@ -62,7 +62,7 @@ class Catalog(HTMLParser):
     def handle_endtag(self, tag):
         for i in range(len(self.stack) - 1, -1, -1):
             if self.stack[i]["tag"] == tag:
-                end = self.document.find(">", self.offset()) + 1
+                end = self.document.find(">", self.source_offset()) + 1
                 for node in self.stack[i:]: node["end"] = end
                 del self.stack[i:]
                 break
@@ -72,7 +72,7 @@ class Catalog(HTMLParser):
         slot = node["slots"]
         node["slots"] += 1
         if node["excluded"] or not any(c.isalpha() for c in data): return
-        start = self.offset()
+        start = self.source_offset()
         # getpos() addresses raw source. Entity spelling is preserved when unchanged.
         end = self.document.find("<", start)
         if end < 0: end = len(self.document)
