@@ -191,7 +191,11 @@ def replace_photos(document, items):
     # Gallery year sections are followed by a closing gallery section and dialog.
     end = document.rfind("</div></section>",start,document.index("<dialog",start)) + len("</div></section>")
     if end < start: raise ValueError("Photography template boundary missing")
-    return document[:start] + "\n".join(sections) + document[end:]
+    result = document[:start] + "\n".join(sections) + document[end:]
+    visible = [p for p in items if p.get("status") == "published"]
+    first = html.escape(visible[0]["full"], quote=True) if visible else ""
+    result = re.sub(r'(<a class="photo-viewer-download"[^>]*\bhref=")[^"]*(")', lambda m: m[1]+first+m[2], result, count=1)
+    return result
 def piano_html(item, number):
     esc=lambda x:html.escape(str(x),quote=True)
     media=item.get("audio","")
