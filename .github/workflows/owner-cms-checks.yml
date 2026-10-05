@@ -30,3 +30,6 @@ jobs:
         run: python3 scripts/validate_site.py dist
       - name: Build protected admin catalog
         run: python3 scripts/cms_content.py --admin-export admin/service/ui
+      - name: Bundle the private Worker without deploying
+        working-directory: admin/service
+        run: npx --yes wrangler@4.147.0 deploy --dry-run --outdir ../../work/owner-cms-worker

@@ -10,7 +10,7 @@
     if(typeof value!=="string"||/[\x00-\x20\\]/.test(value)||value.startsWith("//"))return false;
     try{const u=new URL(value,location.origin);return !u.username&&!u.password&&["https:","http:","mailto:","tel:"].includes(u.protocol);}catch{return false;}
   };
-  const asset=value=>value&&(/^[a-z][a-z0-9+.-]*:/i.test(value)||value.startsWith("/")||value.startsWith("#")?value:"/"+value);
+  const asset=value=>value&&(/^[a-z][a-z0-9+.-]*:/i.test(value)||value.startsWith("/")||value.startsWith("#")||value.startsWith("?")?value:"/"+value);
   const nodeFor=id=>document.querySelector('[data-cms-node="'+id+'"]');
   function apply(language=document.documentElement.lang||"en"){
     for(const field of overrides){
@@ -108,8 +108,8 @@
         const parent=nodeFor(group);if(!parent||!Array.isArray(ids))continue;
         for(const id of ids){const node=nodeFor(id);if(node&&node.parentElement===parent)parent.append(node);}
       }
-      if(config.page==="hobbies/photos.html"&&Array.isArray(data.photos))previewPhotos(data.photos);
-      if(config.page==="hobbies/piano.html"&&Array.isArray(data.piano))previewPiano(data.piano);
+      if(config.collection==="photos"&&Array.isArray(data.photos))previewPhotos(data.photos);
+      if(config.collection==="piano"&&Array.isArray(data.piano))previewPiano(data.piano);
       apply();
     });
   }

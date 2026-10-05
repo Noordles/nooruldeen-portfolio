@@ -43,7 +43,7 @@ class Catalog(HTMLParser):
         address = (parent["address"] + "/" if parent else "") + f"{tag}:{serial}"
         classes = set((attr.get("class") or "").split())
         excluded = bool(parent and parent["excluded"]) or tag in SKIP or attr.get("aria-hidden") == "true" or "photo-year-section" in classes or "track-list" in classes
-        node = {"id": uid(self.path + "/" + address), "tag": tag, "attrs": attr, "address": address, "children": [], "start": self.source_offset(), "openEnd": self.source_offset() + len(self.get_starttag_text()), "end": None, "slots": 0, "excluded": excluded, "section": (parent["section"] if parent else "Metadata"), "parent": parent}
+        node = {"id": attr.get("data-cms-id") or uid(self.path + "/" + address), "tag": tag, "attrs": attr, "address": address, "children": [], "start": self.source_offset(), "openEnd": self.source_offset() + len(self.get_starttag_text()), "end": None, "slots": 0, "excluded": excluded, "section": (parent["section"] if parent else "Metadata"), "parent": parent}
         if tag in ("section", "article") and attr.get("id"): node["section"] = attr["id"]
         siblings.append(node)
         self.nodes.append(node)
@@ -225,10 +225,11 @@ def piano_html(item, number):
     video_link=f'<a class="audio-download-link" href="{esc(video)}" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>' if video else ""
     midi=item.get("midi","")
     if midi and not safe_url(midi): raise ValueError("Invalid MIDI URL")
+    audio_link=f'<a class="audio-download-link" href="{esc(media)}" download>DOWNLOAD AUDIO ↓</a>' if media else ""
     midi_link=f'<a class="audio-download-link" href="{esc(midi)}" download>DOWNLOAD MIDI ↓</a>' if midi else ""
     thumbnail=f'<img src="{esc(item["thumbnail"])}" alt="" loading="lazy" width="120" height="120" />' if item.get("thumbnail") and safe_url(item["thumbnail"]) else ""
     description=" · ".join(x for x in (item.get("pieceStatus"),item.get("composer"),item.get("description")) if x)
-    return f'<article class="track-card" data-track-card="{esc(built or item["id"])}"><span class="track-number">{number:02}</span><div class="track-info">{thumbnail}<h3>{esc(item["title"])}</h3><p>{esc(description)}</p>{extra}<div class="track-downloads">{video_link}{midi_link}</div></div><span class="track-duration"></span>{button}<div class="track-progress" role="slider" tabindex="0" {"data-track-seek="+chr(34)+esc(built)+chr(34) if built and not media else "data-cms-seek"} aria-label="Seek in {esc(item["title"])}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></article>'
+    return f'<article class="track-card" data-track-card="{esc(built or item["id"])}"><span class="track-number">{number:02}</span><div class="track-info">{thumbnail}<h3>{esc(item["title"])}</h3><p>{esc(description)}</p>{extra}<div class="track-downloads">{video_link}{midi_link}{audio_link}</div></div><span class="track-duration"></span>{button}<div class="track-progress" role="slider" tabindex="0" {"data-track-seek="+chr(34)+esc(built)+chr(34) if built and not media else "data-cms-seek"} aria-label="Seek in {esc(item["title"])}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div></article>'
 def replace_piano(document, items):
     existing={p["id"]:p for p in piano_defaults(document)}
     initial=list(existing.values())
@@ -240,10 +241,12 @@ def replace_piano(document, items):
     for item in items:
         if item.get("status")!="published": continue
         number=len(cards)+1
-        if item["id"] in existing and item.get("builtin") and not item.get("audio") and not item.get("thumbnail"):
+        if item["id"] in existing and item.get("builtin") and not item.get("audio"):
             original=existing[item["id"]]
             raw=original["legacyHtml"]
             raw=re.sub(r'(<span class="track-number">).*?(</span>)',lambda m:m[1]+f"{number:02}"+m[2],raw,count=1)
+            if item.get("thumbnail") and safe_url(item["thumbnail"]):
+                raw=raw.replace("<h3>",'<img src="'+html.escape(item["thumbnail"],quote=True)+'" alt="" loading="lazy" width="120" height="120" /><h3>',1)
             raw=re.sub(r"<h3>.*?</h3>",lambda m:"<h3>"+html.escape(item["title"])+"</h3>",raw,count=1,flags=re.S)
             description=item.get("description","")
             if item.get("composer")!=original.get("composer"): description=" · ".join(x for x in (item.get("composer"),description) if x)
@@ -264,7 +267,7 @@ def render(document, path, configuration):
     document=render_orders(document,path,configuration.get("orders",{}))
     if path=="hobbies/photos.html" and configuration.get("photos") is not None: document=replace_photos(document,configuration["photos"])
     if path=="hobbies/piano.html" and configuration.get("piano") is not None: document=replace_piano(document,configuration["piano"])
-    data=json.dumps({"bindings":bindings,"pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
+    data=json.dumps({"bindings":bindings,"collection":"photos" if path=="hobbies/photos.html" else "piano" if path=="hobbies/piano.html" else "","pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
     script='<script id="cms-page-data" type="application/json">'+data+'</script><script src="/cms-runtime.js" defer></script>'
     return document.replace("</head>",script+"\n</head>",1)
 def generate(root):

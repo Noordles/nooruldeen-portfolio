@@ -1,0 +1,52 @@
+name: Deploy owner CMS
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'admin/service/**'
+      - 'pages/**'
+      - 'scripts/cms_content.py'
+      - 'scripts/configure_owner_cms.py'
+      - 'scripts/owner_cms_secrets.py'
+      - '.github/workflows/owner-cms-deploy.yml'
+permissions:
+  contents: read
+concurrency:
+  group: owner-cms-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: vars.OWNER_CMS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: owner-cms
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CMS_D1_DATABASE_ID: ${{ vars.CMS_D1_DATABASE_ID }}
+      CMS_ACCESS_TEAM_DOMAIN: ${{ vars.CMS_ACCESS_TEAM_DOMAIN }}
+      CMS_ACCESS_AUD: ${{ vars.CMS_ACCESS_AUD }}
+      CMS_OWNER_EMAIL: ${{ vars.CMS_OWNER_EMAIL }}
+      CMS_OWNER_SUB: ${{ vars.CMS_OWNER_SUB }}
+      CMS_ADMIN_ORIGIN: https://admin.nooruldeen.com
+      CMS_GITHUB_APP_ID: ${{ vars.CMS_GITHUB_APP_ID }}
+      CMS_GITHUB_INSTALLATION_ID: ${{ vars.CMS_GITHUB_INSTALLATION_ID }}
+      CMS_GITHUB_PRIVATE_KEY: ${{ secrets.CMS_GITHUB_PRIVATE_KEY }}
+      CMS_GITHUB_TOKEN: ${{ secrets.CMS_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Generate validated deployment configuration
+        run: python3 scripts/configure_owner_cms.py
+      - name: Generate the private content catalog
+        run: python3 scripts/cms_content.py --admin-export admin/service/ui
+      - name: Apply database migrations
+        run: npx --yes wrangler@4.147.0 d1 migrations apply noor-owner-cms --remote --config admin/service/wrangler.production.json
+      - name: Prepare the server publishing credential
+        run: python3 scripts/owner_cms_secrets.py
+      - name: Deploy the protected owner service and credential
+        run: npx --yes wrangler@4.147.0 deploy --config admin/service/wrangler.production.json --secrets-file admin/service/.secrets.json
+      - name: Remove the temporary publishing credential
+        if: always()
+        run: python3 scripts/owner_cms_secrets.py --clear

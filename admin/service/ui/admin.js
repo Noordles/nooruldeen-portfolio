@@ -28,7 +28,7 @@ function field(label,value,update,{type="text",multiline=false,options,placehold
 function pageName(p){const names={"/":"Home","/design/":"Design","/idrl/":"IDRL","/incsmps/":"INCSMPS","/photos/":"Photography","/piano/":"Piano","/research/":"Research","/site-story/":"How the site was made"};return names[p.route]||p.route.split("/").filter(Boolean).at(-1).replaceAll("-"," ");}
 function navigate(view){state.view=view;state.selected=null;state.section=null;render();navigation();}
 function navigation(){
-  const entries=[["dashboard","Dashboard"],["photos","Photography"],["piano","Piano"],["media","Media library"],["settings","Settings"]];
+  const entries=[["dashboard","Dashboard"],["website","Website content"],["photos","Photography"],["piano","Piano"],["media","Media library"],["settings","Settings"]];
   const nav=$("#navigation"),mobile=$("#mobile-nav");nav.replaceChildren();mobile.replaceChildren();
   for(const [value,label] of entries){nav.append(button(label,()=>navigate(value),state.view===value?"active":""));mobile.append(element("option",{value,text:label}));}
   nav.append(text("div","PAGES","nav-label"));
@@ -89,6 +89,7 @@ async function optimize(file,max){
   if(!blob)throw new Error("Your browser could not process this image");return blob;
 }
 async function uploads(files,onUploaded){
+  let uploaded=0;const errors=[];
   for(let i=0;i<files.length;i++){
     let file=files[i];
     const canonical={"audio/x-wav":"audio/wav","audio/wave":"audio/wav","audio/x-midi":"audio/midi"}[file.type]||(!file.type&&/\.mid(i)?$/i.test(file.name)?"audio/midi":file.type);
@@ -103,10 +104,11 @@ async function uploads(files,onUploaded){
       }
       const result=await api("media",{method:"POST",body:form});
       if(!state.media.some(m=>m.id===result.media.id))state.media.unshift(result.media);
+      uploaded++;
       if(onUploaded)onUploaded(allMedia().find(m=>m.id===result.media.id),file);
-    }catch(error){notice(file.name+": "+error.message,true);}
+    }catch(error){errors.push(file.name+": "+error.message);notice(errors.at(-1),true);}
   }
-  if(onUploaded)changed();render();notice("Uploads finished. Save the draft when you are ready.");
+  if(onUploaded&&uploaded)changed();render();notice(errors.length?uploaded+" uploaded. "+errors.join(" · "):uploaded+" uploaded. Save the draft when you are ready.",Boolean(errors.length));
 }
 function uploadButton(label,kind,onUploaded,multiple=true){
   const input=element("input",{type:"file",accept:kind==="image"?"image/jpeg,image/png,image/webp":"audio/mpeg,audio/wav,audio/midi",...(multiple?{multiple:""}:{})});
@@ -176,9 +178,46 @@ function pageEditor(main){
     panel.append(orderRows);main.append(panel);
   }
 }
+function websiteEditor(main){
+  main.append(...heading("Website content","Edit shared wording and links across the website. Use Pages for text that belongs to one page."));
+  const groups=new Map();
+  for(const page of state.catalog.pages)for(const f of page.fields){
+    if(f.value.length<2)continue;
+    const key=(f.attribute||"text")+":"+f.value;
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push({page,f});
+  }
+  const shared=[...groups.values()].filter(g=>new Set(g.map(x=>x.page.id)).size>1);
+  const toolbar=element("div",{class:"toolbar"});
+  toolbar.append(field("Language",state.lang,v=>{state.lang=v;render();},{options:["en","ro","ar"]}));
+  const search=element("input",{type:"search",placeholder:"Search shared names, navigation, labels or links","aria-label":"Search website content"});
+  search.value=state.globalSearch||"";toolbar.append(search);main.append(toolbar);
+  const fields=element("div",{class:"fields"});main.append(fields);
+  const draw=()=>{
+    state.globalSearch=search.value;
+    const matches=shared.filter(g=>g[0].f.value.toLowerCase().includes(search.value.toLowerCase()));
+    fields.replaceChildren();
+    for(const group of matches.slice(0,60)){
+      const {page,f}=group[0],overrides=state.data.pages[page.id]?.[f.key]||{};
+      const update=value=>{for(const {page,f} of group){state.data.pages[page.id]??={};state.data.pages[page.id][f.key]??={};state.data.pages[page.id][f.key][state.lang]=value;}};
+      const box=element("div",{class:"field"});
+      box.append(text("div",f.value,"field-label"),text("small","Shared across "+new Set(group.map(x=>x.page.id)).size+" pages"));
+      const input=field(f.attribute||"Text",overrides[state.lang]??(state.lang==="en"?f.value:""),update,{multiline:!f.attribute&&f.value.length>70,placeholder:state.lang==="en"?"":"Keep the existing translation"});
+      if(state.lang==="ar")input.lastElementChild.dir="rtl";
+      box.append(input);
+      if(f.attribute==="src")box.append(button("Choose image for these pages",()=>chooseMedia(m=>update(m.full))));
+      box.append(button("Restore defaults",()=>{for(const {page,f} of group)if(state.data.pages[page.id]?.[f.key])delete state.data.pages[page.id][f.key][state.lang];changed();draw();}));
+      fields.append(box);
+    }
+    if(matches.length>60)fields.append(text("p","Showing 60 shared fields. Search to find a specific phrase.","muted"));
+    if(!matches.length)fields.append(text("p","No shared fields match this search. Select a page for its own content.","empty"));
+  };
+  search.addEventListener("input",draw);draw();
+}
 function render(){
   const main=$("#workspace");main.replaceChildren();
   if(state.view==="photos"||state.view==="piano")editCollection(state.view,main);
+  else if(state.view==="website")websiteEditor(main);
   else if(state.view.startsWith("page:"))pageEditor(main);
   else if(state.view==="media"){
     main.append(...heading("Media library","Browse existing site images and new uploads. Uploaded originals stay private; the website uses optimized copies."));
@@ -200,6 +239,24 @@ function render(){
     main.append(...heading("Settings","Your owner session and publishing connection."));
     const panel=element("section",{class:"panel"});
     panel.append(text("h2","Signed in as "+state.session.owner.email),text("p","Website: "+state.session.siteOrigin),text("p","Admin: "+state.session.adminOrigin),text("p","Drafts and originals are held in private storage. Publish saves a version to the site repository, then the existing deployment rebuilds the public pages."),element("a",{href:"/cdn-cgi/access/logout",text:"Sign out of this owner session ↗"}));main.append(panel);
+    const backup=element("section",{class:"panel"},[text("h2","Content backup"),text("p","Export your current content and draft. Uploaded files remain in your media library.")]);
+    backup.append(button("Download content backup",()=>{
+      const url=URL.createObjectURL(new Blob([JSON.stringify(state.data,null,2)],{type:"application/json"}));
+      const link=element("a",{href:url,download:"noor-content-"+new Date().toISOString().slice(0,10)+".json"});link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }));
+    const restore=element("input",{type:"file",accept:"application/json,.json"});restore.hidden=true;
+    restore.addEventListener("change",async()=>{
+      const file=restore.files[0];if(!file)return;
+      try{
+        if(file.size>1800000)throw new Error("This content backup is too large");
+        const data=JSON.parse(await file.text());
+        if(data.version!==1||!data.pages||!Array.isArray(data.photos)||!Array.isArray(data.piano))throw new Error("Choose an owner CMS content backup");
+        if(!confirm("Replace this draft with the selected backup? The live website changes only when you publish."))return;
+        const result=await api("draft",{method:"PUT",body:JSON.stringify({revision:state.revision,data})});
+        state.data=data;state.revision=result.revision;state.dirty=false;$("#save-state").textContent="Backup restored to draft";render();notice("Backup restored privately. Preview it before publishing.");
+      }catch(e){notice(e.message,true);}
+    });
+    backup.append(button("Restore content backup",()=>restore.click()),restore);main.append(backup);
   }else{
     main.append(...heading("Your website, within reach.","Edit a page, prepare a photograph, or add a piano piece. Save privately as you work, then preview and publish when ready."));
     const stats=element("div",{class:"stats"});
