@@ -1544,3 +1544,6 @@ html[dir=rtl] main :is(button,.detail-return,.idrl-case-link,.idrl-hero-cta,.sit
 @media(max-width:760px) {
   .photo-viewer { width:100%;max-width:100%; }
 }
+
+/* Research charts use fixed left-to-right numeric coordinates in every locale. */
+.project-chart,.spatial-results-chart,.spatial-results-chart-wrap { direction:ltr;unicode-bidi:isolate; }
