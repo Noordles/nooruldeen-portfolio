@@ -1569,3 +1569,36 @@ html[lang="ar"] .brand-name .brand-arabic-name .name-highlight { padding-inline:
 @media (min-width:641px) and (max-width:1000px) { html[dir="rtl"] .topline { padding-left:20px;padding-right:88px; } }
 
 @media(max-width:380px) { html[dir="rtl"] .detail-hero.illustrated-hero h1 { font-size:clamp(26px,9.1cqw,32px); } }
+
+
+
+/* Selected INCSMPS page designs: present the original Figma captures as a browsable gallery. */
+.incsmps-hero-actions .incsmps-page-gallery-link { border-color:rgba(233,224,207,.38);background:rgba(15,18,17,.56); }
+.incsmps-hero-actions .incsmps-page-gallery-link:hover { border-color:var(--teal); }
+.incsmps-gallery-section { padding-bottom:clamp(58px,8vw,104px); }
+.incsmps-screen-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:34px 0 0; }
+.incsmps-screen-card { min-width:0;overflow:hidden;border:1px solid rgba(51,51,153,.62);background:rgba(17,20,20,.92);box-shadow:0 12px 32px rgba(0,0,0,.18); }
+.incsmps-screen-preview { position:relative;display:block;height:clamp(250px,31vw,410px);overflow:hidden;background:#f7f7f5; }
+.incsmps-screen-preview img { display:block;width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .45s ease; }
+.incsmps-screen-preview::after { position:absolute;inset:45% 0 0;content:"";background:linear-gradient(transparent,rgba(15,17,20,.42));pointer-events:none; }
+.incsmps-screen-open { position:absolute;right:12px;bottom:12px;z-index:1;display:inline-flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid rgba(255,255,255,.45);background:rgba(23,25,30,.9);color:#fff;font:500 7px/1.2 var(--mono);letter-spacing:.09em; }
+.incsmps-screen-open .arrow-glyph { color:#f1c535;font-size:12px; }
+.incsmps-screen-preview:hover img { transform:scale(1.025); }
+.incsmps-screen-preview:focus-visible { outline:3px solid #e9be34;outline-offset:-3px; }
+.incsmps-screen-caption { min-height:82px;padding:14px 15px 15px;border-top:1px solid rgba(236,228,210,.12); }
+.incsmps-screen-label { display:block;color:#8faaa5;font:500 7px/1.4 var(--mono);letter-spacing:.105em; }
+.incsmps-screen-caption h3 { margin:8px 0 0;color:var(--paper);font:600 clamp(1rem,1.4vw,1.25rem)/1.2 var(--display); }
+html[dir="rtl"] .incsmps-screen-caption { text-align:right; }
+html[dir="rtl"] .incsmps-screen-open { right:auto;left:12px; }
+@media (max-width:1050px) {
+  .incsmps-screen-grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:13px; }
+  .incsmps-screen-preview { height:clamp(250px,38vw,380px); }
+}
+@media (max-width:620px) {
+  .incsmps-screen-grid { grid-template-columns:minmax(0,1fr);max-width:540px;margin-left:auto;margin-right:auto; }
+  .incsmps-screen-preview { height:clamp(300px,86vw,380px); }
+  .incsmps-screen-caption { min-height:76px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .incsmps-screen-preview img { transition:none; }
+}
