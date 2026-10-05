@@ -1,0 +1,32 @@
+name: Owner CMS checks
+on:
+  push:
+    branches: [owner-cms]
+  pull_request:
+    paths: ['admin/**', 'content/**', 'scripts/**', 'tests/**', '.github/workflows/owner-cms-checks.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Run content and design preservation checks
+        run: python3 -m unittest discover -s tests -p 'test_cms*.py' -v
+      - name: Run authentication and upload checks
+        run: node --test admin/service/tests/*.test.mjs
+      - name: Check browser JavaScript syntax
+        run: |
+          node --check admin/service/ui/admin.js
+          node --check scripts/browser/cms-runtime.js
+          node --check scripts/browser/photos-gallery.js
+          node --check scripts/browser/piano-player.js
+          node --check scripts/browser/language-switcher.js
+      - name: Build public pages without altering their layout
+        run: python3 scripts/build_site.py
+      - name: Validate public pages
+        run: python3 scripts/validate_site.py dist
+      - name: Build protected admin catalog
+        run: python3 scripts/cms_content.py --admin-export admin/service/ui

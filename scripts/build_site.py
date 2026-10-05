@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import cms_content
 import html
 import json
 import re
@@ -26,6 +27,7 @@ PUBLIC_SCRIPT_NAMES = {
     "piano-melting.js",
     "research-presentation.js",
     "language-switcher.js",
+    "cms-runtime.js",
 }
 HTML_ATTRIBUTE = re.compile(
     r"""(?P<prefix>\b(?:href|src|poster|action|data-src|data-poster|data-href|srcset)\s*=\s*)(?P<quote>["'])(?P<value>.*?)(?P=quote)""",
@@ -177,6 +179,7 @@ def main() -> int:
     if missing:
         return fail("Required site input is missing: " + ", ".join(missing))
 
+    configuration = cms_content.read_json(ROOT / "content" / "published.json", cms_content.CONFIG)
     stylesheet_version = hashlib.sha256(STYLE_SOURCE.read_bytes()).hexdigest()[:12]
     language_script = BROWSER_SCRIPT_ROOT / "language-switcher.js"
     if not language_script.is_file():
@@ -221,7 +224,7 @@ def main() -> int:
         route = public_route(output_path)
         destination = OUTPUT / output_path
         destination.parent.mkdir(parents=True, exist_ok=True)
-        document = source.read_text(encoding="utf-8")
+        document = cms_content.render(source.read_text(encoding="utf-8"), source.relative_to(PAGE_ROOT).as_posix(), configuration)
         document = rewrite_html_references(document, page_routes, stylesheet_version)
         if route == "/":
             document = add_homepage_alias_redirect(document)
@@ -245,6 +248,20 @@ def main() -> int:
         (OUTPUT / source.name).write_text(script_text, encoding="utf-8")
     for directory in ASSET_DIRECTORIES:
         shutil.copytree(ROOT / directory, OUTPUT / directory)
+    cms_content.export(ROOT, OUTPUT / "cms")
+    admin_origin = configuration.get("adminOrigin", "")
+    if admin_origin and (not admin_origin.startswith("https://") or not cms_content.safe_url(admin_origin)):
+        return fail("Admin origin must be an HTTPS URL")
+    admin_output = OUTPUT / "admin"
+    admin_output.mkdir()
+    target = admin_origin.rstrip("/") + "/admin" if admin_origin else ""
+    owner_entry = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Owner sign-in — Noor</title></head><body><main><h1>Owner administration</h1>'
+    if target:
+        owner_entry += '<p><a href="' + html.escape(target, quote=True) + '">Continue to secure owner sign-in</a></p><script>location.replace(' + json.dumps(target).replace("<", "\\u003c") + ')</script>'
+    else:
+        owner_entry += '<p>The owner administration service is being set up.</p>'
+    (admin_output / "index.html").write_text(owner_entry + "</main></body></html>", encoding="utf-8")
+
     shutil.copy2(ROOT / "CNAME", OUTPUT / "CNAME")
     (OUTPUT / ".nojekyll").touch()
 
