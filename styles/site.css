@@ -1547,3 +1547,25 @@ html[dir=rtl] main :is(button,.detail-return,.idrl-case-link,.idrl-hero-cta,.sit
 
 /* Research charts use fixed left-to-right numeric coordinates in every locale. */
 .project-chart,.spatial-results-chart,.spatial-results-chart-wrap { direction:ltr;unicode-bidi:isolate; }
+
+
+/* Isolate the Latin identity and contact values from surrounding Arabic text. */
+.full-name,.footer-name,#hero-title[dir="ltr"],#about-title[dir="ltr"],
+.contact-fullname[dir="ltr"],.contact-links > a > b[dir="ltr"] { unicode-bidi:isolate; }
+.full-name { display:inline-block; }
+.personal-name-part { display:inline-block;white-space:nowrap;overflow-wrap:normal; }
+.contact-links > a[href^="tel:"] > b { white-space:nowrap;word-break:normal;overflow-wrap:normal; }
+
+
+/* Show Noor’s Arabic name in the shared masthead in Arabic mode. */
+.brand-name .brand-arabic-name { display:none; }
+html[lang="ar"] .brand-name > .full-name[dir="ltr"] { display:none; }
+html[lang="ar"] .brand-name > .brand-arabic-name { display:inline-block;direction:rtl;unicode-bidi:isolate;text-align:right;font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:0;line-height:1.3;white-space:nowrap; }
+html[lang="ar"] .brand-name .brand-arabic-name .name-highlight { padding-inline:.07em; }
+.site-story-preview-content > strong[dir="ltr"] { direction:ltr;unicode-bidi:isolate;text-align:left;overflow-wrap:normal; }
+
+
+/* Leave space for the fixed right rail so the Arabic masthead stays visible. */
+@media (min-width:641px) and (max-width:1000px) { html[dir="rtl"] .topline { padding-left:20px;padding-right:88px; } }
+
+@media(max-width:380px) { html[dir="rtl"] .detail-hero.illustrated-hero h1 { font-size:clamp(26px,9.1cqw,32px); } }

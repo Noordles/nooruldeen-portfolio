@@ -137,7 +137,7 @@
     ["Corruption,","Corupție,","الفساد،"],
     ["protest & migration.","protest și migrație.","والاحتجاج والهجرة."],
     ["Research by Noor, including collaborative work and independent studies. This project with his colleague David examines connections between corruption, protest, and migration.","Cercetare realizată de Noor, atât în colaborare, cât și independent. Acest proiect, realizat împreună cu colegul său David, analizează legăturile dintre corupție, protest și migrație.","أبحاث نور تشمل أعمالًا تعاونية ودراسات مستقلة. يبحث هذا المشروع، الذي أنجزه مع زميله David، الروابط بين الفساد والاحتجاج والهجرة."],
-    ["Shifting Shadows","Umbre în schimbare","ظلال متحركة"],
+    ["Shifting Shadows","Shifting Shadows","Shifting Shadows"],
     ["This collaborative study asks how corruption perceptions, recorded protest activity and emigration totals vary together across countries. It combines descriptive statistics, tests and regression, with notes on its samples and limitations.","Acest studiu colaborativ analizează cum variază împreună percepțiile despre corupție, protestele înregistrate și emigrația în diferite țări. Combină statistici descriptive, teste și regresie și descrie eșantioanele și limitele analizei.","تبحث هذه الدراسة التعاونية في تباين تصورات الفساد والاحتجاجات المسجلة وأعداد الهجرة بين البلدان. وتجمع بين الإحصاء الوصفي والاختبارات والانحدار، مع توضيح العينات والقيود."],
     ["PROJECT THEMES","TEMELE PROIECTULUI","موضوعات المشروع"],
     ["QUESTIONS NOOR FOLLOWS","ÎNTREBĂRI PE CARE LE URMĂREȘTE NOOR","قضايا يتابعها نور"],
@@ -402,6 +402,758 @@
   ];
 
   entries.forEach((entry) => add(entry[0], entry[1], entry[2]));
+
+  const projectTranslations = [
+  [
+    "Al Sammarraie Nooruldeen, home",
+    "Acasă — Al Sammarraie Nooruldeen",
+    "السامرائي نورالدين، الرئيسية"
+  ],
+  [
+    "Informality Data Research Lab",
+    "Informality Data Research Lab",
+    "Informality Data Research Lab"
+  ],
+  [
+    "DESIGN / AL SAMARRAIE NOORULDEEN",
+    "DESIGN / AL SAMARRAIE NOORULDEEN",
+    "تصميم / السامرائي نورالدين"
+  ],
+  [
+    "WEB / APP / IDENTITY / MOTION",
+    "WEB / APLICAȚII / IDENTITATE / ANIMAȚIE",
+    "ويب / تطبيقات / هوية / حركة"
+  ],
+  [
+    "01 / SELECTED PROJECT",
+    "01 / PROIECT SELECTAT",
+    "01 / مشروع مختار"
+  ],
+  [
+    "OFFICIAL WORK",
+    "LUCRĂRI OFICIALE",
+    "أعمال رسمية"
+  ],
+  [
+    "OFFICIAL WORK / VISUAL IDENTITY",
+    "LUCRĂRI OFICIALE / IDENTITATE VIZUALĂ",
+    "أعمال رسمية / هوية بصرية"
+  ],
+  [
+    "OFFICIAL WORK / WEBSITE + IDENTITY",
+    "LUCRĂRI OFICIALE / SITE + IDENTITATE",
+    "أعمال رسمية / موقع + هوية"
+  ],
+  [
+    "OFFICIAL WORK / WEBSITE DESIGN / FIGMA",
+    "LUCRĂRI OFICIALE / DESIGN WEB / FIGMA",
+    "أعمال رسمية / تصميم الموقع / FIGMA"
+  ],
+  [
+    "OFFICIAL DESIGN / IDRL + INCSMPS",
+    "DESIGN OFICIAL / IDRL + INCSMPS",
+    "تصميم رسمي / IDRL + INCSMPS"
+  ],
+  [
+    "A complete website and visual identity for IDRL, alongside a near-complete, multi-page INCSMPS website design.",
+    "Un site complet și o identitate vizuală pentru IDRL, alături de designul aproape finalizat al site-ului INCSMPS, cu mai multe pagini.",
+    "موقع متكامل وهوية بصرية لمختبر IDRL، إلى جانب تصميم شبه مكتمل ومتعدد الصفحات لموقع INCSMPS."
+  ],
+  [
+    "I designed the complete IDRL website as well as its visual identity, bringing the lab’s research into one clear digital experience.",
+    "Am proiectat întregul site IDRL, precum și identitatea sa vizuală, reunind cercetarea laboratorului într-o experiență digitală clară.",
+    "صممت موقع IDRL بالكامل إلى جانب هويته البصرية، وجمعت أبحاث المختبر في تجربة رقمية واضحة."
+  ],
+  [
+    "EXPLORE IDRL WEBSITE + IDENTITY",
+    "EXPLOREAZĂ SITE-UL ȘI IDENTITATEA IDRL",
+    "استكشف موقع IDRL وهويته"
+  ],
+  [
+    "OFFICIAL PROJECT / WEBSITE + IDENTITY",
+    "PROIECT OFICIAL / SITE + IDENTITATE",
+    "مشروع رسمي / موقع + هوية"
+  ],
+  [
+    "OFFICIAL PROJECT / WEBSITE DESIGN",
+    "PROIECT OFICIAL / DESIGN WEB",
+    "مشروع رسمي / تصميم موقع"
+  ],
+  [
+    "INCSMPS · ROMANIA",
+    "INCSMPS · ROMÂNIA",
+    "INCSMPS · رومانيا"
+  ],
+  [
+    "ACTUAL FIGMA FRAME INDEX",
+    "INDEXUL REAL AL CADRELOR FIGMA",
+    "فهرس الإطارات الفعلي في FIGMA"
+  ],
+  [
+    "7 page frames",
+    "7 cadre de pagină",
+    "7 إطارات للصفحات"
+  ],
+  [
+    "6 desktop + mobile pairs",
+    "6 perechi desktop și mobil",
+    "6 أزواج لسطح المكتب والهاتف"
+  ],
+  [
+    "ACASA",
+    "ACASĂ",
+    "الرئيسية"
+  ],
+  [
+    "MOBILE",
+    "MOBIL",
+    "الهاتف"
+  ],
+  [
+    "A digital home",
+    "Un spațiu digital",
+    "مساحة رقمية"
+  ],
+  [
+    "for research.",
+    "pentru cercetare.",
+    "للأبحاث."
+  ],
+  [
+    "A near-complete website design for the National Scientific Research Institute for Labour and Social Protection. The design covers a seven-page set of desktop and mobile frames; the website has not launched.",
+    "Un design aproape finalizat al site-ului Institutului Național de Cercetare Științifică pentru Muncă și Protecție Socială. Proiectul cuprinde șapte pagini pentru desktop și mobil; site-ul nu a fost lansat.",
+    "تصميم شبه مكتمل لموقع المعهد الوطني للبحوث العلمية في مجال العمل والحماية الاجتماعية. يشمل التصميم سبع صفحات بإطارات للحاسوب والهاتف؛ ولم يُطلق الموقع."
+  ],
+  [
+    "EXPLORE THE INCSMPS DESIGN",
+    "EXPLOREAZĂ DESIGNUL INCSMPS",
+    "استكشف تصميم INCSMPS"
+  ],
+  [
+    "INDEPENDENT PROJECTS · MADE BY NOOR",
+    "PROIECTE INDEPENDENTE · CREATE DE NOOR",
+    "مشاريع مستقلة · من صنع نور"
+  ],
+  [
+    "THINGS I MADE FOR MYSELF.",
+    "LUCRURI CREATE PENTRU MINE.",
+    "أشياء صنعتها لنفسي."
+  ],
+  [
+    "SEE HOW THE SITE CAME TOGETHER ↗",
+    "VEZI CUM A LUAT FORMĂ SITE-UL ↗",
+    "شاهد كيف تكوّن الموقع ↗"
+  ],
+  [
+    "PERSONAL STUDY / FASHION WORDMARK",
+    "STUDIU PERSONAL / WORDMARK DE MODĂ",
+    "دراسة شخصية / شعار نصي للأزياء"
+  ],
+  [
+    "PERSONAL STUDY / 01",
+    "STUDIU PERSONAL / 01",
+    "دراسة شخصية / 01"
+  ],
+  [
+    "A WEBSITE BUILT TO HOLD MORE THAN WORK.",
+    "UN SITE CARE CUPRINDE MAI MULT DECÂT MUNCA.",
+    "موقع يجمع أكثر من مجرد العمل."
+  ],
+  [
+    "DESIGN / DIGITAL CRAFT",
+    "DESIGN / CREAȚIE DIGITALĂ",
+    "تصميم / إبداع رقمي"
+  ],
+  [
+    "BACK TO SELECTED WORK",
+    "ÎNAPOI LA PROIECTELE SELECTATE",
+    "العودة إلى الأعمال المختارة"
+  ],
+  [
+    "BACK TO SELECTED WORK ↙",
+    "ÎNAPOI LA PROIECTELE SELECTATE ↙",
+    "العودة إلى الأعمال المختارة ↙"
+  ],
+  [
+    "BACK TO RESEARCH",
+    "ÎNAPOI LA CERCETARE",
+    "العودة إلى الأبحاث"
+  ],
+  [
+    "A project brief for choosing comparable economic indicators, checking their coverage, and describing change across places and years.",
+    "Un rezumat de proiect pentru alegerea unor indicatori economici comparabili, verificarea acoperirii lor și descrierea schimbărilor între regiuni și ani.",
+    "موجز مشروع لاختيار مؤشرات اقتصادية قابلة للمقارنة، والتحقق من تغطيتها، ووصف التغير عبر المناطق والسنوات."
+  ],
+  [
+    "A project brief outlining how future analysis could study connections between employment conditions and migration decisions.",
+    "موجز مشروع يوضح كيف يمكن لتحليل مستقبلي دراسة الصلات بين ظروف العمل وقرارات الهجرة.",
+    "عرض موجز لمشروع يوضح كيف يمكن لتحليل مستقبلي دراسة الروابط بين ظروف التوظيف وقرارات الهجرة."
+  ],
+  [
+    "A research website",
+    "Un site de cercetare",
+    "موقع للأبحاث"
+  ],
+  [
+    "for the",
+    "despre",
+    "حول"
+  ],
+  [
+    "shadow economy.",
+    "economia informală.",
+    "الاقتصاد غير الرسمي."
+  ],
+  [
+    "The complete website,",
+    "Întregul site,",
+    "الموقع بالكامل،"
+  ],
+  [
+    "designed as one system.",
+    "gândit ca un singur sistem.",
+    "مصمم كنظام واحد."
+  ],
+  [
+    "The ideas behind",
+    "Ideile din spatele",
+    "الأفكار وراء"
+  ],
+  [
+    "the mark.",
+    "simbolului.",
+    "العلامة."
+  ],
+  [
+    "Research, held in one visual system.",
+    "Cercetarea, redată într-un sistem vizual unitar.",
+    "الأبحاث ضمن نظام بصري واحد."
+  ],
+  [
+    "Several logo",
+    "Mai multe variante de logo",
+    "عدة نسخ للشعار"
+  ],
+  [
+    "versions to choose from.",
+    "din care poți alege.",
+    "للاختيار منها."
+  ],
+  [
+    "Emblem + wordmark",
+    "Emblemă + wordmark",
+    "الشعار الرمزي + الاسم المكتوب"
+  ],
+  [
+    "Recognizable at a glance",
+    "Ușor de recunoscut",
+    "واضح من النظرة الأولى"
+  ],
+  [
+    "Chart and wordmark.",
+    "Grafic și wordmark.",
+    "مخطط بياني واسم مكتوب."
+  ],
+  [
+    "Hand and economy.",
+    "Mână și economie.",
+    "اليد والاقتصاد."
+  ],
+  [
+    "Colour and",
+    "Culoare și",
+    "الألوان"
+  ],
+  [
+    "backgrounds.",
+    "fundaluri.",
+    "والخلفيات."
+  ],
+  [
+    "One typeface.",
+    "Un singur font.",
+    "خط واحد."
+  ],
+  [
+    "Clear levels.",
+    "Ierarhie clară.",
+    "مستويات واضحة."
+  ],
+  [
+    "Logo motion and",
+    "Animația logo-ului și",
+    "حركة الشعار"
+  ],
+  [
+    "branded backgrounds.",
+    "fundaluri de brand.",
+    "وخلفيات الهوية."
+  ],
+  [
+    "The animation,",
+    "Animația,",
+    "التحريك"
+  ],
+  [
+    "shown in context.",
+    "în context.",
+    "ضمن سياقه."
+  ],
+  [
+    "I designed this certificate.",
+    "Am creat acest certificat.",
+    "صممت هذه الشهادة."
+  ],
+  [
+    "Design, development, and care.",
+    "Design, dezvoltare și atenție.",
+    "التصميم والتطوير والمتابعة."
+  ],
+  [
+    "VIEW FULL CERTIFICATE ↗",
+    "VEZI CERTIFICATUL COMPLET ↗",
+    "شاهد الشهادة كاملة ↗"
+  ],
+  [
+    "VISIT THE IDRL WEBSITE ↗",
+    "VIZITEAZĂ SITE-UL IDRL ↗",
+    "زُر موقع IDRL ↗"
+  ],
+  [
+    "VISIT INFORMALITY.RO ↗",
+    "VIZITEAZĂ INFORMALITY.RO ↗",
+    "زُر INFORMALITY.RO ↗"
+  ]
+];
+  projectTranslations.forEach((entry) => add(entry[0], entry[1], entry[2]));
+
+  const idrlTranslations = [
+  [
+    "A research website",
+    "Un site de cercetare",
+    "موقع للأبحاث"
+  ],
+  [
+    "for the",
+    "despre",
+    "حول"
+  ],
+  [
+    "shadow economy.",
+    "economia informală.",
+    "الاقتصاد غير الرسمي."
+  ],
+  [
+    "I designed the complete website and visual identity for the Informality Data Research Lab. A clear visual hierarchy helps people explore its research on informal work and economic data.",
+    "Am proiectat site-ul complet și identitatea vizuală pentru Informality Data Research Lab. O ierarhie vizuală clară îi ajută pe vizitatori să exploreze cercetările despre munca informală și datele economice.",
+    "صممت الموقع بالكامل والهوية البصرية لمختبر Informality Data Research Lab. ويساعد التسلسل البصري الواضح الزوار على استكشاف أبحاثه حول العمل غير الرسمي والبيانات الاقتصادية."
+  ],
+  [
+    "EXPLORE THE PROJECT",
+    "EXPLOREAZĂ PROIECTUL",
+    "استكشف المشروع"
+  ],
+  [
+    "VISUAL THEME",
+    "TEMĂ VIZUALĂ",
+    "الطابع البصري"
+  ],
+  [
+    "CERTIFICATE",
+    "CERTIFICAT",
+    "الشهادة"
+  ],
+  [
+    "00 / WEBSITE DESIGN",
+    "00 / DESIGNUL SITE-ULUI",
+    "00 / تصميم الموقع"
+  ],
+  [
+    "The complete website,",
+    "Site-ul complet,",
+    "الموقع بالكامل،"
+  ],
+  [
+    "designed as one system.",
+    "proiectat ca un sistem unitar.",
+    "مصمم كنظام واحد."
+  ],
+  [
+    "The lab studies informal economies through research and data. I translated its focus on people, work and the economy into a hand-held chart symbol, then developed several logo versions around those ideas for different settings.",
+    "Laboratorul studiază economiile informale prin cercetare și date. Am transpus interesul său pentru oameni, muncă și economie într-un simbol cu un grafic susținut de o mână, apoi am creat mai multe variante de logo pentru contexte diferite.",
+    "يدرس المختبر الاقتصادات غير الرسمية من خلال الأبحاث والبيانات. وحولت تركيزه على الناس والعمل والاقتصاد إلى رمز بياني تحمله يد، ثم طورت عدة نسخ للشعار تناسب استخدامات مختلفة."
+  ],
+  [
+    "The ideas behind",
+    "Ideile din spatele",
+    "الأفكار وراء"
+  ],
+  [
+    "the mark.",
+    "simbolului.",
+    "العلامة."
+  ],
+  [
+    "THE DESIGN IDEA",
+    "IDEA DE DESIGN",
+    "فكرة التصميم"
+  ],
+  [
+    "Research, held in one visual system.",
+    "Cercetarea, într-un sistem vizual unitar.",
+    "الأبحاث ضمن نظام بصري واحد."
+  ],
+  [
+    "The hand creates a human foundation for the rising chart and dollar symbol. Together they make a distinct mark for the lab, while the IDRL wordmark keeps the name easy to recognize.",
+    "Mâna oferă o bază umană graficului ascendent și simbolului dolarului. Împreună formează un semn distinctiv pentru laborator, iar logotipul IDRL îi păstrează numele ușor de recunoscut.",
+    "تمنح اليد أساسًا إنسانيًا للمخطط الصاعد ورمز الدولار. ويشكلان معًا علامة مميزة للمختبر، بينما يحافظ اسم IDRL المكتوب على سهولة التعرف عليه."
+  ],
+  [
+    "I prepared light and dark applications so the identity can sit clearly on both bright and deep-colour surfaces.",
+    "Am pregătit versiuni pentru fundaluri deschise și închise, astfel încât identitatea să rămână clară pe suprafețe de ambele tipuri.",
+    "أعددت تطبيقات فاتحة وأخرى داكنة لتظل الهوية واضحة على الخلفيات الفاتحة والداكنة."
+  ],
+  [
+    "02 / LOGO DESIGN",
+    "02 / DESIGNUL LOGOULUI",
+    "02 / تصميم الشعار"
+  ],
+  [
+    "Several logo",
+    "Mai multe variante de logo",
+    "عدة نسخ للشعار"
+  ],
+  [
+    "versions to choose from.",
+    "din care poți alege.",
+    "للاختيار منها."
+  ],
+  [
+    "I developed a set of logo variations around the lab’s main ideas. The full wordmark and standalone symbol suit different placements, while the early explorations show how I tested ways to connect data, informal work and research.",
+    "Am dezvoltat mai multe variante de logo pornind de la ideile principale ale laboratorului. Logotipul complet și simbolul de sine stătător se potrivesc în contexte diferite, iar explorările timpurii arată cum am căutat să conectez datele, munca informală și cercetarea.",
+    "طورت مجموعة من أشكال الشعار انطلاقًا من أفكار المختبر الأساسية. يناسب الاسم المكتوب كاملًا والرمز المستقل مواضع مختلفة، وتوضح التجارب الأولى محاولاتي لربط البيانات والعمل غير الرسمي والأبحاث."
+  ],
+  [
+    "OPEN IMAGE ↗",
+    "DESCHIDE IMAGINEA ↗",
+    "افتح الصورة ↗"
+  ],
+  [
+    "PRIMARY LOCKUP",
+    "COMPOZIȚIA PRINCIPALĂ",
+    "التكوين الرئيسي"
+  ],
+  [
+    "Emblem + wordmark",
+    "Emblemă + logotip",
+    "الرمز + الاسم المكتوب"
+  ],
+  [
+    "The full signature brings the hand-and-chart mark together with the IDRL name for clear, formal placements.",
+    "Semnătura completă unește simbolul mâinii și graficului cu numele IDRL, pentru aplicații formale și clare.",
+    "يجمع التوقيع الكامل رمز اليد والمخطط مع اسم IDRL للاستخدامات الرسمية والواضحة."
+  ],
+  [
+    "STANDALONE SYMBOL",
+    "SIMBOL DE SINE STĂTĂTOR",
+    "الرمز المستقل"
+  ],
+  [
+    "Recognizable at a glance",
+    "Ușor de recunoscut",
+    "سهل التمييز"
+  ],
+  [
+    "The emblem can work without the wordmark when a compact graphic is needed.",
+    "Emblema poate fi folosită fără logotip atunci când este nevoie de un element grafic compact.",
+    "يمكن استخدام الشعار الرمزي دون الاسم المكتوب عند الحاجة إلى شكل مختصر."
+  ],
+  [
+    "EARLY DIRECTIONS",
+    "DIRECȚII TIMPURII",
+    "اتجاهات أولية"
+  ],
+  [
+    "DIRECTION A / CHART + WORDMARK",
+    "DIRECȚIA A / GRAFIC + LOGOTIP",
+    "الاتجاه أ / مخطط + اسم مكتوب"
+  ],
+  [
+    "Chart and wordmark.",
+    "Grafic și logotip.",
+    "مخطط واسم مكتوب."
+  ],
+  [
+    "This route places a rising chart inside a geometric frame and keeps the initials direct and legible.",
+    "Această variantă așază un grafic ascendent într-un cadru geometric și păstrează inițialele simple și lizibile.",
+    "يضع هذا الاتجاه مخططًا صاعدًا داخل إطار هندسي، مع إبقاء الأحرف الأولى واضحة وسهلة القراءة."
+  ],
+  [
+    "DIRECTION B / HAND + ECONOMY",
+    "DIRECȚIA B / MÂNĂ + ECONOMIE",
+    "الاتجاه ب / يد + اقتصاد"
+  ],
+  [
+    "Hand and economy.",
+    "Mână și economie.",
+    "اليد والاقتصاد."
+  ],
+  [
+    "This more illustrative concept combines a hand with an economy symbol and supporting research icons.",
+    "Acest concept ilustrativ combină o mână, un simbol economic și pictograme asociate cercetării.",
+    "يجمع هذا التصور التوضيحي بين اليد ورمز للاقتصاد وأيقونات مساندة للأبحاث."
+  ],
+  [
+    "03 / VISUAL THEME",
+    "03 / TEMĂ VIZUALĂ",
+    "03 / الطابع البصري"
+  ],
+  [
+    "Colour and",
+    "Culoare și",
+    "الألوان"
+  ],
+  [
+    "backgrounds.",
+    "fundaluri.",
+    "والخلفيات."
+  ],
+  [
+    "Teal anchors the identity, with pink and coral for contrast. Light and dark logo versions keep the mark clear across the background colours and surfaces used for the lab.",
+    "Turcoazul este culoarea de bază a identității, cu accente roz și coral pentru contrast. Versiunile deschise și închise ale logo-ului păstrează simbolul clar pe fundalurile folosite de laborator.",
+    "يشكل التركواز أساس الهوية، مع الوردي والمرجاني لإضافة التباين. وتحافظ نسخ الشعار الفاتحة والداكنة على وضوحه فوق خلفيات المختبر المختلفة."
+  ],
+  [
+    "COLOUR MARK / LIGHT SURFACE",
+    "LOGO COLOR / FUNDAL DESCHIS",
+    "الشعار الملون / خلفية فاتحة"
+  ],
+  [
+    "COLOUR MARK / DARK SURFACE",
+    "LOGO COLOR / FUNDAL ÎNCHIS",
+    "الشعار الملون / خلفية داكنة"
+  ],
+  [
+    "DESIGN PRINCIPLE",
+    "PRINCIPIU DE DESIGN",
+    "مبدأ التصميم"
+  ],
+  [
+    "Keep the core mark consistent, then switch between colour and reversed versions to protect contrast and readability.",
+    "Păstrez simbolul de bază consecvent și folosesc versiunea color sau inversată pentru a menține contrastul și lizibilitatea.",
+    "أحافظ على ثبات العلامة الأساسية، وأبدل بين النسخة الملونة والمعكوسة للحفاظ على التباين وسهولة القراءة."
+  ],
+  [
+    "04 / TYPE HIERARCHY",
+    "04 / IERARHIE TIPOGRAFICĂ",
+    "04 / التسلسل الطباعي"
+  ],
+  [
+    "One typeface.",
+    "Un singur font.",
+    "خط واحد."
+  ],
+  [
+    "Clear levels.",
+    "Ierarhie clară.",
+    "مستويات واضحة."
+  ],
+  [
+    "I chose Alexandria for a clean, contemporary feel, then set a size and weight for each level so headings, navigation and detail text are easy to tell apart.",
+    "Am ales Alexandria pentru aspectul său curat și contemporan, apoi am stabilit dimensiuni și greutăți diferite, pentru a distinge ușor titlurile, navigarea și detaliile.",
+    "اخترت خط Alexandria لمظهره العصري والواضح، ثم حددت أحجامًا وسماكات مختلفة لتسهيل تمييز العناوين والتنقل والنصوص التفصيلية."
+  ],
+  [
+    "TYPE SCALE / LIGHT VERSION",
+    "SCALĂ TIPOGRAFICĂ / VERSIUNE DESCHISĂ",
+    "المقياس الطباعي / النسخة الفاتحة"
+  ],
+  [
+    "TYPE SCALE / DARK VERSION",
+    "SCALĂ TIPOGRAFICĂ / VERSIUNE ÎNCHISĂ",
+    "المقياس الطباعي / النسخة الداكنة"
+  ],
+  [
+    "05 / LOGO ANIMATION",
+    "05 / ANIMAȚIA LOGO-ULUI",
+    "05 / تحريك الشعار"
+  ],
+  [
+    "Logo motion and",
+    "Animația logo-ului și",
+    "حركة الشعار"
+  ],
+  [
+    "branded backgrounds.",
+    "fundaluri de brand.",
+    "وخلفيات الهوية."
+  ],
+  [
+    "I created an animation for the IDRL logo using the colours and background style developed for the identity. Play it here, or download the video exports and the After Effects project.",
+    "Am creat o animație pentru logo-ul IDRL, folosind culorile și stilul de fundal dezvoltate pentru identitate. O poți reda aici sau poți descărca exporturile video și proiectul After Effects.",
+    "أنشأت حركة لشعار IDRL باستخدام ألوان الهوية وأسلوب الخلفيات الذي طورته لها. شاهدها هنا، أو نزّل ملفات الفيديو ومشروع After Effects."
+  ],
+  [
+    "ANIMATION PREVIEW",
+    "PREVIZUALIZARE ANIMAȚIE",
+    "معاينة التحريك"
+  ],
+  [
+    "The animation,",
+    "Animația,",
+    "التحريك"
+  ],
+  [
+    "shown in context.",
+    "în context.",
+    "ضمن سياقه."
+  ],
+  [
+    "The logo animation can be played here as an MP4 preview.",
+    "Animația logo-ului poate fi redată aici ca previzualizare MP4.",
+    "يمكن تشغيل حركة الشعار هنا كمعاينة بصيغة MP4."
+  ],
+  [
+    "06 / RECOGNITION",
+    "06 / RECUNOAȘTERE",
+    "06 / التقدير"
+  ],
+  [
+    "I designed this certificate.",
+    "Am creat acest certificat.",
+    "صممت هذه الشهادة."
+  ],
+  [
+    "The internship certificate recognizes my contribution to the lab across brand identity, UX/UI, front-end development, and ongoing site maintenance.",
+    "Certificatul de practică recunoaște contribuția mea la laborator: identitatea de brand, UX/UI, dezvoltarea front-end și întreținerea continuă a site-ului.",
+    "تُقدّر شهادة التدريب مساهمتي في المختبر في الهوية البصرية وUX/UI وتطوير الواجهة الأمامية وصيانة الموقع باستمرار."
+  ],
+  [
+    "OPEN CERTIFICATE ↗",
+    "DESCHIDE CERTIFICATUL ↗",
+    "افتح الشهادة ↗"
+  ],
+  [
+    "Design, development, and care.",
+    "Design, dezvoltare și mentenanță.",
+    "التصميم والتطوير والمتابعة."
+  ],
+  [
+    "The certificate recognizes my work on the visual identity and website, along with ongoing support for the lab’s site.",
+    "Certificatul recunoaște munca mea la identitatea vizuală și la site, precum și sprijinul continuu acordat site-ului laboratorului.",
+    "تُقدّر الشهادة عملي على الهوية البصرية والموقع، إلى جانب دعمي المستمر لموقع المختبر."
+  ],
+  [
+    "VIEW FULL CERTIFICATE ↗",
+    "VEZI CERTIFICATUL COMPLET ↗",
+    "شاهد الشهادة كاملة ↗"
+  ],
+  [
+    "BACK TO DESIGN ↑",
+    "ÎNAPOI LA DESIGN ↑",
+    "العودة إلى التصميم ↑"
+  ],
+  [
+    "BACK TO SELECTED DESIGN WORK ↖",
+    "ÎNAPOI LA LUCRĂRILE DE DESIGN SELECTATE ↖",
+    "العودة إلى أعمال التصميم المختارة ↖"
+  ]
+];
+  idrlTranslations.forEach((entry) => add(entry[0], entry[1], entry[2]));
+
+  const idrlLabelTranslations = [
+  [
+    "IN THIS PROJECT",
+    "ÎN ACEST PROIECT",
+    "في هذا المشروع"
+  ],
+  [
+    "Exploration boards · Illustrator files",
+    "Planșe de explorare · fișiere Illustrator",
+    "لوحات استكشاف · ملفات Illustrator"
+  ],
+  [
+    "OFFICIAL WORK / WEBSITE DESIGN + VISUAL IDENTITY",
+    "LUCRĂRI OFICIALE / DESIGN WEB + IDENTITATE VIZUALĂ",
+    "أعمال رسمية / تصميم موقع + هوية بصرية"
+  ],
+  [
+    "This case study presents selected work while the full editable project files remain private.",
+    "Acest studiu de caz prezintă o selecție de lucrări; fișierele complete, editabile, rămân private.",
+    "يعرض هذا المشروع نماذج مختارة من العمل، بينما تظل الملفات الكاملة القابلة للتحرير خاصة."
+  ],
+  [
+    "PRESS PLAY TO VIEW THE LOGO ANIMATION",
+    "APASĂ REDAREA PENTRU A VEDEA ANIMAȚIA LOGO-ULUI",
+    "اضغط تشغيل لمشاهدة حركة الشعار"
+  ],
+  [
+    "MP4 · INLINE PLAYBACK",
+    "MP4 · REDARE ÎN PAGINĂ",
+    "MP4 · تشغيل داخل الصفحة"
+  ],
+  [
+    "RESEARCH TEAL",
+    "TURCOAZ PENTRU CERCETARE",
+    "تركواز الأبحاث"
+  ],
+  [
+    "ACCENT PINK",
+    "ACCENT ROZ",
+    "وردي بارز"
+  ],
+  [
+    "HIGHLIGHT CORAL",
+    "ACCENT CORAI",
+    "مرجاني بارز"
+  ],
+  [
+    "LIGHT VERSION",
+    "VERSIUNE DESCHISĂ",
+    "نسخة فاتحة"
+  ],
+  [
+    "H1 / MAIN TITLE",
+    "H1 / TITLU PRINCIPAL",
+    "H1 / العنوان الرئيسي"
+  ],
+  [
+    "H2 / SUBTITLE",
+    "H2 / SUBTITLU",
+    "H2 / العنوان الفرعي"
+  ],
+  [
+    "H3 / SUBHEADING",
+    "H3 / SUBTITLU DE SECȚIUNE",
+    "H3 / عنوان فرعي"
+  ],
+  [
+    "H4 / SECTION",
+    "H4 / SECȚIUNE",
+    "H4 / قسم"
+  ],
+  [
+    "BODY TEXT",
+    "TEXT PRINCIPAL",
+    "النص الأساسي"
+  ],
+  [
+    "NAVIGATION",
+    "NAVIGARE",
+    "التنقل"
+  ],
+  [
+    "CAPTIONS / SMALL TEXT",
+    "LEGENDĂ / TEXT MIC",
+    "التعليقات / نص صغير"
+  ],
+  [
+    "IDRL / BRAND & DIGITAL IDENTITY",
+    "IDRL / IDENTITATE ȘI DESIGN DIGITAL",
+    "IDRL / الهوية والعلامة الرقمية"
+  ]
+];
+  idrlLabelTranslations.forEach((entry) => add(entry[0], entry[1], entry[2]));
   ["SOURCE-BASED DESIGN RECORD","DOSAR DE DESIGN BAZAT PE SURSĂ","سجل تصميم مستند إلى المصدر"],
   ["The actual Figma","Artboardurile reale din Figma","إطارات Figma الفعلية"],
   ["artboards and palette.","și paleta de culori.","ولوحة الألوان."],
