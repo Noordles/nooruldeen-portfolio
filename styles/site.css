@@ -1405,3 +1405,15 @@ html[dir="rtl"] .story-language-fact::after { right:auto;left:clamp(16px,3vw,34p
 html[dir="rtl"] .incsmps-page .incsmps-frame-grid,
 html[dir="rtl"] .incsmps-page .incsmps-project-facts,
 html[dir="rtl"] .incsmps-page .incsmps-responsive-table { direction:ltr;text-align:left; }
+
+
+/* Original interest-led vector scenes used behind each page hero. */
+.hero-city img { filter:none !important; opacity:.48; object-position:right center; }
+.contact-city img { filter:none !important; opacity:.26; }
+.photos-detail-hero .hero-city img, .piano-detail-hero .hero-city img { filter:none !important; opacity:.48 !important; }
+.photos-detail-hero .hero-city::before, .photos-detail-hero .hero-city::after,
+.piano-detail-hero .hero-city::before, .piano-detail-hero .hero-city::after { content:none !important; }
+@media (max-width:760px) {
+  .hero-city img { opacity:.28; object-position:right center; }
+  .photos-detail-hero .hero-city img, .piano-detail-hero .hero-city img { opacity:.28 !important; }
+}
