@@ -1154,6 +1154,120 @@
   ]
 ];
   idrlLabelTranslations.forEach((entry) => add(entry[0], entry[1], entry[2]));
+
+  const interfaceTranslations = [
+  [
+    "WEB",
+    "WEB",
+    "الويب"
+  ],
+  [
+    "APP",
+    "APLICAȚIE",
+    "تطبيق"
+  ],
+  [
+    "IDENTITY",
+    "IDENTITATE",
+    "هوية"
+  ],
+  [
+    "IDENTITY SYSTEM",
+    "SISTEM DE IDENTITATE",
+    "نظام الهوية"
+  ],
+  [
+    "SYSTEM",
+    "SISTEM",
+    "النظام"
+  ],
+  [
+    "MOTION",
+    "MIȘCARE",
+    "حركة"
+  ],
+  [
+    "WEBSITE",
+    "SITE WEB",
+    "موقع إلكتروني"
+  ],
+  [
+    "WEBSITE + IDENTITY",
+    "SITE + IDENTITATE",
+    "موقع + هوية"
+  ],
+  [
+    "WEBSITE DESIGN / FIGMA",
+    "DESIGN WEB / FIGMA",
+    "تصميم الموقع / FIGMA"
+  ],
+  [
+    "TYPE",
+    "TIPOGRAFIE",
+    "الخطوط"
+  ],
+  [
+    "LOGOS",
+    "LOGOURI",
+    "الشعارات"
+  ],
+  [
+    "VISIT INFORMALITY.RO",
+    "VIZITEAZĂ INFORMALITY.RO",
+    "زُر INFORMALITY.RO"
+  ],
+  [
+    "NOOR’S INFORMALITY PROFILE",
+    "PROFILUL LUI NOOR LA INFORMALITY",
+    "ملف نور على Informality"
+  ],
+  [
+    "ILLUSTRATOR FILE",
+    "FIȘIER ILLUSTRATOR",
+    "ملف Illustrator"
+  ],
+  [
+    "Explore the IDRL identity case study",
+    "Explorează studiul de caz al identității IDRL",
+    "استكشف دراسة حالة هوية IDRL"
+  ],
+  [
+    "Explore the IDRL website and visual identity case study",
+    "Explorează studiul de caz al site-ului și identității vizuale IDRL",
+    "استكشف دراسة حالة موقع IDRL وهويته البصرية"
+  ],
+  [
+    "Open the original UMME fashion wordmark and monogram study in a new tab",
+    "Deschide studiul original UMME cu wordmark și monogramă într-o filă nouă",
+    "افتح دراسة شعار UMME النصي وعلامته المختصرة في نافذة جديدة"
+  ],
+  [
+    "Open the INCSMPS website design case study",
+    "Deschide studiul de caz al designului site-ului INCSMPS",
+    "افتح دراسة حالة تصميم موقع INCSMPS"
+  ],
+  [
+    "Explore the IDRL website and visual identity case study",
+    "Explorează studiul de caz al site-ului și identității vizuale IDRL",
+    "استكشف دراسة حالة موقع IDRL وهويته البصرية"
+  ],
+  [
+    "INFORMALITY.RO",
+    "INFORMALITY.RO",
+    "INFORMALITY.RO"
+  ],
+  [
+    "TYPE / IDENTITY / MOTION",
+    "TIPOGRAFIE / IDENTITATE / MIȘCARE",
+    "خطوط / هوية / حركة"
+  ],
+  [
+    "WEBSITE / IDENTITY / TYPE / MOTION",
+    "SITE / IDENTITATE / TIPOGRAFIE / MIȘCARE",
+    "موقع / هوية / خطوط / حركة"
+  ]
+];
+  interfaceTranslations.forEach((entry) => add(entry[0], entry[1], entry[2]));
   ["SOURCE-BASED DESIGN RECORD","DOSAR DE DESIGN BAZAT PE SURSĂ","سجل تصميم مستند إلى المصدر"],
   ["The actual Figma","Artboardurile reale din Figma","إطارات Figma الفعلية"],
   ["artboards and palette.","și paleta de culori.","ولوحة الألوان."],
