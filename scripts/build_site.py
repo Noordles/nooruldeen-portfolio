@@ -117,7 +117,13 @@ def rewrite_html_references(document: str, page_routes: dict[str, str], styleshe
     return HTML_ATTRIBUTE.sub(replace_attribute, document)
 
 
-def add_site_metadata(document: str, route: str, language_version: str) -> str:
+def add_site_metadata(document: str, route: str, language_version: str, script_version: str) -> str:
+    document = re.sub(
+        r'(?P<prefix><script\s+[^>]*src=["\'])/script\.js(?:\?[^"\']*)?(?P<quote>["\'])',
+        lambda match: f'{match.group("prefix")}/script.js?v={script_version}{match.group("quote")}',
+        document,
+        flags=re.IGNORECASE,
+    )
     additions = []
     if not re.search(r'<link\s+[^>]*rel=["\']canonical["\']', document, re.IGNORECASE):
         additions.append(f'<link rel="canonical" href="https://nooruldeen.com{route}" />')
@@ -204,6 +210,7 @@ def main() -> int:
     if not language_script.is_file():
         return fail("Required browser script is missing: scripts/browser/language-switcher.js")
     language_version = hashlib.sha256(language_script.read_bytes()).hexdigest()[:12]
+    script_version = hashlib.sha256((BROWSER_SCRIPT_ROOT / "script.js").read_bytes()).hexdigest()[:12]
 
     input_roots = [ROOT / name for name in INPUT_DIRECTORIES]
     for directory in input_roots:
@@ -247,7 +254,7 @@ def main() -> int:
         document = rewrite_html_references(document, page_routes, stylesheet_version)
         if route == "/":
             document = add_homepage_alias_redirect(document)
-        document = add_site_metadata(document, route, language_version)
+        document = add_site_metadata(document, route, language_version, script_version)
         destination.write_text(document, encoding="utf-8")
 
         if route != "/":

@@ -91,6 +91,17 @@ main > section[id] { scroll-margin-top: 84px; }
 .overline { margin: 0 0 15px; color: var(--wine-light); font-size: 9px; letter-spacing: .16em; }
 .work-section .overline, .photos-section .overline, .contact-section .overline { color: var(--wine-light); }
 .highlight-word { display:inline-block;position:relative;padding:0 .09em .055em;border-radius:2px;color:var(--paper);background:linear-gradient(135deg,rgba(132,46,68,.98),rgba(103,29,49,.96));box-shadow:.045em .05em 0 rgba(116,38,60,.9),.09em .095em 0 rgba(48,196,160,.52);box-decoration-break:clone;-webkit-box-decoration-break:clone; }
+
+/* Share one decoration layer beneath all letters, including adjacent lines. */
+.highlight-surface { position:relative;isolation:isolate; }
+.full-name.highlight-surface,.footer-name.highlight-surface { display:inline-block; }
+.highlight-surface :is(.name-highlight,.highlight-word) { background:none;box-shadow:none; }
+.highlight-backdrop { position:absolute;inset:0;z-index:-1;display:block;pointer-events:none;user-select:none; }
+.highlight-backdrop,.highlight-backdrop * { color:transparent !important;text-shadow:none !important;-webkit-text-stroke-color:transparent !important; }
+.highlight-backdrop :is(.name-highlight,.highlight-word) {
+  background:linear-gradient(135deg,rgba(132,46,68,.98),rgba(103,29,49,.96));
+  box-shadow:.045em .05em 0 rgba(116,38,60,.9),.09em .095em 0 rgba(48,196,160,.52);
+}
 .about-section { padding: 27px clamp(24px,6vw,108px) 0; }
 .about-section > .section-marker,.about-grid { max-width: 1320px; margin-inline: auto; }
 .about-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(36px,6vw,96px); padding: clamp(54px,6vw,88px) 0 clamp(14px,1.5vw,20px); }
@@ -199,6 +210,8 @@ a.text-link:hover span { transform: translate(3px,-3px); }
 .piano-card { min-height:450px;background:linear-gradient(145deg,rgba(83,31,48,.92),rgba(34,22,28,.96) 48%,rgba(16,25,22,.98));border-color:rgba(209,139,152,.48);transform:rotate(-.65deg); }
 .photography-card { min-height:392px;margin-top:25px;background:linear-gradient(145deg,rgba(27,67,78,.92),rgba(16,30,37,.98) 62%);border-color:rgba(38,126,148,.55);transform:rotate(.7deg); }
 .hobby-visual { position:relative;min-height:210px;overflow:hidden;background:#151616; }
+a.hobby-visual { display:block;cursor:pointer; }
+a.hobby-visual:focus-visible { outline:3px solid var(--paper);outline-offset:-5px; }
 .piano-card .hobby-visual { min-height:270px; }
 .photography-card .hobby-visual { min-height:230px;background:#153641; }
 .hobby-versus { position:absolute;z-index:5;top:49%;left:56%;width:54px;height:54px;display:grid;place-items:center;border:2px solid var(--paper);border-radius:50%;color:var(--paper);background:linear-gradient(135deg,var(--wine) 0 48%,var(--photo-blue) 52% 100%);box-shadow:0 5px 20px rgba(0,0,0,.42);font:800 12px/1 var(--mono);letter-spacing:.08em;transform:translate(-50%,-50%) rotate(-9deg); }

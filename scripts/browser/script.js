@@ -11,6 +11,51 @@ const updateProgress = () => {
 window.addEventListener("scroll", updateProgress, { passive: true });
 updateProgress();
 
+// Paint highlight decorations in a separate layer behind the entire text block.
+// Copying the inline layout preserves wrapping, rotated title lines and RTL text.
+(() => {
+  const selector = ".name-highlight, .highlight-word";
+  let scheduled = false;
+  const observer = new MutationObserver((records) => {
+    if (!records.some((record) => {
+      const element = record.target.nodeType === Node.ELEMENT_NODE ? record.target : record.target.parentElement;
+      if (element?.closest(".highlight-backdrop")) return false;
+      return element?.closest(".highlight-surface") || [...record.addedNodes].some((node) =>
+        node.nodeType === Node.ELEMENT_NODE && (node.matches(selector) || node.querySelector(selector))
+      );
+    }) || scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(refresh);
+  });
+
+  function refresh() {
+    scheduled = false;
+    observer.disconnect();
+    const hosts = new Set();
+    document.querySelectorAll(selector).forEach((highlight) => {
+      if (highlight.closest(".highlight-backdrop")) return;
+      hosts.add(highlight.closest("h1,h2,h3,h4,.full-name,.footer-name") || highlight.parentElement);
+    });
+    hosts.forEach((host) => {
+      host.querySelectorAll(":scope > .highlight-backdrop").forEach((layer) => layer.remove());
+      const layer = document.createElement("span");
+      layer.className = "highlight-backdrop";
+      layer.setAttribute("aria-hidden", "true");
+      layer.inert = true;
+      [...host.childNodes].forEach((node) => layer.appendChild(node.cloneNode(true)));
+      layer.querySelectorAll("*").forEach((node) => {
+        node.removeAttribute("id");
+        node.removeAttribute("data-cms-node");
+      });
+      host.classList.add("highlight-surface");
+      host.appendChild(layer);
+    });
+    observer.observe(document.body, { childList: true, characterData: true, subtree: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", refresh, { once: true });
+  else refresh();
+})();
+
 const revealTargets = document.querySelectorAll(
   ".about-heading, .about-body, .work-heading, .work-card, .hobbies-heading, .hobby-card, .photos-heading, .photo-card, .contact-content"
 );

@@ -398,7 +398,7 @@
     ["ready for its next chapter.","pregătit pentru următorul capitol.","مستعد لخطوته التالية."],
     ["The Figma file brings the INCSMPS website together as a detailed multi-page concept. The design is close to complete, but the website itself has not been launched. I’m sharing the work here as a look at the structure, visual direction, and responsive thinking behind it.","Fișierul Figma reunește site-ul INCSMPS într-un concept detaliat, cu mai multe pagini. Designul este aproape complet, însă site-ul nu a fost lansat. Împărtășesc aici lucrarea pentru a arăta structura, direcția vizuală și gândirea responsive din spatele ei.","يجمع ملف Figma موقع INCSMPS في مفهوم تفصيلي متعدد الصفحات. التصميم قريب من الاكتمال، لكن الموقع نفسه لم يُطلق بعد. أشارك هنا العمل لعرض البنية والتوجه البصري والتفكير المتجاوب وراءه."],
     ["OPEN THE FIGMA DESIGN","DESCHIDE DESIGNUL FIGMA","افتح تصميم Figma"],
-    ["BACK TO OFFICIAL WORK","ÎNAPOI LA LUCRĂRILE OFICIALE","العودة إلى الأعمال الرسمية"]
+    ["BACK TO OFFICIAL WORK","ÎNAPOI LA LUCRĂRILE OFICIALE","العودة إلى الأعمال الرسمية"],
     ["SEE THE PAGE DESIGNS", "VEZI DESIGNURILE PAGINILOR", "شاهد تصاميم الصفحات"],
     ["05 / SELECTED PAGE DESIGNS", "05 / PAGINI SELECTATE", "05 / تصاميم صفحات مختارة"],
     ["Seven pages,", "Șapte pagini,", "سبع صفحات،"],
@@ -1349,7 +1349,7 @@
   ["ANIMATION PREVIEW","PREVIZUALIZARE ANIMAȚIE","معاينة الحركة"],
   ["The animation,","Animația,","الحركة،"],
   ["shown in context.","prezentată în context.","معروضة ضمن سياقها."],
-  ["The logo animation can be played here as an MP4 preview.","Animația logo-ului poate fi redată aici ca previzualizare MP4.","يمكن تشغيل حركة الشعار هنا كمعاينة MP4."].forEach((entry) => add(entry[0], entry[1], entry[2]));
+  add("The logo animation can be played here as an MP4 preview.", "Animația logo-ului poate fi redată aici ca previzualizare MP4.", "يمكن تشغيل حركة الشعار هنا كمعاينة MP4.");
 
   add("LANGUAGES", "LIMBI", "اللغات");
   add("ENGLISH", "ENGLEZĂ", "الإنجليزية");
@@ -1468,7 +1468,7 @@
   };
   const pageMeta = {
     "/": {
-      en: ["Al Sammarraie Nooruldeen — Web Design & Development", "Design, development, animation, photography, and interests in statistics and Iraq's shadow economy."],
+      en: ["Nooruldeen Al Sammarraie | Web Design & Development", "Nooruldeen Al Sammarraie’s personal portfolio: web and app design, development, visual identities, animation, photography, economics and statistics."],
       ro: ["Al Sammarraie Nooruldeen — Design și dezvoltare web", "Design, dezvoltare, animație, fotografie și interese în statistică și economia ascunsă din Irak."],
       ar: ["Al Sammarraie Nooruldeen — تصميم وتطوير الويب", "تصميم وتطوير ورسوم متحركة وتصوير واهتمامات بالإحصاء والاقتصاد الخفي في العراق."]
     },
@@ -1579,7 +1579,7 @@
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         const parent = node.parentElement;
-        if (!parent || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/i.test(parent.tagName)) return NodeFilter.FILTER_REJECT;
+        if (!parent || parent.closest(".highlight-backdrop") || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/i.test(parent.tagName)) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     });
@@ -1605,7 +1605,7 @@
       const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
       const nodes = [];
       while (walker.nextNode()) {
-        if (walker.currentNode.nodeValue.trim()) nodes.push(walker.currentNode);
+        if (!walker.currentNode.parentElement.closest(".highlight-backdrop") && walker.currentNode.nodeValue.trim()) nodes.push(walker.currentNode);
       }
       const replacements = context.text[language];
       if (nodes.length !== replacements.length) return;
