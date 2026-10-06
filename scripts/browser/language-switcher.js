@@ -1685,6 +1685,7 @@
     collectAndTranslate(document.body, language);
     translateContextualHeadings(language);
     updatePageMetadata(language);
+    window.noorCmsApply?.(language);
     updateSwitcher();
     if (persist) {
       try { window.localStorage.setItem(STORAGE_KEY, language); } catch (_) {}

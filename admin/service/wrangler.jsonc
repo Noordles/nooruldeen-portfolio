@@ -1,0 +1,35 @@
+{
+  "name": "noor-owner-cms",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "assets": {
+    "directory": "./ui",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "noor-owner-cms",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "noor-owner-cms-media"
+    }
+  ],
+  "vars": {
+    "PUBLIC_SITE_ORIGIN": "https://nooruldeen.com",
+    "ADMIN_ORIGIN": "https://admin.nooruldeen.com",
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    "OWNER_EMAIL": "",
+    "OWNER_SUB": "",
+    "GITHUB_REPOSITORY": "Noordles/nooruldeen-portfolio",
+    "GITHUB_BRANCH": "main"
+  }
+}

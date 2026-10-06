@@ -16,3 +16,11 @@
 Thumbs.db
 __pycache__/
 *.py[cod]
+
+# Owner CMS deployment settings and generated private service assets
+admin/service/.dev.vars*
+admin/service/.wrangler/
+admin/service/wrangler.production.json
+admin/service/ui/catalog.json
+admin/service/ui/initial-content.json
+admin/service/.secrets.json

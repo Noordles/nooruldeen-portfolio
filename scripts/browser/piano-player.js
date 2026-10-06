@@ -579,3 +579,12 @@ buildKeyboard();
 centerMiddleC();
 updateMidiRollPositions();
 clearVisualizer();
+
+window.addEventListener("noor:stop-piano", () => stopPlayback());
+document.querySelectorAll(".track-card[data-track-card]").forEach((card) => {
+  const piece = trackData[card.dataset.trackCard];
+  if (piece) piece.title = card.querySelector("h3")?.textContent || piece.title;
+});
+document.addEventListener("click", (event) => {
+  if (event.target.closest(".track-button[data-track]")) window.dispatchEvent(new Event("noor:stop-media"));
+}, true);
