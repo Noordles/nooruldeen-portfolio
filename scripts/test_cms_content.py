@@ -52,6 +52,16 @@ class ContentCatalogTests(unittest.TestCase):
         payload = json.loads(result.split('<script id="cms-page-data" type="application/json">')[1].split('</script>')[0])
         self.assertEqual(payload["items"][0]["translations"]["ar"]["title"], "مقطوعة")
 
+    def test_design_settings_are_embedded_with_approved_bindings(self):
+        document = '<head></head><h1>Noor</h1>'
+        field = Catalog(document, "sample.html").fields[0]
+        styles = {field["key"]: {"en": {"font": "Georgia", "effect": "wine-highlight", "text": "Noor"}}}
+        result = render(document, "sample.html", {"styles": {"sample.html": styles}, "theme": {"ar": {"font": "Amiri"}}})
+        payload = json.loads(result.split('<script id="cms-page-data" type="application/json">')[1].split('</script>')[0])
+        self.assertEqual(payload["styles"], styles)
+        self.assertEqual(payload["theme"], {"ar": {"font": "Amiri"}})
+        self.assertEqual(payload["bindings"][0]["key"], field["key"])
+
 
 if __name__ == "__main__":
     unittest.main()

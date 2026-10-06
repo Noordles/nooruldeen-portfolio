@@ -140,13 +140,17 @@ function collectionField(label,item,key,{multiline=false}={}){
     else{item.translations??={};item.translations[state.lang]??={};item.translations[state.lang][key]=v;}
     if(["caption","title"].includes(key)&&"gallery" in item){if(state.lang==="en")item.viewerCaption="";else item.translations[state.lang].viewerCaption="";}
   },{multiline,placeholder:state.lang==="en"?"":"Keep the site’s existing translation"});
-  wrap.lastElementChild.dir=state.lang==="ar"?"rtl":"ltr";return wrap;
+  wrap.lastElementChild.dir=state.lang==="ar"?"rtl":"ltr";
+  const photos="gallery" in item,type=photos?"photo":"piano",page=state.catalog.pages.find(p=>p.route===(photos?"/photos/":"/piano/"));
+  const styled=photos?["title","caption","alt","gallery"]:["title","description","notes","pieceStatus","difficulty"];
+  const box=element("div",{class:"collection-field"},[wrap]);if(styled.includes(key))box.append(designControls(page,type+":"+item.id+":"+key));return box;
 }
 function editCollection(type,main){
   const photos=type==="photos",list=state.data[type];
   main.append(...heading(photos?"Photography":"Piano",photos?"Upload photographs, edit captions, and arrange the collection. Draft items appear in preview; hidden items stay off the page.":"Manage pieces and recordings using the existing listening room design."));
   const toolbar=element("div",{class:"toolbar"});
   toolbar.append(languageEditor());
+  toolbar.append(fontChooser("Website font in this language",state.data.theme?.[state.lang]?.font||"",font=>{state.data.theme??={};state.data.theme[state.lang]={font};changed();}));
   if(photos){
     toolbar.append(uploadButton("Upload photographs","image",m=>{list.push(photoFromMedia(m,state.gallery||new Date().getFullYear().toString()));}));
     toolbar.append(button("Add from media library",()=>chooseMedia(m=>list.push(photoFromMedia(m,state.gallery||"Collection")))));
@@ -160,6 +164,7 @@ function editCollection(type,main){
   else{
     const editor=element("section",{class:"panel"});
     editor.append(text("h2",selected.title));
+    editor.append(designControls(state.catalog.pages.find(p=>p.route===(photos?"/photos/":"/piano/")),(photos?"photo":"piano")+":"+selected.id+":item",{container:true}));
     editor.append(text("p",editorLanguages.find(l=>l.value===state.lang).label+" · Text changes belong to this language. Files, order and visibility are shared.","muted"));
     editor.append(collectionField("Title",selected,"title"),field("Visibility",selected.status,v=>{selected.status=v;render();},{options:["draft","published","hidden"]}));
     if(photos){
@@ -180,6 +185,26 @@ function editCollection(type,main){
   main.append(layout);
 }
 const editorLanguages=[{value:"en",label:"English editor"},{value:"ro",label:"Romanian editor"},{value:"ar",label:"Arabic editor"}];
+const fontOptions=["Roboto Slab","Barlow Condensed","IBM Plex Mono","Noto Sans Arabic","Amiri","Cairo","Inter","Montserrat","Lora","Playfair Display","Arial","Georgia","Times New Roman","Verdana","Trebuchet MS","Courier New"];
+const textEffects=[{value:"default",label:"Use site design"},{value:"none",label:"No effect"},{value:"wine-highlight",label:"Wine + cyan highlight"},{value:"cyan-highlight",label:"Cyan highlight"},{value:"teal-highlight",label:"Teal highlight"},{value:"wine-shadow",label:"Wine shadow"},{value:"teal-shadow",label:"Teal shadow"},{value:"duotone-shadow",label:"Wine + teal layered shadow"},{value:"outline",label:"Outline"},{value:"underline",label:"Accent underline"},{value:"glow",label:"Soft glow"},{value:"stamp",label:"Tilted wine stamp"},{value:"wine-frame",label:"Wine frame"},{value:"cyan-frame",label:"Cyan frame"},{value:"teal-frame",label:"Teal frame"},{value:"tilt",label:"Tilt"}];
+function fontChooser(label,value,update){
+  const wrap=element("div",{class:"font-chooser"});
+  const custom=field("Custom font family",fontOptions.includes(value)?"":value,update,{placeholder:"A Google Fonts family, e.g. DM Sans"});
+  custom.hidden=!value||fontOptions.includes(value);
+  wrap.append(field(label,!value?"":fontOptions.includes(value)?value:"custom",v=>{custom.hidden=v!=="custom";if(v!=="custom")update(v);else custom.lastElementChild.focus();},{options:[{value:"",label:"Use site font"},...fontOptions,{value:"custom",label:"Custom font…"}]}),custom);return wrap;
+}
+function designControls(page,key,{media=false,container=false,fontOnly=false,targets=[{page,key}]}={}){
+  const current=state.data.styles?.[page.id]?.[key]?.[state.lang]||{};
+  const details=element("details",{class:"design-controls"});details.append(element("summary",{text:fontOnly?"Page font":"Font & effect"}));
+  const update=(name,value)=>{for(const target of targets){state.data.styles??={};state.data.styles[target.page.id]??={};state.data.styles[target.page.id][target.key]??={};state.data.styles[target.page.id][target.key][state.lang]??={};state.data.styles[target.page.id][target.key][state.lang][name]=value;}changed();};
+  if(!media)details.append(fontChooser("Font family",current.font||"",v=>update("font",v)));
+  if(!fontOnly){
+    details.append(field("Effect",current.effect||"default",v=>update("effect",v),{options:media||container?textEffects.filter(e=>["default","none","glow","wine-frame","cyan-frame","teal-frame","tilt"].includes(e.value)):textEffects}));
+    if(!media&&!container)details.append(field("Highlight text (optional)",current.text||"",v=>update("text",v),{placeholder:"Leave empty to highlight the whole text"}));
+  }
+  details.append(button("Restore design defaults",()=>{for(const target of targets)if(state.data.styles?.[target.page.id]?.[target.key])delete state.data.styles[target.page.id][target.key][state.lang];changed();render();}));
+  return details;
+}
 const sectionLabel=value=>value==="Metadata"?"Page content & metadata":value==="top"?"Hero / top":value;
 const availableInLanguage=f=>!f.languages||f.languages.includes(state.lang);
 function languageEditor(){return field("Editing language",state.lang,v=>{state.lang=v;state.selected=null;render();},{options:editorLanguages});}
@@ -189,13 +214,14 @@ function contentField(page,f,onUpdate=()=>{}){
   const box=element("div",{class:"field","data-field-key":f.key});box.append(text("div",f.label,"field-label"));
   const update=v=>{
     values[f.key]??={};values[f.key][state.lang]=v;
-    document.querySelectorAll('[data-field-key="'+f.key+'"] label input,[data-field-key="'+f.key+'"] label textarea').forEach(input=>{if(input.value!==v)input.value=v;});
+    document.querySelectorAll('[data-field-key="'+f.key+'"] [data-cms-value]').forEach(input=>{if(input.value!==v)input.value=v;});
     onUpdate();
   };
   const input=field(f.attribute||"Text",value,update,{multiline:!f.attribute&&Math.max(value.length,f.value.length)>70,placeholder:state.lang==="en"?"":"Keep the site’s existing translation"});
-  input.lastElementChild.dir=state.lang==="ar"?"rtl":"ltr";box.append(input);
+  input.lastElementChild.dir=state.lang==="ar"?"rtl":"ltr";input.lastElementChild.dataset.cmsValue="";box.append(input);
   if(["src","poster"].includes(f.attribute))box.append(button("Choose image",()=>chooseMedia(m=>update(m.full))));
   box.append(button("Restore site default",()=>{if(values[f.key])delete values[f.key][state.lang];changed();render();}));
+  if((!f.attribute&&!f.label.startsWith("title:"))||["src","poster"].includes(f.attribute))box.append(designControls(page,f.key,{media:Boolean(f.attribute)}));
   return box;
 }
 function pageEditor(main){
@@ -212,7 +238,7 @@ function pageEditor(main){
   const toolbar=element("div",{class:"toolbar"});
   toolbar.append(languageEditor(),field("Section",state.section,v=>{state.section=v;render();},{options:["All content",...sections.map(value=>({value,label:sectionLabel(value)}))]}));
   const search=element("input",{type:"search",placeholder:"Find a heading, paragraph, number, image or link","aria-label":"Search page content"});
-  search.value=state.pageSearch||"";toolbar.append(element("label",{text:"Search content"},[search]));main.append(toolbar);
+  search.value=state.pageSearch||"";toolbar.append(element("label",{text:"Search content"},[search]),designControls(page,"$page",{fontOnly:true}));main.append(toolbar);
   const body=element("div");main.append(body);
   const values=state.data.pages[page.id]??={},byKey=new Map(fields.map(f=>[f.key,f]));
   const memberLabel=member=>{
@@ -239,7 +265,7 @@ function pageEditor(main){
       panel.append(rows(items,id=>{state.selected=state.selected===id?null:id;draw();},()=>{state.data.orders[group.key]=items.map(m=>m.id);},{editable:true}));
       const selected=items.find(m=>m.id===state.selected);
       if(selected){
-        const editor=element("div",{class:"item-editor fields"});editor.append(text("h3","Edit item / "+editorLanguages.find(l=>l.value===state.lang).label));
+        const editor=element("div",{class:"item-editor fields"});editor.append(text("h3","Edit item / "+editorLanguages.find(l=>l.value===state.lang).label),designControls(page,selected.id,{container:true}));
         for(const key of selected.fieldKeys||[]){const f=byKey.get(key);if(f)editor.append(contentField(page,f,refreshRows));}
         if(!editor.querySelector(".field"))editor.append(text("p","This item has no content in the selected language.","muted"));
         panel.append(editor);
@@ -265,6 +291,7 @@ function websiteEditor(main){
   const shared=[...groups.values()].filter(g=>new Set(g.map(x=>x.page.id)).size>1);
   const toolbar=element("div",{class:"toolbar"});
   toolbar.append(languageEditor());
+  toolbar.append(fontChooser("Website font in this language",state.data.theme?.[state.lang]?.font||"",font=>{state.data.theme??={};state.data.theme[state.lang]={font};changed();}));
   const search=element("input",{type:"search",placeholder:"Search shared names, navigation, labels or links","aria-label":"Search website content"});
   search.value=state.globalSearch||"";toolbar.append(search);main.append(toolbar);
   const fields=element("div",{class:"fields"});main.append(fields);
@@ -280,6 +307,7 @@ function websiteEditor(main){
       const input=field(f.attribute||"Text",overrides[state.lang]??(state.lang==="en"?f.value:""),update,{multiline:!f.attribute&&f.value.length>70,placeholder:state.lang==="en"?"":"Keep the existing translation"});
       if(state.lang==="ar")input.lastElementChild.dir="rtl";
       box.append(input);
+      if((!f.attribute&&!f.label.startsWith("title:"))||["src","poster"].includes(f.attribute))box.append(designControls(page,f.key,{media:Boolean(f.attribute),targets:group.map(({page,f})=>({page,key:f.key}))}));
       if(f.attribute==="src")box.append(button("Choose image for these pages",()=>chooseMedia(m=>update(m.full))));
       box.append(button("Restore defaults",()=>{for(const {page,f} of group)if(state.data.pages[page.id]?.[f.key])delete state.data.pages[page.id][f.key][state.lang];changed();draw();}));
       fields.append(box);

@@ -16,7 +16,7 @@ export function safeUrl(value) {
 export function validateDocument(input,catalog,env) {
   assert(plain(input) && input.version===1,"Unsupported content format");
   assert(plain(input.pages) && plain(input.orders),"Invalid page data");
-  const out={version:1,pages:{},orders:{},photos:[],piano:[],adminOrigin:env.ADMIN_ORIGIN};
+  const out={version:1,pages:{},orders:{},photos:[],piano:[],styles:{},theme:{},adminOrigin:env.ADMIN_ORIGIN};
   const pages=new Map(catalog.pages.map(p=>[p.id,p]));
   for(const [id,values] of Object.entries(input.pages)) {
     assert(pages.has(id) && plain(values),"Unknown page");
@@ -68,16 +68,47 @@ export function validateDocument(input,catalog,env) {
       out[type].push(item);
     }
   }
+  assert(plain(input.styles??{})&&plain(input.theme??{}),"Invalid site design settings");
+  for(const [lang,value] of Object.entries(input.theme??{})){
+    assert(["en","ro","ar"].includes(lang)&&plain(value)&&Object.keys(value).every(key=>key==="font"),"Invalid language font settings");out.theme[lang]=validateStyle(value);
+  }
+  for(const [id,values] of Object.entries(input.styles??{})){
+    assert(pages.has(id)&&plain(values),"Unknown styled page");const page=pages.get(id);
+    const allowed=new Set(["$page",...page.fields.map(f=>f.key),...page.collections.flatMap(g=>g.members.map(m=>m.id))]);
+    if(page.route==="/photos/")for(const p of out.photos)for(const key of ["item","title","caption","alt","gallery"])allowed.add("photo:"+p.id+":"+key);
+    if(page.route==="/piano/")for(const p of out.piano)for(const key of ["item","title","description","notes","pieceStatus","difficulty"])allowed.add("piano:"+p.id+":"+key);
+    out.styles[id]={};
+    for(const [key,langs] of Object.entries(values)){
+      assert(allowed.has(key)&&plain(langs),"Unknown styled content item");out.styles[id][key]={};
+      for(const [lang,value] of Object.entries(langs)){assert(["en","ro","ar"].includes(lang),"Unknown design language");out.styles[id][key][lang]=validateStyle(value);}
+    }
+  }
   assert(JSON.stringify(out).length<=1800000,"Content is too large");
   return out;
 }
-export const publishedDocument=doc=>({...doc,photos:doc.photos.filter(x=>x.status==="published"),piano:doc.piano.filter(x=>x.status==="published")});
+export const publishedDocument=doc=>{
+  const photos=doc.photos.filter(x=>x.status==="published"),piano=doc.piano.filter(x=>x.status==="published"),live=new Set([...photos.map(p=>"photo:"+p.id),...piano.map(p=>"piano:"+p.id)]);
+  const out={...doc,photos,piano};
+  if(doc.styles)out.styles=Object.fromEntries(Object.entries(doc.styles).map(([page,values])=>[page,Object.fromEntries(Object.entries(values).filter(([key])=>!/^(photo|piano):/.test(key)||live.has(key.split(":").slice(0,2).join(":"))))]));
+  return out;
+};
 export const mediaUses=(doc,id)=> {
   const result=[];
   for(const [page,values] of Object.entries(doc?.pages??{})) if(JSON.stringify(values).includes("/media/"+id+"/")) result.push(page);
   for(const type of ["photos","piano"]) for(const item of doc?.[type]??[]) if(JSON.stringify(item).includes("/media/"+id+"/")) result.push(type+": "+item.title);
   return result;
 };
+const effects=new Set(["default","none","wine-highlight","cyan-highlight","teal-highlight","wine-shadow","teal-shadow","duotone-shadow","outline","underline","glow","stamp","wine-frame","cyan-frame","teal-frame","tilt"]);
+export function validateStyle(value){
+  assert(plain(value),"Invalid design settings");const out={};
+  for(const [key,v] of Object.entries(value)){
+    assert(["font","effect","text"].includes(key),"Unknown design setting");
+    if(key==="effect"){assert(effects.has(v),"Unknown text effect");out.effect=v;}
+    else if(key==="font"){assert(typeof v==="string"&&(v===""||/^[\p{L}\p{N} _-]{1,80}$/u.test(v)),"Invalid font family");out.font=v;}
+    else out.text=text(v,2048);
+  }
+  return out;
+}
 export function inspectMedia(bytes,type) {
   const a=new Uint8Array(bytes),view=new DataView(bytes);
   const match=(offset,s)=>[...s].every((ch,i)=>a[offset+i]===ch.charCodeAt(0));

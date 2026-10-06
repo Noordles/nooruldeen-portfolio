@@ -72,6 +72,18 @@ test("collection translations save separately and cannot alter media URLs",()=>{
   assert.throws(()=>validateDocument({...initial,photos:[{...photo,translations:{ar:{src:"javascript:alert(1)"}}}]},catalog,env));
   assert.throws(()=>validateDocument({...initial,photos:[{...photo,translations:{fr:{title:"Invalid language"}}}]},catalog,env));
 });
+test("fonts and effects remain separate for each language",()=>{
+  const style={styles:{"home/index.html":{"a:0":{en:{font:"Georgia",effect:"wine-highlight",text:"Noor"},ar:{font:"Amiri",effect:"teal-shadow"}}}},theme:{en:{font:"Inter"}}};
+  const result=validateDocument({...initial,...style},catalog,env);
+  assert.deepEqual(result.styles,style.styles);assert.deepEqual(result.theme,style.theme);
+  for(const bad of [{font:'Arial; background:url(https://attacker.test)'},{effect:'javascript:alert(1)'},{color:'#fff'}])assert.throws(()=>validateDocument({...initial,styles:{"home/index.html":{"a:0":{en:bad}}}},catalog,env));
+  assert.throws(()=>validateDocument({...initial,styles:{"home/index.html":{"unknown":{en:{font:"Arial"}}}}},catalog,env));
+});
+test("hidden collection design settings stay out of published content",()=>{
+  const doc={...initial,photos:[{id:"a",status:"draft"},{id:"b",status:"published"}],styles:{"hobbies/photos.html":{"photo:a:title":{en:{text:"Private title"}},"photo:b:title":{en:{effect:"wine-highlight"}}}}};
+  const pub=publishedDocument(doc);
+  assert.equal(pub.styles["hobbies/photos.html"]["photo:a:title"],undefined);assert(pub.styles["hobbies/photos.html"]["photo:b:title"]);
+});
 test("media references in pages and collections prevent deletion",()=>{
   const id="00000000-0000-4000-8000-000000000000",url="https://admin.nooruldeen.com/media/"+id+"/full";
   const doc={pages:{"home/index.html":{"a@href":{en:url}}},photos:[{title:"Photograph",full:url}],piano:[]};

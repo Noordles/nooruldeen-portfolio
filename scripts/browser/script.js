@@ -14,13 +14,13 @@ updateProgress();
 // Paint highlight decorations in a separate layer behind the entire text block.
 // Copying the inline layout preserves wrapping, rotated title lines and RTL text.
 (() => {
-  const selector = ".name-highlight, .highlight-word";
+  const selector = ".name-highlight, .highlight-word, .cms-highlight";
   let scheduled = false;
   const observer = new MutationObserver((records) => {
     if (!records.some((record) => {
       const element = record.target.nodeType === Node.ELEMENT_NODE ? record.target : record.target.parentElement;
       if (element?.closest(".highlight-backdrop")) return false;
-      return element?.closest(".highlight-surface") || [...record.addedNodes].some((node) =>
+      return element?.closest(".highlight-surface") || element?.matches(selector) || [...record.addedNodes].some((node) =>
         node.nodeType === Node.ELEMENT_NODE && (node.matches(selector) || node.querySelector(selector))
       );
     }) || scheduled) return;
@@ -36,6 +36,10 @@ updateProgress();
       if (highlight.closest(".highlight-backdrop")) return;
       hosts.add(highlight.closest("h1,h2,h3,h4,.full-name,.footer-name") || highlight.parentElement);
     });
+    document.querySelectorAll(".highlight-surface").forEach((host)=>{
+      if(hosts.has(host))return;
+      host.querySelectorAll(":scope > .highlight-backdrop").forEach(layer=>layer.remove());host.classList.remove("highlight-surface");
+    });
     hosts.forEach((host) => {
       host.querySelectorAll(":scope > .highlight-backdrop").forEach((layer) => layer.remove());
       const layer = document.createElement("span");
@@ -46,12 +50,21 @@ updateProgress();
       layer.querySelectorAll("*").forEach((node) => {
         node.removeAttribute("id");
         node.removeAttribute("data-cms-node");
+        node.removeAttribute("data-cms-item");
+        node.removeAttribute("data-cms-style-field");
+      });
+      layer.querySelectorAll("[data-cms-effect-text]").forEach((node) => {
+        const phrase=node.dataset.cmsEffectText,value=node.textContent,index=value.indexOf(phrase);
+        if(index<0)return;const highlight=document.createElement("span");highlight.className="cms-highlight";highlight.dataset.cmsEffect=node.dataset.cmsEffect;highlight.textContent=phrase;
+        node.classList.remove("cms-highlight");delete node.dataset.cmsEffect;delete node.dataset.cmsEffectText;
+        node.replaceChildren(document.createTextNode(value.slice(0,index)),highlight,document.createTextNode(value.slice(index+phrase.length)));
       });
       host.classList.add("highlight-surface");
       host.appendChild(layer);
     });
-    observer.observe(document.body, { childList: true, characterData: true, subtree: true });
+    observer.observe(document.body, { childList: true, characterData: true, attributes:true, attributeFilter:["class","style","data-cms-effect","data-cms-effect-text"], subtree: true });
   }
+  window.noorRefreshHighlights=refresh;
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", refresh, { once: true });
   else refresh();
 })();

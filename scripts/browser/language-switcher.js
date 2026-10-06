@@ -1758,8 +1758,11 @@
     observeAddedContent();
   }
 
-  window.noorCmsDefaultValue = (source, language) => {
+  window.noorCmsDefaultValue = (source, language, node) => {
     if (language === "en" || typeof source !== "string") return source;
+    const meta=pageMeta[window.location.pathname.replace(/\/+$/, "/")]?.[language];
+    if(meta&&node?.tagName==="TITLE")return localizeName(meta[0],language);
+    if(meta&&node?.tagName==="META"&&node.getAttribute("name")==="description")return localizeName(meta[1],language);
     const entry = translations[normalize(source)];
     const localized = localizeDate(source.trim(), language) || localizePhotoLabel(source.trim(), language) || localizeCase(source.trim(), entry?.[language] || source.trim(), language);
     return localizeName(localized, language);

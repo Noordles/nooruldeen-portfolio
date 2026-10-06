@@ -7,6 +7,10 @@
   const bindings=new Map((config.bindings||[]).map(f=>[f.key,f]));
   let overrides=config.fields||[];
   let collectionItems=config.items||[];
+  let designs=config.styles||{},theme=config.theme||{};
+  const designWrappers=new Map(),designNodes=new Set(),fontLinks=new Set();
+  const styleNodes=new Set(config.styleNodes||[]);
+  const knownEffects=new Set(["default","none","wine-highlight","cyan-highlight","teal-highlight","wine-shadow","teal-shadow","duotone-shadow","outline","underline","glow","stamp","wine-frame","cyan-frame","teal-frame","tilt"]);
   const safeUrl=value=>{
     if(typeof value!=="string"||/[\x00-\x20\\]/.test(value)||value.startsWith("//"))return false;
     try{const u=new URL(value,location.origin);return !u.username&&!u.password&&["https:","http:","mailto:","tel:"].includes(u.protocol);}catch{return false;}
@@ -22,7 +26,8 @@
     for(const field of overrides){
       const node=nodeFor(field.node);
       if(!node)continue;
-      const value=field.values[language]??field.values.en??window.noorCmsDefaultValue?.(field.original,language)??field.original;
+      const sharedUrl=["href","src","poster"].includes(field.attribute);
+      const value=field.values[language]??((language==="en"||sharedUrl)?field.values.en:undefined)??window.noorCmsDefaultValue?.(field.original,language,node)??field.original;
       if(typeof value!=="string")continue;
       if(field.attribute){
         if(["href","src","poster"].includes(field.attribute)&&!safeUrl(value))continue;
@@ -30,7 +35,7 @@
         if(node.getAttribute(field.attribute)!==next)node.setAttribute(field.attribute,next);
       }else{
         let texts=textSlots.get(field.node)||[];
-        if(texts.some(text=>text.parentNode!==node)){
+        if(texts.some(text=>!node.contains(text))){
           const children=[...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE);
           texts=children.filter(text=>text.nodeValue.trim()||children.length===1);textSlots.set(field.node,texts);
         }
@@ -39,8 +44,14 @@
       }
     }
     applyCollection(language);
+    applyDesign(language);
   }
-  function setText(node,value){if(!node)return;const child=node.firstChild;if(child?.nodeType===Node.TEXT_NODE&&node.childNodes.length===1){if(child.nodeValue!==value)child.nodeValue=value;}else if(node.textContent!==value)node.textContent=value;}
+  function setText(node,value){
+    if(!node)return;const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT),texts=[];
+    while(walker.nextNode())if(!walker.currentNode.parentElement.closest(".highlight-backdrop"))texts.push(walker.currentNode);
+    if(texts.map(n=>n.nodeValue).join("")===value)return;
+    if(texts.length===1)texts[0].nodeValue=value;else node.textContent=value;
+  }
   function setAttribute(node,key,value){if(node&&node.getAttribute(key)!==value)node.setAttribute(key,value);}
   function applyCollection(language){
     const localized=(item,key)=>item.translations?.[language]?.[key]??window.noorCmsDefaultValue?.(item[key]||"",language)??item[key]??"";
@@ -64,6 +75,61 @@
         for(const key of ["notes","difficulty","pieceStatus"])setText(card.querySelector('[data-cms-note="'+key+'"]'),localized(item,key));
       }
     }
+  }
+  function applyDesign(language){
+    let changed=false;const activeNodes=new Set(),activeWrappers=new Set(),resetNodes=new Set();
+    function configure(node,settings={}){
+      activeNodes.add(node);const before=node.className+"|"+node.style.cssText+"|"+node.dataset.cmsEffect+"|"+node.dataset.cmsEffectText;
+      const font=typeof settings.font==="string"&&/^[\p{L}\p{N} _-]{1,80}$/u.test(settings.font)?settings.font:"";
+      node.classList.toggle("cms-font-override",Boolean(font));
+      if(font){
+        const family=JSON.stringify(font)+", "+(/Mono|Courier/i.test(font)?"monospace":/Slab|Georgia|Times|Lora|Playfair|Amiri/i.test(font)?"serif":"sans-serif");
+        if(node.style.getPropertyValue("--cms-font-family")!==family)node.style.setProperty("--cms-font-family",family);
+        if(!fontLinks.has(font)&&!["Roboto Slab","Barlow Condensed","IBM Plex Mono","Arial","Georgia","Times New Roman","Verdana","Trebuchet MS","Courier New"].includes(font)){
+          fontLinks.add(font);const link=document.createElement("link");link.rel="stylesheet";link.href="https://fonts.googleapis.com/css2?family="+encodeURIComponent(font)+":wght@400;700&display=swap";document.head.append(link);
+        }
+      }else node.style.removeProperty("--cms-font-family");
+      const effect=knownEffects.has(settings.effect)?settings.effect:"default";
+      if(effect==="default")delete node.dataset.cmsEffect;else if(node.dataset.cmsEffect!==effect)node.dataset.cmsEffect=effect;
+      node.classList.toggle("cms-highlight",effect.endsWith("-highlight")||effect==="stamp");
+      const phrase=typeof settings.text==="string"?settings.text.trim():"";
+      if(phrase&&effect.endsWith("-highlight")){if(node.dataset.cmsEffectText!==phrase)node.dataset.cmsEffectText=phrase;}else delete node.dataset.cmsEffectText;
+      if(before!==node.className+"|"+node.style.cssText+"|"+node.dataset.cmsEffect+"|"+node.dataset.cmsEffectText)changed=true;
+    }
+    configure(document.body,{font:designs.$page?.[language]?.font||theme[language]?.font||""});
+    for(const [key,langs] of Object.entries(designs)){
+      if(key==="$page")continue;const settings=langs?.[language];if(!settings||typeof settings!=="object")continue;
+      let node,text,field=bindings.get(key),container=false;
+      if(field){
+        node=nodeFor(field.node);if(node&&!field.attribute)text=textSlots.get(field.node)?.[field.slot];else container=true;
+      }else if(styleNodes.has(key)){node=nodeFor(key);container=true;}
+      else{
+        const match=key.match(/^(photo|piano):([a-z0-9-]+):(item|title|caption|alt|gallery|description|notes|pieceStatus|difficulty)$/);
+        if(!match)continue;const [,type,id,part]=match,item=collectionItems.find(p=>p.id===id);if(!item)continue;
+        const card=document.querySelector(type==="photo"?'[data-cms-item="'+id+'"]':'[data-track-card="'+(item.builtin||id)+'"]');if(!card)continue;
+        container=part==="item"||part==="alt";
+        node=part==="item"?card:type==="photo"?card.querySelector(part==="title"?"figcaption b":part==="caption"?"figcaption small":part==="alt"?"img":".not-used"):card.querySelector(part==="title"?"h3":part==="description"?".track-info > p":'[data-cms-note="'+part+'"]');
+        if(type==="photo"&&part==="gallery")node=card.closest(".photo-year-section")?.querySelector(".photo-year-heading h3");
+        if(node&&!container){const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT);while(walker.nextNode()){if(!walker.currentNode.parentElement.closest(".highlight-backdrop")){text=walker.currentNode;break;}}}
+      }
+      if(!node)continue;
+      if(container){configure(node,settings);continue;}
+      if(!text||!node.contains(text))continue;
+      const effect=knownEffects.has(settings.effect)?settings.effect:"default";
+      if(!settings.font&&effect==="default")continue;
+      let record=designWrappers.get(key);
+      if(!record||record.text!==text||!node.contains(record.wrapper)){
+        const wrapper=document.createElement("span");wrapper.className="cms-inline-design";wrapper.dataset.cmsStyleField=key;
+        text.before(wrapper);wrapper.append(text);record={wrapper,text,node};designWrappers.set(key,record);changed=true;
+      }
+      activeWrappers.add(key);configure(record.wrapper,settings);if(effect!=="default")resetNodes.add(node);
+    }
+    for(const [key,record] of designWrappers){if(!activeWrappers.has(key)){if(record.wrapper.contains(record.text))record.wrapper.replaceWith(record.text);designWrappers.delete(key);changed=true;}}
+    document.querySelectorAll(".cms-effect-reset").forEach(node=>{if(!node.closest(".highlight-backdrop")&&!resetNodes.has(node)){node.classList.remove("cms-effect-reset");changed=true;}});
+    for(const node of resetNodes){if(!node.classList.contains("cms-effect-reset")){node.classList.add("cms-effect-reset");changed=true;}}
+    for(const node of designNodes)if(!activeNodes.has(node)){configure(node,{});activeNodes.delete(node);}
+    designNodes.clear();for(const node of activeNodes)designNodes.add(node);
+    if(changed)window.noorRefreshHighlights?.();
   }
   window.noorCmsApply=apply;
   apply();
@@ -137,6 +203,7 @@
       if(event.origin!==config.adminOrigin||event.source!==window.parent||event.data?.type!=="noor-cms-preview"||event.data.page!==config.page)return;
       const data=event.data.data;
       if(!data||data.version!==1)return;
+      designs=data.styles?.[config.page]||{};theme=data.theme||{};
       // Draft data replaces published overrides, including fields restored to their defaults.
       overrides=overrides.map(field=>({...field,values:{}}));
       for(const [key,values] of Object.entries(data.pages?.[config.page]||{})){

@@ -10,7 +10,7 @@ VOID = set("area base br col embed hr img input link meta param source track wbr
 SKIP = set("script style noscript template svg canvas pre code".split())
 EDIT_ATTRS = {"a": ("href", "title", "aria-label"), "img": ("alt", "src"), "button": ("title", "aria-label"), "input": ("placeholder",), "textarea": ("placeholder",), "video": ("src", "poster"), "audio": ("src",), "source": ("src",)}
 CARD_CLASSES = set("work-card topic-feature research-deck-card site-story-preview incsmps-page-card incsmps-gallery-card logo-piece".split())
-CONFIG = {"version": 1, "pages": {}, "orders": {}, "photos": None, "piano": None, "adminOrigin": ""}
+CONFIG = {"version": 1, "pages": {}, "orders": {}, "photos": None, "piano": None, "styles": {}, "theme": {}, "adminOrigin": ""}
 def uid(value): return hashlib.sha256(value.encode()).hexdigest()[:16]
 def read_json(path, default):
     return json.loads(path.read_text("utf-8")) if path.is_file() else default
@@ -271,7 +271,9 @@ def replace_piano(document, items):
 def render(document, path, configuration):
     piano_baseline = [{k:v for k,v in p.items() if k!="legacyHtml"} for p in piano_defaults(document)] if path=="hobbies/piano.html" else []
     photo_baseline = [{k:v for k,v in p.items() if k!="legacyHtml"} for p in photo_defaults(document)] if path=="hobbies/photos.html" else []
-    bindings=[{k:v for k,v in f.items() if k in ("key","node","slot","attribute","value")} for f in Catalog(document,path).fields]
+    source_catalog=Catalog(document,path)
+    bindings=[{k:v for k,v in f.items() if k in ("key","node","slot","attribute","value")} for f in source_catalog.fields]
+    style_nodes=[m["id"] for g in source_catalog.groups() for m in g["members"]]
     values=configuration.get("pages",{}).get(path,{})
     document,runtime=render_fields(document,path,values)
     document=render_orders(document,path,configuration.get("orders",{}))
@@ -285,7 +287,7 @@ def render(document, path, configuration):
         cards=[n for n in catalog.nodes if n["tag"]=="figure" and "photo-card" in (n["attrs"].get("class") or "").split()]
         visible=[p for p in items if p.get("status")=="published"]
         document=apply_edits(document,[(n["openEnd"]-1,n["openEnd"]-1,' data-cms-item="'+html.escape(p["id"],quote=True)+'"') for n,p in zip(cards,visible)])
-    data=json.dumps({"bindings":bindings,"collection":collection,"items":items,"pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
+    data=json.dumps({"bindings":bindings,"styleNodes":style_nodes,"styles":configuration.get("styles",{}).get(path,{}),"theme":configuration.get("theme",{}),"collection":collection,"items":items,"pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
     script='<script id="cms-page-data" type="application/json">'+data+'</script><script src="/cms-runtime.js" defer></script>'
     return document.replace("</head>",script+"\n</head>",1)
 def generate(root):
@@ -297,9 +299,9 @@ def generate(root):
     piano=piano_defaults((root/"pages/hobbies/piano.html").read_text("utf-8"))
     for item in photos+piano: item.pop("legacyHtml",None)
     schema={"version":1,"pages":pages}
-    initial={"version":1,"pages":{},"orders":{},"photos":photos,"piano":piano,"adminOrigin":""}
+    initial={"version":1,"pages":{},"orders":{},"photos":photos,"piano":piano,"styles":{},"theme":{},"adminOrigin":""}
     saved=read_json(root/"content/published.json", CONFIG)
-    for key in ("pages","orders","adminOrigin"): initial[key]=saved.get(key,initial[key])
+    for key in ("pages","orders","styles","theme","adminOrigin"): initial[key]=saved.get(key,initial[key])
     for key in ("photos","piano"):
         if saved.get(key) is not None: initial[key]=saved[key]
     return schema,initial
