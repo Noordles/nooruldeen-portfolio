@@ -1,8 +1,18 @@
 # Noor / Owner Studio
 
-The admin is reached through **https://nooruldeen.com/admin/** after activation. It opens the protected owner service at **https://admin.nooruldeen.com/admin**. Sign in using the owner identity configured in Cloudflare Access.
+The admin is reached through **https://nooruldeen.com/admin/**. It opens the protected owner service at **https://admin.nooruldeen.com/admin**. Sign in using your owner Cloudflare account.
 
-**The CMS becomes usable after the deployment setup is completed: managed owner login, private storage, the database binding and a server publishing credential.** See [deployment instructions](DEPLOYMENT.md).
+See the [deployment and maintenance instructions](DEPLOYMENT.md) for service configuration, recovery and future deployments.
+
+## Sign in with your Cloudflare account
+
+1. Open **https://nooruldeen.com/admin/**.
+2. Choose **Cloudflare** if a login method chooser is displayed.
+3. Sign in with your existing owner Cloudflare account and complete its usual MFA if requested. If you are already signed in, Cloudflare can reuse that session.
+
+The dashboard uses Cloudflare account sign-in. It does not require an emailed one-time PIN or a separate website password. The Access policy must match the configured owner email and require the Cloudflare login method; belonging to the account alone does not give another member editing access. Sessions last 30 minutes before renewed authorization is needed.
+
+Your Cloudflare account's own security checks still apply. Cloudflare may request verification during account recovery or an unusual sign-in; the website does not control those account checks.
 
 ## Everyday controls
 

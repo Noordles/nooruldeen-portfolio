@@ -35,8 +35,10 @@ Create a Cloudflare Access **self-hosted** application covering **admin.noorulde
 
 - Name: Noor Owner Studio.
 - Allow only the exact owner email. Do not use an Everyone allow rule.
-- Use a managed identity provider with MFA, or Cloudflare's managed email one-time PIN login.
-- Set a short session duration, such as one hour.
+- Select **Cloudflare** as the application's only identity provider. Disable **Accept all available identity providers** and do not select the email one-time PIN provider for this application.
+- In **Integrations > Identity providers > Cloudflare**, keep **Restrict to account members** enabled. Use the owner's existing Cloudflare account credentials and its MFA.
+- In the owner Allow policy, Include only the exact owner email and Require **Login Methods: Cloudflare**. The Include email and Require login method must both match.
+- Set the application session duration to **30 minutes**.
 - Record the team hostname (for example team.cloudflareaccess.com) and this application's audience tag.
 - Optionally pin the owner subject after the first successful login.
 
@@ -44,7 +46,9 @@ Create a second, more specific Access application covering **admin.nooruldeen.co
 
 Published media variants must load without an Access login; private originals must remain unavailable to a visitor. Access alone is not the media authorization boundary.
 
-References: [Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/), [validate Access JWTs](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/), [path precedence](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/).
+This uses Cloudflare's managed account sign-in without an emailed Access PIN or a separate website password. Cloudflare may still require its normal account MFA or recovery checks. Keeping an email PIN provider configured for other applications does not enable it here when this application and policy are restricted to Cloudflare.
+
+References: [Cloudflare account identity provider](https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/cloudflare/), [Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/), [validate Access JWTs](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/), [path precedence](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/).
 
 ### 2. Database and original-file storage
 
