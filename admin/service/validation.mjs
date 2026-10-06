@@ -50,6 +50,14 @@ export function validateDocument(input,catalog,env) {
       const item={id:raw.id,status:raw.status};
       const fields=type==="photos"?["gallery","title","caption","alt","src","full","viewerCaption"]:["title","composer","description","notes","pieceStatus","difficulty","learnedDate","audio","video","thumbnail","midi","builtin"];
       for(const field of fields) item[field]=text(raw[field]??"",field==="description"||field==="notes"?20000:2048);
+      if(raw.translations!==undefined){
+        assert(plain(raw.translations),"Invalid collection translations");item.translations={};
+        const translatedFields=type==="photos"?["gallery","title","caption","alt","viewerCaption"]:["title","composer","description","notes","pieceStatus","difficulty"];
+        for(const [lang,values] of Object.entries(raw.translations)){
+          assert(["ro","ar"].includes(lang)&&plain(values),"Invalid translation language");item.translations[lang]={};
+          for(const [key,value] of Object.entries(values)){assert(translatedFields.includes(key),"Unknown translated field");item.translations[lang][key]=text(value,key==="description"||key==="notes"?20000:2048);}
+        }
+      }
       assert(item.title.trim().length>0,"Every item needs a title");
       for(const field of (type==="photos"?["src","full"]:["audio","video","thumbnail","midi"])) assert(safeUrl(item[field]),"Unsafe media URL");
       if(type==="photos"){

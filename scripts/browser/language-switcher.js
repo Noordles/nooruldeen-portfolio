@@ -1736,12 +1736,18 @@
 
   function observeAddedContent() {
     const observer = new MutationObserver((records) => {
+      let translated = false;
       records.forEach((record) => {
         record.addedNodes.forEach((node) => {
+          if ((node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement)?.closest(".highlight-backdrop")) return;
           if (node.nodeType === Node.TEXT_NODE) translateNode(node, activeLanguage);
           else if (node.nodeType === Node.ELEMENT_NODE) collectAndTranslate(node, activeLanguage);
+          else return;
+          translated = true;
         });
       });
+      // Moving an existing card also adds it to the DOM. Keep CMS edits after translation.
+      if (translated) window.noorCmsApply?.(activeLanguage);
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
@@ -1751,6 +1757,13 @@
     setLanguage(initialLanguage(), false);
     observeAddedContent();
   }
+
+  window.noorCmsDefaultValue = (source, language) => {
+    if (language === "en" || typeof source !== "string") return source;
+    const entry = translations[normalize(source)];
+    const localized = localizeDate(source.trim(), language) || localizePhotoLabel(source.trim(), language) || localizeCase(source.trim(), entry?.[language] || source.trim(), language);
+    return localizeName(localized, language);
+  };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();

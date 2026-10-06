@@ -64,6 +64,14 @@ test("draft and hidden items never enter published payload",()=>{
   const doc={...initial,photos:[{id:"a",status:"draft"},{id:"b",status:"published"}],piano:[{id:"x",status:"hidden"}]};
   assert.deepEqual(publishedDocument(doc).photos,[{id:"b",status:"published"}]);assert.deepEqual(publishedDocument(doc).piano,[]);
 });
+test("collection translations save separately and cannot alter media URLs",()=>{
+  const photo={id:"photo-a",status:"published",title:"English title",gallery:"2026",src:"/a.webp",full:"/a.webp",width:900,height:900,translations:{ar:{title:"صورة",caption:"وصف"},ro:{title:"Fotografie"}}};
+  const result=validateDocument({...initial,photos:[photo]},catalog,env);
+  assert.equal(result.photos[0].title,"English title");
+  assert.deepEqual(result.photos[0].translations,photo.translations);
+  assert.throws(()=>validateDocument({...initial,photos:[{...photo,translations:{ar:{src:"javascript:alert(1)"}}}]},catalog,env));
+  assert.throws(()=>validateDocument({...initial,photos:[{...photo,translations:{fr:{title:"Invalid language"}}}]},catalog,env));
+});
 test("media references in pages and collections prevent deletion",()=>{
   const id="00000000-0000-4000-8000-000000000000",url="https://admin.nooruldeen.com/media/"+id+"/full";
   const doc={pages:{"home/index.html":{"a@href":{en:url}}},photos:[{title:"Photograph",full:url}],piano:[]};

@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 SKIP = set("script style noscript template svg canvas pre code".split())
-EDIT_ATTRS = {"a": ("href", "title", "aria-label"), "img": ("alt", "src"), "input": ("placeholder",), "textarea": ("placeholder",)}
+EDIT_ATTRS = {"a": ("href", "title", "aria-label"), "img": ("alt", "src"), "button": ("title", "aria-label"), "input": ("placeholder",), "textarea": ("placeholder",), "video": ("src", "poster"), "audio": ("src",), "source": ("src",)}
 CARD_CLASSES = set("work-card topic-feature research-deck-card site-story-preview incsmps-page-card incsmps-gallery-card logo-piece".split())
 CONFIG = {"version": 1, "pages": {}, "orders": {}, "photos": None, "piano": None, "adminOrigin": ""}
 def uid(value): return hashlib.sha256(value.encode()).hexdigest()[:16]
@@ -42,18 +42,22 @@ class Catalog(HTMLParser):
         serial = sum(n["tag"] == tag for n in siblings) + 1
         address = (parent["address"] + "/" if parent else "") + f"{tag}:{serial}"
         classes = set((attr.get("class") or "").split())
-        excluded = bool(parent and parent["excluded"]) or tag in SKIP or attr.get("aria-hidden") == "true" or "photo-year-section" in classes or "track-list" in classes
-        node = {"id": attr.get("data-cms-id") or uid(self.path + "/" + address), "tag": tag, "attrs": attr, "address": address, "children": [], "start": self.source_offset(), "openEnd": self.source_offset() + len(self.get_starttag_text()), "end": None, "slots": 0, "excluded": excluded, "section": (parent["section"] if parent else "Metadata"), "parent": parent}
+        languages = parent["languages"] if parent else ["en", "ro", "ar"]
+        if tag not in ("html", "body") and attr.get("lang") in ("en", "ro", "ar"): languages = [attr["lang"]]
+        elif "full-name" in classes and parent and "brand-name" in (parent["attrs"].get("class") or "").split(): languages = ["en", "ro"]
+        content_excluded = bool(parent and parent["contentExcluded"]) or tag in SKIP or "photo-year-section" in classes or "track-list" in classes
+        excluded = content_excluded or bool(parent and parent["excluded"]) or attr.get("aria-hidden") == "true"
+        node = {"id": attr.get("data-cms-id") or uid(self.path + "/" + address), "tag": tag, "attrs": attr, "address": address, "children": [], "start": self.source_offset(), "openEnd": self.source_offset() + len(self.get_starttag_text()), "end": None, "slots": 0, "excluded": excluded, "contentExcluded": content_excluded, "languages": languages, "section": (parent["section"] if parent else "Metadata"), "parent": parent}
         if tag in ("section", "article") and attr.get("id"): node["section"] = attr["id"]
         siblings.append(node)
         self.nodes.append(node)
-        if not excluded:
+        if not content_excluded:
             names = EDIT_ATTRS.get(tag, ())
             if tag == "meta" and attr.get("name") == "description": names = ("content",)
             for name in names:
                 value = attr.get(name)
                 if value and value.strip():
-                    self.fields.append({"key": node["id"] + "@" + name, "node": node["id"], "kind": "url" if name in ("href", "src") else "text", "attribute": name, "value": value, "section": node["section"], "label": name + ": " + value[:85]})
+                    self.fields.append({"key": node["id"] + "@" + name, "node": node["id"], "kind": "url" if name in ("href", "src", "poster") else "text", "attribute": name, "value": value, "languages": languages, "section": node["section"], "label": name + ": " + value[:85]})
         if tag not in VOID: self.stack.append(node)
         else: node["end"] = node["openEnd"]
     def handle_startendtag(self, tag, attrs):
@@ -71,14 +75,15 @@ class Catalog(HTMLParser):
         node = self.stack[-1]
         slot = node["slots"]
         node["slots"] += 1
-        if node["excluded"] or not any(c.isalpha() for c in data): return
+        if node["excluded"]: return
         start = self.source_offset()
         # getpos() addresses raw source. Entity spelling is preserved when unchanged.
         end = self.document.find("<", start)
         if end < 0: end = len(self.document)
-        self.fields.append({"key": node["id"] + ":" + str(slot), "node": node["id"], "kind": "text", "slot": slot, "value": data.strip(), "section": node["section"], "label": node["tag"] + ": " + data.strip()[:100], "start": start, "end": end})
+        self.fields.append({"key": node["id"] + ":" + str(slot), "node": node["id"], "kind": "text", "slot": slot, "value": data.strip(), "languages": node["languages"], "section": node["section"], "label": node["tag"] + ": " + data.strip()[:100], "start": start, "end": end})
     def groups(self):
         groups = []
+        nodes = {n["id"]: n for n in self.nodes}
         for parent in self.nodes:
             children = parent["children"]
             members = [n for n in children if not n["excluded"] and (n["tag"] == "article" or bool(CARD_CLASSES & set((n["attrs"].get("class") or "").split())))]
@@ -86,7 +91,11 @@ class Catalog(HTMLParser):
             positions = [children.index(n) for n in members]
             if positions != list(range(min(positions), max(positions) + 1)): continue
             if any(not n["end"] for n in members): continue
-            groups.append({"key": parent["id"], "section": parent["section"], "label": "Items in " + parent["section"], "members": [{"id": n["id"], "label": re.sub("<[^>]+>", " ", self.document[n["start"]:n["end"]]).strip()[:120]} for n in members], "_nodes": members})
+            items = []
+            for member in members:
+                keys = [f["key"] for f in self.fields if nodes[f["node"]]["address"] == member["address"] or nodes[f["node"]]["address"].startswith(member["address"] + "/")]
+                items.append({"id": member["id"], "label": re.sub("<[^>]+>", " ", self.document[member["start"]:member["end"]]).strip()[:120], "fieldKeys": keys})
+            groups.append({"key": parent["id"], "section": parent["section"], "label": "Items in " + parent["section"], "members": items, "_nodes": members})
         return groups
     def schema(self):
         return {"id": self.path, "route": route(self.path), "label": self.path.replace(".html", "").replace("/", " / "), "fields": [{k: v for k, v in f.items() if k not in ("start", "end")} for f in self.fields], "collections": [{k: v for k, v in g.items() if k != "_nodes"} for g in self.groups()]}
@@ -110,11 +119,11 @@ def render_fields(document, path, values, mark=True):
         if en != field["value"] and "slot" in field:
             raw = document[field["start"]:field["end"]]
             lead, tail = re.match(r"^\s*", raw).group(), re.search(r"\s*$", raw).group()
-            edits.append((field["start"], field["end"], lead + html.escape(en, quote=False) + tail))
+            edits.append((field["start"], field["end"], lead + (html.escape(en, quote=False) if en else "&#8203;") + tail))
         if override:
             runtime.append({**{k:field[k] for k in ("node", "slot", "attribute") if k in field}, "values": {l:v for l,v in override.items() if l in ("en","ro","ar") and isinstance(v,str)}, "original": field["value"]})
     for node in catalog.nodes:
-        if node["excluded"]: continue
+        if node["excluded"] and not node_keys[node["id"]]: continue
         opening = document[node["start"]:node["openEnd"]]
         for field in catalog.fields:
             if field["node"] != node["id"] or "attribute" not in field: continue
@@ -221,7 +230,7 @@ def piano_html(item, number):
     key=esc(item["id"])
     built=item.get("builtin","")
     button=(f'<button class="track-button" type="button" data-track="{esc(built)}" aria-label="Play {esc(item["title"])}" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>' if built and not media else f'<button class="track-button" type="button" data-cms-audio="{esc(media)}" aria-label="Play {esc(item["title"])}" aria-pressed="false"><span class="play-symbol" aria-hidden="true">▶</span><span class="button-text">PLAY</span></button>' if media else "")
-    extra="".join(f'<p data-cms-note>{esc(item.get(k,""))}</p>' for k in ("notes","difficulty","learnedDate") if item.get(k))
+    extra="".join(f'<p data-cms-note="{k}">{esc(item.get(k,""))}</p>' for k in ("notes","difficulty","learnedDate") if item.get(k) or any(v.get(k) for v in item.get("translations",{}).values()))
     video_link=f'<a data-cms-note class="audio-download-link" href="{esc(video)}" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>' if video else ""
     midi=item.get("midi","")
     if midi and not safe_url(midi): raise ValueError("Invalid MIDI URL")
@@ -250,8 +259,8 @@ def replace_piano(document, items):
             raw=re.sub(r"<h3>.*?</h3>",lambda m:"<h3>"+html.escape(item["title"])+"</h3>",raw,count=1,flags=re.S)
             description=item.get("description","")
             if item.get("composer")!=original.get("composer"): description=" · ".join(x for x in (item.get("composer"),description) if x)
-            extra="".join('<p data-cms-note>'+html.escape(item[k])+"</p>" for k in ("notes","difficulty","learnedDate") if item.get(k))
-            if item.get("pieceStatus")!=original.get("pieceStatus") and item.get("pieceStatus"): extra+='<p data-cms-note>'+html.escape(item["pieceStatus"])+"</p>"
+            extra="".join('<p data-cms-note="'+k+'">'+html.escape(item.get(k,""))+"</p>" for k in ("notes","difficulty","learnedDate") if item.get(k) or any(v.get(k) for v in item.get("translations",{}).values()))
+            if item.get("pieceStatus")!=original.get("pieceStatus") and item.get("pieceStatus") or any(v.get("pieceStatus") for v in item.get("translations",{}).values()): extra+='<p data-cms-note="pieceStatus">'+html.escape(item.get("pieceStatus",""))+"</p>"
             if item.get("video") and safe_url(item["video"]): extra+='<a data-cms-note class="audio-download-link" href="'+html.escape(item["video"],quote=True)+'" rel="noopener noreferrer" target="_blank">WATCH PERFORMANCE ↗</a>'
             if item.get("midi") and safe_url(item["midi"]): extra+='<a data-cms-note class="audio-download-link" href="'+html.escape(item["midi"],quote=True)+'" download>DOWNLOAD MIDI ↓</a>'
             raw=re.sub(r"<p>.*?</p>",lambda m:"<p>"+html.escape(description)+"</p>"+extra,raw,count=1,flags=re.S)
@@ -261,13 +270,22 @@ def replace_piano(document, items):
 
 def render(document, path, configuration):
     piano_baseline = [{k:v for k,v in p.items() if k!="legacyHtml"} for p in piano_defaults(document)] if path=="hobbies/piano.html" else []
+    photo_baseline = [{k:v for k,v in p.items() if k!="legacyHtml"} for p in photo_defaults(document)] if path=="hobbies/photos.html" else []
     bindings=[{k:v for k,v in f.items() if k in ("key","node","slot","attribute","value")} for f in Catalog(document,path).fields]
     values=configuration.get("pages",{}).get(path,{})
     document,runtime=render_fields(document,path,values)
     document=render_orders(document,path,configuration.get("orders",{}))
     if path=="hobbies/photos.html" and configuration.get("photos") is not None: document=replace_photos(document,configuration["photos"])
     if path=="hobbies/piano.html" and configuration.get("piano") is not None: document=replace_piano(document,configuration["piano"])
-    data=json.dumps({"bindings":bindings,"collection":"photos" if path=="hobbies/photos.html" else "piano" if path=="hobbies/piano.html" else "","pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
+    collection="photos" if path=="hobbies/photos.html" else "piano" if path=="hobbies/piano.html" else ""
+    items=(configuration.get(collection) if collection else None)
+    if items is None: items=photo_baseline if collection=="photos" else piano_baseline
+    if collection=="photos":
+        catalog=Catalog(document,path)
+        cards=[n for n in catalog.nodes if n["tag"]=="figure" and "photo-card" in (n["attrs"].get("class") or "").split()]
+        visible=[p for p in items if p.get("status")=="published"]
+        document=apply_edits(document,[(n["openEnd"]-1,n["openEnd"]-1,' data-cms-item="'+html.escape(p["id"],quote=True)+'"') for n,p in zip(cards,visible)])
+    data=json.dumps({"bindings":bindings,"collection":collection,"items":items,"pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
     script='<script id="cms-page-data" type="application/json">'+data+'</script><script src="/cms-runtime.js" defer></script>'
     return document.replace("</head>",script+"\n</head>",1)
 def generate(root):

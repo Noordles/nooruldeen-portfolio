@@ -6,25 +6,62 @@
   const config=JSON.parse(tag.textContent);
   const bindings=new Map((config.bindings||[]).map(f=>[f.key,f]));
   let overrides=config.fields||[];
+  let collectionItems=config.items||[];
   const safeUrl=value=>{
     if(typeof value!=="string"||/[\x00-\x20\\]/.test(value)||value.startsWith("//"))return false;
     try{const u=new URL(value,location.origin);return !u.username&&!u.password&&["https:","http:","mailto:","tel:"].includes(u.protocol);}catch{return false;}
   };
   const asset=value=>value&&(/^[a-z][a-z0-9+.-]*:/i.test(value)||value.startsWith("/")||value.startsWith("#")||value.startsWith("?")?value:"/"+value);
   const nodeFor=id=>document.querySelector('[data-cms-node="'+id+'"]');
+  const textSlots=new Map();
+  for(const field of bindings.values()){
+    const node=nodeFor(field.node);
+    if(node&&!textSlots.has(field.node))textSlots.set(field.node,[...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.nodeValue.trim()));
+  }
   function apply(language=document.documentElement.lang||"en"){
     for(const field of overrides){
       const node=nodeFor(field.node);
       if(!node)continue;
-      const value=field.values[language]??field.values.en??field.original;
+      const value=field.values[language]??field.values.en??window.noorCmsDefaultValue?.(field.original,language)??field.original;
       if(typeof value!=="string")continue;
       if(field.attribute){
-        if(["href","src"].includes(field.attribute)&&!safeUrl(value))continue;
-        node.setAttribute(field.attribute,["href","src"].includes(field.attribute)?asset(value):value);
+        if(["href","src","poster"].includes(field.attribute)&&!safeUrl(value))continue;
+        const next=["href","src","poster"].includes(field.attribute)?asset(value):value;
+        if(node.getAttribute(field.attribute)!==next)node.setAttribute(field.attribute,next);
       }else{
-        const texts=[...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.nodeValue.trim());
+        let texts=textSlots.get(field.node)||[];
+        if(texts.some(text=>text.parentNode!==node)){
+          const children=[...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE);
+          texts=children.filter(text=>text.nodeValue.trim()||children.length===1);textSlots.set(field.node,texts);
+        }
         const text=texts[field.slot];
-        if(text)text.nodeValue=text.nodeValue.replace(text.nodeValue.trim(),value);
+        if(text){const next=text.nodeValue.replace(text.nodeValue.trim(),value);if(text.nodeValue!==next)text.nodeValue=next;}
+      }
+    }
+    applyCollection(language);
+  }
+  function setText(node,value){if(!node)return;const child=node.firstChild;if(child?.nodeType===Node.TEXT_NODE&&node.childNodes.length===1){if(child.nodeValue!==value)child.nodeValue=value;}else if(node.textContent!==value)node.textContent=value;}
+  function setAttribute(node,key,value){if(node&&node.getAttribute(key)!==value)node.setAttribute(key,value);}
+  function applyCollection(language){
+    const localized=(item,key)=>item.translations?.[language]?.[key]??window.noorCmsDefaultValue?.(item[key]||"",language)??item[key]??"";
+    for(const item of collectionItems){
+      if(config.collection==="photos"){
+        const card=document.querySelector('[data-cms-item="'+item.id+'"]');if(!card)continue;
+        const title=localized(item,"title"),caption=localized(item,"caption"),alt=localized(item,"alt");
+        setText(card.querySelector("figcaption b"),title);setText(card.querySelector("figcaption small"),caption);
+        setAttribute(card.querySelector("img"),"alt",alt);setAttribute(card.querySelector("[data-photo-open]"),"data-alt",alt);
+        const translation=item.translations?.[language],edited=translation&&("title" in translation||"caption" in translation);
+        setAttribute(card.querySelector("[data-photo-open]"),"data-caption",(edited?translation.viewerCaption:localized(item,"viewerCaption"))||[title,caption].filter(Boolean).join(" · "));
+        const gallery=card.closest(".photo-year-section");
+        if(gallery){setText(gallery.querySelector(".photo-year-heading h3"),localized(item,"gallery"));setText(gallery.querySelector(".photo-year-heading > span"),localized(item,"gallery"));}
+      }else if(config.collection==="piano"){
+        const card=document.querySelector('[data-track-card="'+(item.builtin||item.id)+'"]');if(!card)continue;
+        setText(card.querySelector("h3"),localized(item,"title"));
+        const original=(config.pianoDefaults||[]).find(p=>p.id===item.id);
+        const composer=localized(item,"composer"),description=localized(item,"description");
+        const copy=item.builtin?(original?.composer===item.composer&&!item.translations?.[language]?.composer?description:[composer,description].filter(Boolean).join(" · ")):[localized(item,"pieceStatus"),composer,description].filter(Boolean).join(" · ");
+        setText(card.querySelector(".track-info > p"),copy);
+        for(const key of ["notes","difficulty","pieceStatus"])setText(card.querySelector('[data-cms-note="'+key+'"]'),localized(item,key));
       }
     }
   }
@@ -53,7 +90,7 @@
           el("img",{src:asset(p.src),alt:p.alt||"",loading:"lazy",decoding:"async",width:p.width||900,height:p.height||900}),
           el("figcaption",{},[el("span",{},[el("b",{text:p.title}),el("small",{text:p.caption||""})])])
         ]);
-        grid.append(el("figure",{class:"photo-card"},[link,el("a",{class:"photo-card-download",href:asset(p.full),download:"","aria-label":"Download "+p.title},[el("span",{text:"DOWNLOAD"}),el("b",{"aria-hidden":"true",class:"arrow-glyph",text:"↓"})])]));
+        grid.append(el("figure",{class:"photo-card","data-cms-item":p.id},[link,el("a",{class:"photo-card-download",href:asset(p.full),download:"","aria-label":"Download "+p.title},[el("span",{text:"DOWNLOAD"}),el("b",{"aria-hidden":"true",class:"arrow-glyph",text:"↓"})])]));
       }
       fragment.append(el("section",{class:"photo-year-section","aria-label":name+" photographs"},[el("div",{class:"photo-year-heading"},[el("h3",{text:name}),el("span",{text:name})]),grid]));
     }
@@ -79,8 +116,8 @@
       const description=p.builtin?(defaultPiece&&defaultPiece.composer===p.composer?p.description:[p.composer,p.description].filter(Boolean).join(" · ")):[p.pieceStatus,p.composer,p.description].filter(Boolean).join(" · ");
       card.querySelector(".track-info > p").textContent=description;
       card.querySelectorAll("[data-cms-note]").forEach(n=>n.remove());
-      for(const key of ["notes","difficulty","learnedDate"])if(p[key])card.querySelector(".track-info").append(el("p",{"data-cms-note":"",text:p[key]}));
-      if(p.builtin&&p.pieceStatus&&defaultPiece?.pieceStatus!==p.pieceStatus)card.querySelector(".track-info").append(el("p",{"data-cms-note":"",text:p.pieceStatus}));
+      for(const key of ["notes","difficulty","learnedDate"])if(p[key]||Object.values(p.translations||{}).some(v=>v[key]))card.querySelector(".track-info").append(el("p",{"data-cms-note":key,text:p[key]||""}));
+      if(p.builtin&&(p.pieceStatus&&defaultPiece?.pieceStatus!==p.pieceStatus||Object.values(p.translations||{}).some(v=>v.pieceStatus)))card.querySelector(".track-info").append(el("p",{"data-cms-note":"pieceStatus",text:p.pieceStatus||""}));
       if(p.thumbnail&&safeUrl(p.thumbnail))card.querySelector(".track-info").prepend(el("img",{"data-cms-note":"",src:asset(p.thumbnail),alt:"",width:"120",height:"120",loading:"lazy"}));
       if(p.midi&&safeUrl(p.midi))card.querySelector(".track-info").append(el("a",{"data-cms-note":"",class:"audio-download-link",href:asset(p.midi),download:"",text:"DOWNLOAD MIDI ↓"}));
       if(p.audio&&safeUrl(p.audio)){
@@ -95,11 +132,13 @@
     list.replaceChildren(fragment);
   }
   if(config.adminOrigin && new URLSearchParams(location.search).get("cms-preview")==="1"){
+    const reply=type=>window.parent.postMessage({type,page:config.page},config.adminOrigin);
     window.addEventListener("message",event=>{
       if(event.origin!==config.adminOrigin||event.source!==window.parent||event.data?.type!=="noor-cms-preview"||event.data.page!==config.page)return;
       const data=event.data.data;
       if(!data||data.version!==1)return;
-      overrides=[...config.fields];
+      // Draft data replaces published overrides, including fields restored to their defaults.
+      overrides=overrides.map(field=>({...field,values:{}}));
       for(const [key,values] of Object.entries(data.pages?.[config.page]||{})){
         const field=bindings.get(key);if(!field||!values||typeof values!=="object")continue;
         overrides=overrides.filter(f=>!(f.node===field.node&&f.slot===field.slot&&f.attribute===field.attribute));
@@ -107,12 +146,19 @@
       }
       for(const [group,ids] of Object.entries(data.orders||{})){
         const parent=nodeFor(group);if(!parent||!Array.isArray(ids))continue;
-        for(const id of ids){const node=nodeFor(id);if(node&&node.parentElement===parent)parent.append(node);}
+        const nodes=ids.map(nodeFor).filter(node=>node?.parentElement===parent);
+        const current=[...parent.children].filter(node=>nodes.includes(node));
+        if(current.every((node,index)=>node===nodes[index]))continue;
+        const anchor=current.at(-1)?.nextSibling||null,fragment=document.createDocumentFragment();
+        fragment.append(...nodes);parent.insertBefore(fragment,anchor);
       }
-      if(config.collection==="photos"&&Array.isArray(data.photos))previewPhotos(data.photos);
-      if(config.collection==="piano"&&Array.isArray(data.piano))previewPiano(data.piano);
+      if(config.collection==="photos"&&Array.isArray(data.photos)){collectionItems=data.photos;previewPhotos(data.photos);}
+      if(config.collection==="piano"&&Array.isArray(data.piano)){collectionItems=data.piano;previewPiano(data.piano);}
       apply();
+      reply("noor-cms-preview-applied");
     });
+    if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>reply("noor-cms-preview-ready"),{once:true});
+    else reply("noor-cms-preview-ready");
   }
   let audio,active,context,analyser,frame;
   function stopMedia(){
