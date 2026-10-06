@@ -11,6 +11,13 @@ class ContentTests(unittest.TestCase):
         for page in pages:
             original=page.read_text("utf-8")
             output=cms.render(original,page.relative_to(ROOT/"pages").as_posix(),cms.CONFIG)
+            # Collection IDs connect existing photos to translations and previews.
+            # Validate them before removing this nonvisual CMS metadata from the
+            # otherwise exact comparison of the public page markup.
+            item_ids=re.findall(r' data-cms-item="([^"]+)"',output)
+            expected_ids=[p["id"] for p in cms.photo_defaults(original)] if page.name=="photos.html" else []
+            self.assertEqual(expected_ids,item_ids,str(page))
+            output=re.sub(r' data-cms-item="legacy-[a-f0-9]{16}"',"",output)
             output=re.sub(r' data-cms-node="[a-f0-9]{16}"',"",output)
             output=re.sub(r'<script id="cms-page-data".*?</script><script src="/cms-runtime.js" defer></script>\n',"",output,flags=re.S)
             self.assertEqual(original,output,str(page))

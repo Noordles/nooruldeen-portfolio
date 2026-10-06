@@ -118,6 +118,12 @@ Run **Deploy owner CMS** from Actions on main. The workflow:
 
 The public Pages workflow remains the existing workflow. Secrets do not enter dist, page JSON or browser bundles. Changing a source page deploys an updated admin catalog without replacing the draft stored in D1.
 
+### Repository checks and deployment connections
+
+**Deploy portfolio to GitHub Pages** builds and deploys the public website. **Owner CMS checks** runs content preservation, language and design-setting regression checks, authentication/upload checks, browser syntax checks, the public build and private Worker bundle on pushes to main and owner-cms. It can also be run manually from Actions.
+
+The unused Cloudflare Worker named **nooruldeen-portfolio** has been disconnected from Git builds. It had no enabled URLs, routes, domains or bindings, and its root-level `wrangler deploy` job failed because the repository's generated static output was not built. Do not reconnect that Worker to the repository root. The private admin service is **noor-owner-cms** and uses the separate owner-service deployment configuration described above.
+
 Reference: [Worker secrets](https://developers.cloudflare.com/workers/configuration/secrets/), [Worker custom domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/).
 
 ### 5. Activate the public /admin entry and preview

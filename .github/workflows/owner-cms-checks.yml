@@ -1,9 +1,10 @@
 name: Owner CMS checks
 on:
+  workflow_dispatch:
   push:
-    branches: [owner-cms]
+    branches: [main, owner-cms]
   pull_request:
-    paths: ['admin/**', 'content/**', 'scripts/**', 'tests/**', '.github/workflows/owner-cms-checks.yml']
+    paths: ['admin/**', 'content/**', 'pages/**', 'styles/**', 'scripts/**', 'tests/**', '.github/workflows/owner-cms-checks.yml']
 permissions:
   contents: read
 jobs:
@@ -14,7 +15,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Run content and design preservation checks
-        run: python3 -m unittest discover -s tests -p 'test_cms*.py' -v
+        run: |
+          python3 -m unittest discover -s tests -p 'test_cms*.py' -v
+          python3 scripts/test_cms_content.py -v
       - name: Run authentication and upload checks
         run: node --test admin/service/tests/*.test.mjs
       - name: Check browser JavaScript syntax
