@@ -228,7 +228,8 @@ export async function handle(request,env){
   }
   if(path.startsWith("/api/"))return no(404,"Endpoint not found");
   if(request.method!=="GET"&&request.method!=="HEAD")return no(405,"Method not allowed");
-  const assetUrl=new URL(request.url);assetUrl.pathname=path==="/"||path==="/admin"||path==="/admin/"?"/index.html":path;
+  // Fetch the canonical index URL: /index.html redirects to / in the assets binding.
+  const assetUrl=new URL(request.url);assetUrl.pathname=path==="/"||path==="/admin"||path==="/admin/"?"/":path;
   return env.ASSETS.fetch(new Request(assetUrl,request));
 }
 export default {

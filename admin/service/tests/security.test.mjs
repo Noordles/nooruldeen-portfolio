@@ -80,3 +80,24 @@ test("PNG dimensions are read from binary header",()=>{
   const png=new Uint8Array(40);png.set([137,80,78,71,13,10,26,10]);png.set(new TextEncoder().encode("IHDR"),12);const v=new DataView(png.buffer);v.setUint32(16,1600);v.setUint32(20,900);
   assert.deepEqual(inspectMedia(png.buffer,"image/png"),{width:1600,height:900});
 });
+
+test("signed owner entry routes serve HTML without an asset canonicalization loop",async()=>{
+  const originalFetch=globalThis.fetch;
+  globalThis.fetch=keyFetch;
+  try{
+    const jwt=await token();
+    const assets={async fetch(request){
+      const path=new URL(request.url).pathname;
+      // Cloudflare's default HTML handling canonicalizes index.html to /.
+      if(path==="/index.html")return new Response(null,{status:307,headers:{Location:"/"}});
+      if(path==="/")return new Response("<!doctype html><title>Owner Studio</title>",{headers:{"Content-Type":"text/html"}});
+      return new Response("Not found",{status:404});
+    }};
+    for(const path of ["/","/admin","/admin/"]){
+      const response=await handle(new Request(env.ADMIN_ORIGIN+path,{headers:{"Cf-Access-Jwt-Assertion":jwt}}),{...env,ASSETS:assets});
+      assert.equal(response.status,200,path+" must serve the owner interface");
+      assert.equal(response.headers.get("Location"),null);
+      assert.match(await response.text(),/Owner Studio/);
+    }
+  }finally{globalThis.fetch=originalFetch;}
+});
