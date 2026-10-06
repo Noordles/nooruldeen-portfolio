@@ -228,6 +228,19 @@ a.hobby-visual:focus-visible { outline:3px solid var(--paper);outline-offset:-5p
 .photography-visual::after { content:"";position:absolute;z-index:1;inset:0;pointer-events:none;background:linear-gradient(125deg,rgba(38,126,148,.58),rgba(19,54,76,.2) 58%,rgba(116,38,60,.12));mix-blend-mode:color; }
 .photography-card:hover .photography-visual img { filter:grayscale(.12) contrast(1.08) brightness(.82);transform:scale(1.07) rotate(-1.3deg); }
 .photography-visual .photo-stamp { z-index:2;background:rgba(38,126,148,.76);border:1px solid rgba(165,220,226,.28); }
+/* Mirror the hobby decorations with the cards in the Arabic layout. */
+html[dir="rtl"] .hobby-grid .photo-stamp { left:auto;right:12px;transform:rotate(3deg); }
+@media (min-width:761px) {
+  html[dir="rtl"] .hobby-grid .photo-stamp { right:20px; }
+  html[dir="rtl"] .hobby-versus {
+    left:auto;right:56%;transform:translate(50%,-50%) rotate(9deg);
+    background:linear-gradient(225deg,var(--wine) 0 48%,var(--photo-blue) 52% 100%);
+  }
+  html[dir="rtl"] .hobby-grid .piano-label { left:auto;right:calc(56% - 125px);transform:rotate(3deg); }
+}
+@media (max-width:760px) {
+  html[dir="rtl"] .hobby-grid .piano-label { left:auto;right:16px;transform:rotate(3deg); }
+}
 .photo-stamp { position:absolute;left:12px;bottom:12px;padding:6px 8px;border-radius:3px;color:var(--paper);background:rgba(116,38,60,.77);font:700 8px var(--mono);letter-spacing:.1em;transform:rotate(-3deg); }
 .piano-visual { background:radial-gradient(ellipse at 78% 24%,rgba(209,139,152,.4),transparent 35%),linear-gradient(145deg,#281b20,#101312 70%); }
 .piano-glow { position:absolute;inset:0;background:linear-gradient(120deg,transparent 15%,rgba(48,196,160,.12) 42%,transparent 75%); }

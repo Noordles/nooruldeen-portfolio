@@ -35,6 +35,8 @@
     ["EXPLORE DESIGN WORK ↗","EXPLOREAZĂ LUCRĂRILE DE DESIGN ↗","استكشف أعمال التصميم ↗"],
     ["EXPLORE RESEARCH ↗","EXPLOREAZĂ CERCETAREA ↗","استكشف الأبحاث ↗"],
     ["EXPLORE MORE ↗","DESCOPERĂ MAI MULT ↗","اكتشف المزيد ↗"],
+    ["EXPLORE MORE","DESCOPERĂ MAI MULT","اكتشف المزيد"],
+    ["VS","VS","مقابل"],
     ["LISTEN TO MORE ↗","ASCULTĂ MAI MULT ↗","استمع إلى المزيد ↗"],
     ["CONTACT NOOR ↗","CONTACTEAZĂ-L PE NOOR ↗","تواصل مع نور ↗"],
     ["CONTACT ↗","CONTACT ↗","اتصل بي ↗"],
@@ -93,7 +95,7 @@
     ["Research & design","Cercetare și design","أبحاث وتصميم"],
     ["CONTACT NOOR","CONTACTEAZĂ-L PE NOOR","تواصل مع نور"],
     ["Contact","Contact","اتصل"],
-    ["For design, development, animation, other work, or just to chat :D","Pentru design, dezvoltare, animație, alte proiecte sau doar pentru o conversație :D","للتصميم أو التطوير أو الرسوم المتحركة أو أي عمل آخر، أو لمجرد الدردشة :D"],
+    ["For design, development, animation, other work, or just to chat :D","Pentru design, dezvoltare, animație, alte proiecte sau doar pentru o conversație :D","للتصميم أو التطوير أو الرسوم المتحركة أو أي عمل آخر، أو لمجرد الدردشة"],
     ["EMAIL","E-MAIL","البريد الإلكتروني"],
     ["PHONE","TELEFON","الهاتف"],
     ["LINKEDIN","LINKEDIN","لينكدإن"],
@@ -1510,6 +1512,12 @@
   };
   const originalText = new WeakMap();
   const originalAttributes = new WeakMap();
+  const originalDirections = new WeakMap();
+  const originalPageTitle = document.title;
+  const originalDescription = document.querySelector('meta[name="description"]')?.content;
+  const socialMetadata = [...document.querySelectorAll('meta[property^="og:"],meta[name^="twitter:"]')]
+    .filter((element) => /(?:title|description|image:alt)$/.test(element.getAttribute("property") || element.name))
+    .map((element) => [element, element.content]);
   let activeLanguage = "en";
   let switcher = null;
 
@@ -1550,12 +1558,34 @@
     const entry = translations[normalize(source)];
     const localizedDate = language === "en" ? null : localizeDate(source.trim(), language);
     const localizedPhotoLabel = language === "en" ? null : localizePhotoLabel(source.trim(), language);
-    if (language === "en" || (!entry && !localizedDate && !localizedPhotoLabel)) {
+    if (language === "en") {
       node.nodeValue = source;
       return;
     }
     const localized = localizedDate || localizedPhotoLabel || localizeCase(source.trim(), entry?.[language] || source.trim(), language);
-    node.nodeValue = source.replace(source.trim(), localized);
+    node.nodeValue = source.replace(source.trim(), localizeName(localized, language));
+  }
+
+  function localizeName(value, language) {
+    if (language !== "ar") return value;
+    // The highlighted given name is split into "Noor" and "uldeen" in markup.
+    if (normalize(value) === "uldeen") return value.replace(value.trim(), "الدين");
+    return value
+      .replace(/\bAl[ -]Sammarraie\b/gi, "السامرائي")
+      .replace(/\bNooruldeen\b(?![.@/])/gi, "نورالدين")
+      .replace(/\bNoor\b(?![.@/])/gi, "نور");
+  }
+
+  function updateNameDirections(language) {
+    const selectors = '#hero-title,#about-title,.contact-fullname,.footer-name,.contact-links b[dir]';
+    document.querySelectorAll(selectors).forEach((element) => {
+      if (element.closest(".highlight-backdrop") || element.closest(".brand-name")) return;
+      if (!originalDirections.has(element)) originalDirections.set(element, element.getAttribute("dir"));
+      const original = originalDirections.get(element);
+      if (language === "ar" && /(?:نور|السامرائي)/.test(element.textContent)) element.setAttribute("dir", "rtl");
+      else if (original === null) element.removeAttribute("dir");
+      else element.setAttribute("dir", original);
+    });
   }
 
   function translateAttribute(element, name, language) {
@@ -1568,7 +1598,8 @@
     if (!(name in originals)) originals[name] = element.getAttribute(name);
     const source = originals[name];
     const entry = translations[normalize(source)];
-    element.setAttribute(name, language === "en" || !entry ? source : localizeCase(source, entry[language] || source, language));
+    const localized = language === "en" || !entry ? source : localizeCase(source, entry[language] || source, language);
+    element.setAttribute(name, localizeName(localized, language));
   }
 
   function collectAndTranslate(root, language) {
@@ -1670,10 +1701,10 @@
 
   function updatePageMetadata(language) {
     const meta = pageMeta[window.location.pathname.replace(/\/+$/, "/")];
-    if (!meta) return;
-    document.title = meta[language][0];
+    document.title = localizeName(meta?.[language]?.[0] || originalPageTitle, language);
     const description = document.querySelector('meta[name="description"]');
-    if (description) description.content = meta[language][1];
+    if (description) description.content = localizeName(meta?.[language]?.[1] || originalDescription || "", language);
+    socialMetadata.forEach(([element, source]) => { element.content = localizeName(source, language); });
   }
 
   function setLanguage(language, persist) {
@@ -1686,6 +1717,7 @@
     translateContextualHeadings(language);
     updatePageMetadata(language);
     window.noorCmsApply?.(language);
+    updateNameDirections(language);
     updateSwitcher();
     if (persist) {
       try { window.localStorage.setItem(STORAGE_KEY, language); } catch (_) {}
