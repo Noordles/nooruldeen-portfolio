@@ -162,6 +162,25 @@ def write_legacy_redirect(destination: Path, route: str, title: str) -> None:
     destination.write_text(document, encoding="utf-8")
 
 
+
+def write_search_discovery(output: Path, routes: list[str]) -> None:
+    """Publish canonical page URLs for search-engine discovery."""
+    urls = "\n".join(
+        f"  <url><loc>{html.escape('https://nooruldeen.com' + route)}</loc></url>"
+        for route in sorted(set(routes))
+    )
+    (output / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + urls + "\n</urlset>\n",
+        encoding="utf-8",
+    )
+    (output / "robots.txt").write_text(
+        "User-agent: *\nAllow: /\n"
+        "\nSitemap: https://nooruldeen.com/sitemap.xml\n",
+        encoding="utf-8",
+    )
+
 def main() -> int:
     if OUTPUT.is_symlink():
         return fail(f"Refusing to replace a symbolic link: {OUTPUT}")
@@ -262,6 +281,7 @@ def main() -> int:
         owner_entry += '<p>The owner administration service is being set up.</p>'
     (admin_output / "index.html").write_text(owner_entry + "</main></body></html>", encoding="utf-8")
 
+    write_search_discovery(OUTPUT, list(page_routes.values()))
     shutil.copy2(ROOT / "CNAME", OUTPUT / "CNAME")
     (OUTPUT / ".nojekyll").touch()
 
