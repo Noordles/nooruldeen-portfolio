@@ -29,6 +29,8 @@ Use the website owner's Cloudflare account. The admin subdomain must be in an ac
 
 ### 1. Managed owner authentication
 
+If Zero Trust has not been activated in the owner account, select the Free plan for this one-owner service. Its checkout may require a payment method, acceptance of Cloudflare's terms and authorization for usage beyond free limits. The owner must approve those account commitments before activation; do not silently select a paid plan.
+
 Create a Cloudflare Access **self-hosted** application covering **admin.nooruldeen.com** with no path restriction.
 
 - Name: Noor Owner Studio.
@@ -46,13 +48,19 @@ References: [Access applications](https://developers.cloudflare.com/cloudflare-o
 
 ### 2. Database and original-file storage
 
-Using Wrangler authenticated to the owner account:
+First check the owner account for an existing **noor-owner-cms** D1 database and **noor-owner-cms-media** R2 bucket. Reuse resources already created for this deployment. The task's local activation record contains the database ID if it was provisioned during implementation.
+
+Using Wrangler authenticated to the owner account, create only missing resources:
 
 ```powershell
 npx --yes wrangler@4.147.0 login
+# Only if the named database does not already exist:
 npx --yes wrangler@4.147.0 d1 create noor-owner-cms
+# Only if the private bucket does not already exist:
 npx --yes wrangler@4.147.0 r2 bucket create noor-owner-cms-media
 ```
+
+R2 may require activating a usage-billed subscription before a bucket can be created. Review the free allowances and additional usage prices in the owner account, and obtain the owner's approval before accepting its billing terms.
 
 Record the D1 database ID. Keep the R2 bucket private: no r2.dev public access and no public bucket custom domain. The Worker is the only public serving path. No bucket lifecycle rule should delete originals or live derivatives.
 

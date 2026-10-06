@@ -2,7 +2,7 @@
 
 The admin is reached through **https://nooruldeen.com/admin/** after activation. It opens the protected owner service at **https://admin.nooruldeen.com/admin**. Sign in using the owner identity configured in Cloudflare Access.
 
-**This implementation still needs its account, authentication policy, database, storage and publishing credential provisioned before those addresses provide a working CMS.** See [deployment instructions](DEPLOYMENT.md).
+**The CMS becomes usable after the deployment setup is completed: managed owner login, private storage, the database binding and a server publishing credential.** See [deployment instructions](DEPLOYMENT.md).
 
 ## Everyday controls
 
