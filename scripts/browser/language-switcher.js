@@ -1470,7 +1470,7 @@
   };
   const pageMeta = {
     "/": {
-      en: ["Nooruldeen Al Sammarraie | Web Design & Development", "Nooruldeen Al Sammarraie’s personal portfolio: web and app design, development, visual identities, animation, photography, economics and statistics."],
+      en: ["Nooruldeen Al Sammarraie | Design, Code & Research", "I’m Noor. I make websites, apps and visual identities, study economics and statistics, and take photos of the details people pass by."],
       ro: ["Al Sammarraie Nooruldeen — Design și dezvoltare web", "Design, dezvoltare, animație, fotografie și interese în statistică și economia ascunsă din Irak."],
       ar: ["Al Sammarraie Nooruldeen — تصميم وتطوير الويب", "تصميم وتطوير ورسوم متحركة وتصوير واهتمامات بالإحصاء والاقتصاد الخفي في العراق."]
     },
