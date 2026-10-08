@@ -117,7 +117,7 @@ def rewrite_html_references(document: str, page_routes: dict[str, str], styleshe
     return HTML_ATTRIBUTE.sub(replace_attribute, document)
 
 
-def add_site_metadata(document: str, route: str, language_version: str, script_version: str, cms_version: str = "") -> str:
+def add_site_metadata(document: str, route: str, language_version: str, script_version: str, cms_version: str = "", favicon_version: str = "") -> str:
     document = re.sub(
         r'(?P<prefix><script\s+[^>]*src=["\'])/script\.js(?:\?[^"\']*)?(?P<quote>["\'])',
         lambda match: f'{match.group("prefix")}/script.js?v={script_version}{match.group("quote")}',
@@ -135,7 +135,9 @@ def add_site_metadata(document: str, route: str, language_version: str, script_v
     if not re.search(r'<link\s+[^>]*rel=["\']canonical["\']', document, re.IGNORECASE):
         additions.append(f'<link rel="canonical" href="https://nooruldeen.com{route}" />')
     if not re.search(r'<link\s+[^>]*rel=["\']icon["\']', document, re.IGNORECASE):
-        additions.append('<link rel="icon" type="image/svg+xml" href="/assets/brand/noor-favicon.svg" />')
+        additions.append(f'<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/noor-favicon-32.png?v={favicon_version}" />')
+        additions.append(f'<link rel="icon" type="image/svg+xml" href="/assets/brand/noor-favicon.svg?v={favicon_version}" />')
+        additions.append(f'<link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/noor-touch-icon.png?v={favicon_version}" />')
     if additions:
         markup = "\n".join(f"  {item}" for item in additions)
         document = re.sub(r"</head\s*>", lambda match: f"{markup}\n{match.group(0)}", document, count=1, flags=re.IGNORECASE)
@@ -219,6 +221,10 @@ def main() -> int:
     language_version = hashlib.sha256(language_script.read_bytes()).hexdigest()[:12]
     script_version = hashlib.sha256((BROWSER_SCRIPT_ROOT / "script.js").read_bytes()).hexdigest()[:12]
     cms_version = hashlib.sha256((BROWSER_SCRIPT_ROOT / "cms-runtime.js").read_bytes()).hexdigest()[:12]
+    favicon_source = ROOT / "assets" / "brand" / "noor-favicon.svg"
+    if not favicon_source.is_file():
+        return fail("Required favicon is missing: assets/brand/noor-favicon.svg")
+    favicon_version = hashlib.sha256(favicon_source.read_bytes()).hexdigest()[:12]
 
     input_roots = [ROOT / name for name in INPUT_DIRECTORIES]
     for directory in input_roots:
@@ -262,7 +268,7 @@ def main() -> int:
         document = rewrite_html_references(document, page_routes, stylesheet_version)
         if route == "/":
             document = add_homepage_alias_redirect(document)
-        document = add_site_metadata(document, route, language_version, script_version, cms_version)
+        document = add_site_metadata(document, route, language_version, script_version, cms_version, favicon_version)
         destination.write_text(document, encoding="utf-8")
 
         if route != "/":

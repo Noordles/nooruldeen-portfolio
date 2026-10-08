@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title id="title">Nooruldeen</title>
-  <rect x="2" y="2" width="60" height="60" rx="15" fill="#101312" stroke="#30c4a0" stroke-width="2"/>
-  <path d="M14 49V15h7l21 22V15h8v34h-7L22 27v22z" fill="#74263c" transform="translate(3 3)"/>
-  <path d="M14 49V15h7l21 22V15h8v34h-7L22 27v22z" fill="#30c4a0" transform="translate(-1 2)"/>
-  <path d="M14 49V15h7l21 22V15h8v34h-7L22 27v22z" fill="#e9e0cf"/>
-  <circle cx="49" cy="14" r="2.5" fill="#d18b98"/>
+  <title id="title">Nooruldeen — N monogram</title>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="#101312" stroke="#d18b98" stroke-width="1.5"/>
+  <path d="M15 47V17h9l16 19V17h9v30h-9L24 28v19Z" fill="#74263c" transform="translate(2.5 3)"/>
+  <path d="M15 47V17h9l16 19V17h9v30h-9L24 28v19Z" fill="#e9e0cf"/>
+  <path d="M40 17h9v7h-9z" fill="#30c4a0"/>
+  <path d="M41 53h10" fill="none" stroke="#30c4a0" stroke-linecap="round" stroke-width="2.5"/>
 </svg>
