@@ -182,18 +182,27 @@ def write_legacy_redirect(destination: Path, route: str, title: str) -> None:
 
 def write_search_discovery(output: Path, routes: list[str]) -> None:
     """Publish canonical page URLs for search-engine discovery."""
+    homepage_image = (
+        '<image:image><image:loc>https://nooruldeen.com/assets/brand/'
+        'noor-search-thumbnail.jpg</image:loc></image:image>'
+    )
     urls = "\n".join(
-        f"  <url><loc>{html.escape('https://nooruldeen.com' + route)}</loc></url>"
+        f"  <url><loc>{html.escape('https://nooruldeen.com' + route)}</loc>"
+        + (homepage_image if route == "/" else "") + "</url>"
         for route in sorted(set(routes))
     )
     (output / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+        'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
         + urls + "\n</urlset>\n",
         encoding="utf-8",
     )
     (output / "robots.txt").write_text(
         "User-agent: *\nAllow: /\n"
+        "\n# Keep decorative artwork out of Google search thumbnails.\n"
+        "User-agent: Googlebot\nUser-agent: Googlebot-Image\n"
+        "Disallow: /assets/brand/interest-atlas.svg\nAllow: /\n"
         "\nSitemap: https://nooruldeen.com/sitemap.xml\n",
         encoding="utf-8",
     )
