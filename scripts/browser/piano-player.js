@@ -1,3 +1,10 @@
+// Canvas paint inherits the same global and local palette as surrounding CSS.
+const paletteColor = (hex, alpha = 1, element = canvas) => {
+  const value = getComputedStyle(element || document.documentElement).getPropertyValue("--site-color-" + hex.slice(1)).trim();
+  const channels = /^\d+ \d+ \d+$/.test(value) ? value.split(" ") : [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  return `rgba(${channels.join(",")},${alpha})`;
+};
+
 const trackData = {
   baghdad: {
     title: "Baghdad at dusk",
@@ -153,10 +160,10 @@ const drawPianoRoll = (playback) => {
   }
   roll.setTransform(ratio, 0, 0, ratio, 0, 0);
   roll.clearRect(0, 0, width, height);
-  roll.fillStyle = "rgba(8, 12, 11, .94)";
+  roll.fillStyle = paletteColor("#080c0b", .94, rollCanvas);
   roll.fillRect(0, 0, width, height);
 
-  roll.strokeStyle = "rgba(236, 228, 210, .075)";
+  roll.strokeStyle = paletteColor("#ece4d2", .075, rollCanvas);
   roll.lineWidth = 1;
   for (let key = 0; key <= 52; key += 1) {
     const x = width * key / 52;
@@ -172,11 +179,11 @@ const drawPianoRoll = (playback) => {
     roll.lineTo(width, y);
     roll.stroke();
   }
-  roll.fillStyle = "rgba(209, 139, 152, .68)";
+  roll.fillStyle = paletteColor("#d18b98", .68, rollCanvas);
   roll.fillRect(0, height - 2, width, 2);
 
   if (!playback) {
-    roll.fillStyle = "rgba(236, 228, 210, .56)";
+    roll.fillStyle = paletteColor("#ece4d2", .56, rollCanvas);
     roll.font = "500 8px IBM Plex Mono, Consolas, monospace";
     roll.textAlign = "center";
     roll.textBaseline = "middle";
@@ -189,7 +196,7 @@ const drawPianoRoll = (playback) => {
   const releaseFadeSeconds = .34;
   const flowTailSeconds = .28;
   const fallSpeed = height / fallSeconds;
-  const noteColors = ["#d18b98", "#35b9d6", "#30c4a0"];
+  const noteColors = [paletteColor("#d18b98", 1, rollCanvas), paletteColor("#35b9d6", 1, rollCanvas), paletteColor("#30c4a0", 1, rollCanvas)];
   playback.events.forEach(({ start, end, chord }) => {
     const timeUntil = start - elapsed;
     const timeSinceEnd = elapsed - end;
@@ -219,14 +226,14 @@ const drawPianoRoll = (playback) => {
         roll.shadowColor = color;
         roll.shadowBlur = 9 + flowProgress * 5;
         const noteGradient = roll.createLinearGradient(x, y, x, bottom);
-        noteGradient.addColorStop(0, "rgba(255, 246, 232, .92)");
+        noteGradient.addColorStop(0, paletteColor("#fff6e8", .92, rollCanvas));
         noteGradient.addColorStop(.16, color);
         noteGradient.addColorStop(1, color);
         roll.fillStyle = noteGradient;
         roll.fillRect(x, y, noteWidth, barHeight);
         roll.shadowBlur = 0;
         roll.globalAlpha = noteOpacity * .82;
-        roll.fillStyle = "rgba(255, 245, 235, .78)";
+        roll.fillStyle = paletteColor("#fff5eb", .78, rollCanvas);
         roll.fillRect(x + 1, y + 1, Math.max(1, noteWidth - 2), 2);
       }
       if (flowActive) {
@@ -310,7 +317,7 @@ const clearVisualizer = () => {
   canvas.height = Math.max(1, Math.floor(height * ratio));
   canvasContext.scale(ratio, ratio);
   canvasContext.clearRect(0, 0, width, height);
-  canvasContext.fillStyle = "rgba(48, 196, 160, .22)";
+  canvasContext.fillStyle = paletteColor("#30c4a0", .22);
   canvasContext.fillRect(0, height / 2, width, 1);
   drawPianoRoll(undefined);
 };
@@ -361,7 +368,7 @@ const drawVisualizer = () => {
     const barHeight = Math.max(3, bin * height * .82);
     const x = i * (barWidth + gap);
     const fade = .32 + bin * .68;
-    canvasContext.fillStyle = i % 5 === 0 ? `rgba(209,139,152,${fade})` : `rgba(48,196,160,${fade})`;
+    canvasContext.fillStyle = i % 5 === 0 ? paletteColor("#d18b98", fade) : paletteColor("#30c4a0", fade);
     canvasContext.fillRect(x, midline - barHeight / 2, barWidth, barHeight);
   }
   const elapsed = getPlaybackPosition(activePlayback);
@@ -581,6 +588,7 @@ updateMidiRollPositions();
 clearVisualizer();
 
 window.addEventListener("noor:stop-piano", () => stopPlayback());
+window.addEventListener("noor:colors-changed", () => { if (!activePlayback) clearVisualizer(); });
 document.querySelectorAll(".track-card[data-track-card]").forEach((card) => {
   const piece = trackData[card.dataset.trackCard];
   if (piece) piece.title = card.querySelector("h3")?.textContent || piece.title;

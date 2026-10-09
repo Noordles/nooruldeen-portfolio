@@ -52,6 +52,20 @@ class ContentCatalogTests(unittest.TestCase):
         payload = json.loads(result.split('<script id="cms-page-data" type="application/json">')[1].split('</script>')[0])
         self.assertEqual(payload["items"][0]["translations"]["ar"]["title"], "مقطوعة")
 
+    def test_page_areas_and_color_settings_keep_existing_field_ids(self):
+        document='<html><head></head><body><header>Brand</header><section id="hero"><h1>Noor</h1><div class="hero-illustration" aria-hidden="true"><img src="/art.svg" /></div></section></body></html>'
+        schema=Catalog(document,"sample.html").schema()
+        heading=next(f for f in schema['fields'] if f['value']=='Noor')
+        hero=next(t for t in schema['designTargets'] if t['label']=='Hero')
+        palette={'families':{'wine':'#4834bc'}}
+        styles={hero['key']:{'en':{'background':'#111111'}}}
+        output=render(document,'sample.html',{'palette':palette,'styles':{'sample.html':styles}})
+        payload=json.loads(output.split('<script id="cms-page-data" type="application/json">')[1].split('</script>')[0])
+        self.assertIn(hero['key'],payload['styleNodes'])
+        self.assertIn('data-cms-node="'+hero['key']+'"',output)
+        self.assertEqual(payload['palette'],palette)
+        self.assertTrue(any(f['key']==heading['key'] for f in payload['bindings']))
+
     def test_design_settings_are_embedded_with_approved_bindings(self):
         document = '<head></head><h1>Noor</h1>'
         field = Catalog(document, "sample.html").fields[0]

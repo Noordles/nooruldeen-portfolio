@@ -18,12 +18,14 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -p 'test_cms*.py' -v
           python3 scripts/test_cms_content.py -v
+          python3 scripts/test_site_colors.py -v
       - name: Run authentication and upload checks
         run: node --test admin/service/tests/*.test.mjs
       - name: Check browser JavaScript syntax
         run: |
           node --check admin/service/ui/admin.js
           node --check scripts/browser/cms-runtime.js
+          node --check scripts/browser/site-colors.js
           node --check scripts/browser/photos-gallery.js
           node --check scripts/browser/piano-player.js
           node --check scripts/browser/language-switcher.js

@@ -1,6 +1,7 @@
 """Owner CMS integration. Preserve source markup and replace only approved content."""
 from __future__ import annotations
-import argparse, hashlib, html, json, re
+import argparse, hashlib, html, json, re, shutil
+import site_colors
 from collections import defaultdict
 from html.parser import HTMLParser
 from pathlib import Path
@@ -10,7 +11,7 @@ VOID = set("area base br col embed hr img input link meta param source track wbr
 SKIP = set("script style noscript template svg canvas pre code".split())
 EDIT_ATTRS = {"a": ("href", "title", "aria-label"), "img": ("alt", "src"), "button": ("title", "aria-label"), "input": ("placeholder",), "textarea": ("placeholder",), "video": ("src", "poster"), "audio": ("src",), "source": ("src",)}
 CARD_CLASSES = set("work-card topic-feature research-deck-card site-story-preview incsmps-page-card incsmps-gallery-card logo-piece".split())
-CONFIG = {"version": 1, "pages": {}, "orders": {}, "photos": None, "piano": None, "styles": {}, "theme": {}, "adminOrigin": ""}
+CONFIG = {"version": 1, "pages": {}, "orders": {}, "photos": None, "piano": None, "styles": {}, "theme": {}, "palette": {}, "adminOrigin": ""}
 def uid(value): return hashlib.sha256(value.encode()).hexdigest()[:16]
 def read_json(path, default):
     return json.loads(path.read_text("utf-8")) if path.is_file() else default
@@ -97,8 +98,21 @@ class Catalog(HTMLParser):
                 items.append({"id": member["id"], "label": re.sub("<[^>]+>", " ", self.document[member["start"]:member["end"]]).strip()[:120], "fieldKeys": keys})
             groups.append({"key": parent["id"], "section": parent["section"], "label": "Items in " + parent["section"], "members": items, "_nodes": members})
         return groups
+    def design_targets(self):
+        targets = []
+        for node in self.nodes:
+            if node["contentExcluded"] or node["tag"] in ("br", "hr", "source"): continue
+            ancestor = node
+            while ancestor and ancestor["tag"] != "body": ancestor = ancestor["parent"]
+            if not ancestor: continue
+            attrs = node["attrs"]
+            name = attrs.get("id") or (attrs.get("class") or "").split(" ")[0]
+            sample = next((f["value"] for f in self.fields if not f.get("attribute") and f["node"] == node["id"]), "")
+            label = sample[:85] or name.replace("-", " ").strip().capitalize() or {"body": "Whole page", "header": "Header", "nav": "Navigation", "main": "Main content", "footer": "Footer", "img": "Image"}.get(node["tag"], "Area")
+            targets.append({"key": node["id"], "label": label, "tag": node["tag"], "section": node["section"], "languages": node["languages"]})
+        return targets
     def schema(self):
-        return {"id": self.path, "route": route(self.path), "label": self.path.replace(".html", "").replace("/", " / "), "fields": [{k: v for k, v in f.items() if k not in ("start", "end")} for f in self.fields], "collections": [{k: v for k, v in g.items() if k != "_nodes"} for g in self.groups()]}
+        return {"id": self.path, "route": route(self.path), "label": self.path.replace(".html", "").replace("/", " / "), "fields": [{k: v for k, v in f.items() if k not in ("start", "end")} for f in self.fields], "collections": [{k: v for k, v in g.items() if k != "_nodes"} for g in self.groups()], "designTargets": self.design_targets()}
 
 def apply_edits(document, edits):
     for start, end, value in sorted(edits, reverse=True):
@@ -106,6 +120,7 @@ def apply_edits(document, edits):
     return document
 def render_fields(document, path, values, mark=True):
     catalog = Catalog(document, path)
+    design_ids = {target["key"] for target in catalog.design_targets()}
     edits, node_keys = [], defaultdict(list)
     runtime = []
     for field in catalog.fields:
@@ -123,7 +138,7 @@ def render_fields(document, path, values, mark=True):
         if override:
             runtime.append({**{k:field[k] for k in ("node", "slot", "attribute") if k in field}, "values": {l:v for l,v in override.items() if l in ("en","ro","ar") and isinstance(v,str)}, "original": field["value"]})
     for node in catalog.nodes:
-        if node["excluded"] and not node_keys[node["id"]]: continue
+        if node["excluded"] and not node_keys[node["id"]] and node["id"] not in design_ids: continue
         opening = document[node["start"]:node["openEnd"]]
         for field in catalog.fields:
             if field["node"] != node["id"] or "attribute" not in field: continue
@@ -273,7 +288,7 @@ def render(document, path, configuration):
     photo_baseline = [{k:v for k,v in p.items() if k!="legacyHtml"} for p in photo_defaults(document)] if path=="hobbies/photos.html" else []
     source_catalog=Catalog(document,path)
     bindings=[{k:v for k,v in f.items() if k in ("key","node","slot","attribute","value")} for f in source_catalog.fields]
-    style_nodes=[m["id"] for g in source_catalog.groups() for m in g["members"]]
+    style_nodes=list(dict.fromkeys([m["id"] for g in source_catalog.groups() for m in g["members"]] + [target["key"] for target in source_catalog.design_targets()]))
     values=configuration.get("pages",{}).get(path,{})
     document,runtime=render_fields(document,path,values)
     document=render_orders(document,path,configuration.get("orders",{}))
@@ -287,7 +302,7 @@ def render(document, path, configuration):
         cards=[n for n in catalog.nodes if n["tag"]=="figure" and "photo-card" in (n["attrs"].get("class") or "").split()]
         visible=[p for p in items if p.get("status")=="published"]
         document=apply_edits(document,[(n["openEnd"]-1,n["openEnd"]-1,' data-cms-item="'+html.escape(p["id"],quote=True)+'"') for n,p in zip(cards,visible)])
-    data=json.dumps({"bindings":bindings,"styleNodes":style_nodes,"styles":configuration.get("styles",{}).get(path,{}),"theme":configuration.get("theme",{}),"collection":collection,"items":items,"pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
+    data=json.dumps({"bindings":bindings,"styleNodes":style_nodes,"styles":configuration.get("styles",{}).get(path,{}),"theme":configuration.get("theme",{}),"palette":configuration.get("palette",{}),"collection":collection,"items":items,"pianoDefaults":piano_baseline,"fields":runtime,"adminOrigin":configuration.get("adminOrigin",""),"page":path},ensure_ascii=False).replace("<","\\u003c")
     script='<script id="cms-page-data" type="application/json">'+data+'</script><script src="/cms-runtime.js" defer></script>'
     return document.replace("</head>",script+"\n</head>",1)
 def generate(root):
@@ -298,10 +313,10 @@ def generate(root):
     photos=photo_defaults((root/"pages/hobbies/photos.html").read_text("utf-8"))
     piano=piano_defaults((root/"pages/hobbies/piano.html").read_text("utf-8"))
     for item in photos+piano: item.pop("legacyHtml",None)
-    schema={"version":1,"pages":pages}
-    initial={"version":1,"pages":{},"orders":{},"photos":photos,"piano":piano,"styles":{},"theme":{},"adminOrigin":""}
+    schema={"version":1,"pages":pages,"colorCatalog":site_colors.catalog(root)}
+    initial={"version":1,"pages":{},"orders":{},"photos":photos,"piano":piano,"styles":{},"theme":{},"palette":{},"adminOrigin":""}
     saved=read_json(root/"content/published.json", CONFIG)
-    for key in ("pages","orders","styles","theme","adminOrigin"): initial[key]=saved.get(key,initial[key])
+    for key in ("pages","orders","styles","theme","palette","adminOrigin"): initial[key]=saved.get(key,initial[key])
     for key in ("photos","piano"):
         if saved.get(key) is not None: initial[key]=saved[key]
     return schema,initial
@@ -310,6 +325,7 @@ def export(root,out):
     schema,initial=generate(root)
     for name,value in (("catalog.json",schema),("initial-content.json",initial)):
         (out/name).write_text(json.dumps(value,ensure_ascii=False,indent=2)+"\n","utf-8")
+    shutil.copy2(root/"scripts/browser/site-colors.js",out/"color-tools.js")
     return schema
 if __name__=="__main__":
     parser=argparse.ArgumentParser()

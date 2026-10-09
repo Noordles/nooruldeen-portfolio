@@ -108,6 +108,7 @@ main > section[id] { scroll-margin-top: 84px; }
 .about-heading h2, .work-heading h2, .hobbies-heading h2, .photos-heading h2, .contact-content h2 { margin: 0; font: 700 clamp(3.7rem,7vw,7rem)/.92 var(--display); letter-spacing: -.03em; }
 .about-heading h2 { font-weight: 700; }
 .about-heading h2 { font-size: clamp(2.2rem,4.1vw,4.5rem); }
+.about-portrait { display:block; width:clamp(160px,24vw,240px); max-width:100%; height:auto; margin-block-start:28px; border:1px solid var(--wine-light); border-radius:4px; }
 .profile-badge { max-width: 335px; display: grid; gap: 8px; margin: 42px 0 0 8px; padding: 15px 17px; border: 1px solid rgba(209,139,152,.18); border-left: 2px solid rgba(209,139,152,.64); border-radius: 7px; background: linear-gradient(110deg,rgba(116,38,60,.18),rgba(16,25,22,.35)); transform: rotate(-.45deg); }
 .profile-badge + .student-badge { margin-top:10px;border-color:rgba(48,196,160,.23);border-left-color:rgba(48,196,160,.72);background:linear-gradient(110deg,rgba(38,126,148,.28),rgba(16,25,22,.35));transform:rotate(.45deg); }
 .badge-label { color: var(--wine-light); font-size: 8px; letter-spacing: .14em; }
@@ -1658,3 +1659,14 @@ html[dir="rtl"] .incsmps-screen-open { right:auto;left:12px; }
 /* Decoration copies paint backgrounds; text effects belong to the real letters. */
 .highlight-backdrop,.highlight-backdrop * { text-shadow:none!important;-webkit-text-stroke-color:transparent!important;filter:none!important; }
 .highlight-backdrop [data-cms-effect]:not(.cms-highlight) { border-color:transparent!important;box-shadow:none!important; }
+
+/* Individual colors stay scoped to the chosen content or page area. */
+.cms-text-color { color:var(--cms-text-color)!important;-webkit-text-stroke-color:var(--cms-text-color)!important; }
+.cms-background-color { background:var(--cms-background-color)!important; }
+.cms-border-color { border-color:var(--cms-border-color)!important; }
+.cms-shadow-color { text-shadow:var(--cms-text-shadow)!important;box-shadow:var(--cms-box-shadow)!important; }
+.highlight-surface .cms-highlight.cms-background-color { background:none!important; }
+.highlight-backdrop .cms-highlight.cms-background-color { background:var(--cms-background-color)!important; }
+.highlight-backdrop .cms-highlight.cms-background-color:not([data-cms-effect]) { box-shadow:none!important; }
+.highlight-backdrop .cms-text-color { color:transparent!important;-webkit-text-stroke-color:transparent!important; }
+.highlight-backdrop .cms-shadow-color { text-shadow:none!important; }

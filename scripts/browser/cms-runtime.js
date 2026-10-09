@@ -7,7 +7,10 @@
   const bindings=new Map((config.bindings||[]).map(f=>[f.key,f]));
   let overrides=config.fields||[];
   let collectionItems=config.items||[];
-  let designs=config.styles||{},theme=config.theme||{};
+  let designs=config.styles||{},theme=config.theme||{},palette=config.palette||{};
+  const colorCatalog=JSON.parse(document.getElementById("cms-color-catalog")?.textContent||"{}");
+  const colors=window.noorColors,rootColorProperties=new Set(),localColorProperties=new WeakMap(),svgSources=new Map(),svgImages=new Map();
+  const colorSettings=new WeakMap();
   const designWrappers=new Map(),designNodes=new Set(),fontLinks=new Set();
   const styleNodes=new Set(config.styleNodes||[]);
   const knownEffects=new Set(["default","none","wine-highlight","cyan-highlight","teal-highlight","wine-shadow","teal-shadow","duotone-shadow","outline","underline","glow","stamp","wine-frame","cyan-frame","teal-frame","tilt"]);
@@ -23,6 +26,7 @@
     if(node&&!textSlots.has(field.node))textSlots.set(field.node,[...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.nodeValue.trim()));
   }
   function apply(language=document.documentElement.lang||"en"){
+    applyPalette();
     for(const field of overrides){
       const node=nodeFor(field.node);
       if(!node)continue;
@@ -45,6 +49,65 @@
     }
     applyCollection(language);
     applyDesign(language);
+    applySvgColors();
+    window.dispatchEvent(new Event("noor:colors-changed"));
+  }
+  function setProperties(node,values,previous){
+    for(const key of previous)if(!(key in values))node.style.removeProperty(key);
+    for(const [key,value] of Object.entries(values))if(node.style.getPropertyValue(key)!==value)node.style.setProperty(key,value);
+    previous.clear();for(const key of Object.keys(values))previous.add(key);
+  }
+  function applyPalette(){if(colors)setProperties(document.documentElement,colors.variables(colorCatalog,palette),rootColorProperties);}
+  function configureColors(node,settings){
+    if(!colors)return;
+    const signature=JSON.stringify([settings.color,settings.background,settings.border,settings.shadow,settings.palette,palette,settings.effect]);
+    if(colorSettings.get(node)===signature)return;
+    colorSettings.set(node,signature);
+    const local=settings.palette||{},merged=colors.merge(palette,local),properties=colors.variables(colorCatalog,merged,local);
+    const previous=localColorProperties.get(node)||new Set();localColorProperties.set(node,previous);
+    for(const [key,property] of [["color","text"],["background","background"],["border","border"]]){
+      const value=settings[key],enabled=colors.valid(value)||value==="transparent";
+      node.classList.toggle("cms-"+property+"-color",enabled);if(enabled)properties["--cms-"+property+"-color"]=value;
+    }
+    node.classList.remove("cms-shadow-color");
+    const base=getComputedStyle(node).textShadow,box=getComputedStyle(node).boxShadow;
+    const replacements=new Map((colorCatalog.colors||[]).map(entry=>[colors.rgb(colors.resolve(entry,palette,colorCatalog)).join(","),colors.resolve(entry,merged,colorCatalog)]));
+    const remap=value=>value.replace(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(\s*,\s*[\d.]+)?\s*\)/g,(all,r,g,b,alpha)=>{
+      const next=colors.valid(settings.shadow)?settings.shadow:replacements.get([r,g,b].join(","));
+      return next&&colors.rgb(next).join(",")!==[r,g,b].join(",")?"rgba("+colors.rgb(next).join(",")+(alpha||",1")+")":all;
+    });
+    const textShadow=base==="none"&&colors.valid(settings.shadow)?"3px 3px 0 "+settings.shadow:remap(base),boxShadow=remap(box);
+    if(textShadow!==base||boxShadow!==box||colors.valid(settings.shadow)){
+      node.classList.add("cms-shadow-color");properties["--cms-text-shadow"]=textShadow;properties["--cms-box-shadow"]=boxShadow;
+    }
+    setProperties(node,properties,previous);
+  }
+  function applySvgColors(){
+    if(!colors)return;
+    const active=new Set();
+    for(const image of document.querySelectorAll("img")){
+      let record=svgImages.get(image);const source=image.getAttribute("src");
+      if(record&&source!==record.result&&source!==record.source){svgImages.delete(image);record=null;}
+      if(!record){
+        let url;try{url=new URL(source,location.href);}catch{continue;}
+        if(url.origin!==location.origin||!colorCatalog.svgAssets?.includes(url.pathname))continue;
+        record={source,url:url.href,result:source,revision:0};svgImages.set(image,record);
+      }
+      active.add(image);
+      const computed=getComputedStyle(image),signature=(colorCatalog.colors||[]).map(entry=>computed.getPropertyValue("--site-color-"+entry.key).trim()).join("|");
+      if(record.signature===signature)continue;record.signature=signature;const revision=++record.revision;
+      if(!signature.replaceAll("|","")){if(image.getAttribute("src")!==record.source)image.setAttribute("src",record.source);record.result=record.source;continue;}
+      if(!svgSources.has(record.url))svgSources.set(record.url,fetch(record.url).then(r=>{if(!r.ok)throw Error("SVG unavailable");return r.text();}).then(s=>{if(s.length>1000000||!/<svg\b/i.test(s))throw Error("Invalid SVG");return s;}));
+      const effective={colors:{}};
+      for(const entry of colorCatalog.colors||[]){const value=computed.getPropertyValue("--site-color-"+entry.key).trim();if(/^\d+ \d+ \d+$/.test(value))effective.colors[entry.key]=colors.hex(value.split(" ").map(Number));}
+      svgSources.get(record.url).then(svg=>{
+        if(record.revision!==revision||!image.isConnected)return;
+        const updated=colors.recolorSvg(svg,colorCatalog,effective);
+        record.result=updated===svg?record.source:"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(updated);
+        if(image.getAttribute("src")!==record.result)image.setAttribute("src",record.result);
+      }).catch(()=>{if(record.revision===revision)record.signature=null;});
+    }
+    for(const image of svgImages.keys())if(!active.has(image))svgImages.delete(image);
   }
   function setText(node,value){
     if(!node)return;const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT),texts=[];
@@ -91,12 +154,13 @@
       }else node.style.removeProperty("--cms-font-family");
       const effect=knownEffects.has(settings.effect)?settings.effect:"default";
       if(effect==="default")delete node.dataset.cmsEffect;else if(node.dataset.cmsEffect!==effect)node.dataset.cmsEffect=effect;
-      node.classList.toggle("cms-highlight",effect.endsWith("-highlight")||effect==="stamp");
+      node.classList.toggle("cms-highlight",effect.endsWith("-highlight")||effect==="stamp"||Boolean(settings.background&&node.classList.contains("cms-inline-design")));
       const phrase=typeof settings.text==="string"?settings.text.trim():"";
       if(phrase&&effect.endsWith("-highlight")){if(node.dataset.cmsEffectText!==phrase)node.dataset.cmsEffectText=phrase;}else delete node.dataset.cmsEffectText;
+      configureColors(node,settings);
       if(before!==node.className+"|"+node.style.cssText+"|"+node.dataset.cmsEffect+"|"+node.dataset.cmsEffectText)changed=true;
     }
-    configure(document.body,{font:designs.$page?.[language]?.font||theme[language]?.font||""});
+    configure(document.body,{...designs.$page?.[language],font:designs.$page?.[language]?.font||theme[language]?.font||""});
     for(const [key,langs] of Object.entries(designs)){
       if(key==="$page")continue;const settings=langs?.[language];if(!settings||typeof settings!=="object")continue;
       let node,text,field=bindings.get(key),container=false;
@@ -116,7 +180,7 @@
       if(container){configure(node,settings);continue;}
       if(!text||!node.contains(text))continue;
       const effect=knownEffects.has(settings.effect)?settings.effect:"default";
-      if(!settings.font&&effect==="default")continue;
+      if(!settings.font&&effect==="default"&&!settings.color&&!settings.background&&!settings.border&&!settings.shadow&&!Object.keys(settings.palette?.families||{}).length&&!Object.keys(settings.palette?.colors||{}).length)continue;
       let record=designWrappers.get(key);
       if(!record||record.text!==text||!node.contains(record.wrapper)){
         const wrapper=document.createElement("span");wrapper.className="cms-inline-design";wrapper.dataset.cmsStyleField=key;
@@ -199,11 +263,44 @@
   }
   if(config.adminOrigin && new URLSearchParams(location.search).get("cms-preview")==="1"){
     const reply=type=>window.parent.postMessage({type,page:config.page},config.adminOrigin);
+    let picking=false,pickOutline;
+    const pickedTarget=target=>{
+      if(!(target instanceof Element)||target.closest("[data-cms-picker]"))return null;
+      const photo=target.closest("[data-cms-item]"),track=target.closest("[data-track-card]");
+      if(photo&&config.collection==="photos"){
+        const part=target.closest("figcaption b")?"title":target.closest("figcaption small")?"caption":target.closest("img")?"alt":"item";
+        return {key:"photo:"+photo.dataset.cmsItem+":"+part,node:part==="item"?photo:target,label:"Photograph / "+part};
+      }
+      if(track&&config.collection==="piano"){
+        const item=collectionItems.find(item=>(item.builtin||item.id)===track.dataset.trackCard);if(!item)return null;
+        const part=target.closest("h3")?"title":target.closest(".track-info > p")?"description":"item";
+        return {key:"piano:"+item.id+":"+part,node:part==="item"?track:target,label:"Piano piece / "+part};
+      }
+      const wrapper=target.closest("[data-cms-style-field]");if(wrapper)return {key:wrapper.dataset.cmsStyleField,node:wrapper,label:wrapper.textContent.slice(0,85)};
+      const node=target.closest("[data-cms-node]");if(!node||!styleNodes.has(node.dataset.cmsNode))return null;
+      const field=[...bindings.values()].find(f=>f.node===node.dataset.cmsNode&&!f.attribute);
+      return {key:field?.key||node.dataset.cmsNode,node,label:node.textContent.trim().slice(0,85)||node.tagName.toLowerCase()};
+    };
+    function stopPicking(){picking=false;pickOutline?.remove();pickOutline=null;}
+    document.addEventListener("pointermove",event=>{
+      if(!picking)return;const picked=pickedTarget(event.target);if(!picked){if(pickOutline)pickOutline.hidden=true;return;}
+      const rect=picked.node.getBoundingClientRect();
+      if(!pickOutline){pickOutline=document.createElement("div");pickOutline.dataset.cmsPicker="";pickOutline.style.cssText="position:fixed;pointer-events:none;z-index:2147483647;border:2px solid #30c4a0;background:rgba(48,196,160,.1);box-sizing:border-box";document.body.append(pickOutline);}
+      pickOutline.hidden=false;Object.assign(pickOutline.style,{left:rect.left+"px",top:rect.top+"px",width:rect.width+"px",height:rect.height+"px"});
+    },true);
+    document.addEventListener("click",event=>{
+      if(!picking)return;event.preventDefault();event.stopImmediatePropagation();const picked=pickedTarget(event.target);if(!picked)return;
+      window.parent.postMessage({type:"noor-cms-color-picked",page:config.page,key:picked.key,label:picked.label},config.adminOrigin);stopPicking();
+    },true);
+    document.addEventListener("keydown",event=>{if(picking&&event.key==="Escape")stopPicking();});
     window.addEventListener("message",event=>{
-      if(event.origin!==config.adminOrigin||event.source!==window.parent||event.data?.type!=="noor-cms-preview"||event.data.page!==config.page)return;
+      if(event.origin!==config.adminOrigin||event.source!==window.parent||event.data?.page!==config.page)return;
+      if(event.data.type==="noor-cms-pick-start"){picking=true;return;}
+      if(event.data.type==="noor-cms-pick-stop"){stopPicking();return;}
+      if(event.data.type!=="noor-cms-preview")return;
       const data=event.data.data;
       if(!data||data.version!==1)return;
-      designs=data.styles?.[config.page]||{};theme=data.theme||{};
+      designs=data.styles?.[config.page]||{};theme=data.theme||{};palette=data.palette||{};
       // Draft data replaces published overrides, including fields restored to their defaults.
       overrides=overrides.map(field=>({...field,values:{}}));
       for(const [key,values] of Object.entries(data.pages?.[config.page]||{})){

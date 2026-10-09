@@ -35,10 +35,8 @@ Create a Cloudflare Access **self-hosted** application covering **admin.noorulde
 
 - Name: Noor Owner Studio.
 - Allow only the exact owner email. Do not use an Everyone allow rule.
-- Select **Cloudflare** as the application's only identity provider. Disable **Accept all available identity providers** and do not select the email one-time PIN provider for this application.
-- In **Integrations > Identity providers > Cloudflare**, keep **Restrict to account members** enabled. Use the owner's existing Cloudflare account credentials and its MFA.
-- In the owner Allow policy, Include only the exact owner email and Require **Login Methods: Cloudflare**. The Include email and Require login method must both match.
-- Set the application session duration to **30 minutes**.
+- Use a managed identity provider with MFA, or Cloudflare's managed email one-time PIN login.
+- Set a short session duration, such as one hour.
 - Record the team hostname (for example team.cloudflareaccess.com) and this application's audience tag.
 - Optionally pin the owner subject after the first successful login.
 
@@ -46,9 +44,7 @@ Create a second, more specific Access application covering **admin.nooruldeen.co
 
 Published media variants must load without an Access login; private originals must remain unavailable to a visitor. Access alone is not the media authorization boundary.
 
-This uses Cloudflare's managed account sign-in without an emailed Access PIN or a separate website password. Cloudflare may still require its normal account MFA or recovery checks. Keeping an email PIN provider configured for other applications does not enable it here when this application and policy are restricted to Cloudflare.
-
-References: [Cloudflare account identity provider](https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/cloudflare/), [Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/), [validate Access JWTs](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/), [path precedence](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/).
+References: [Access applications](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/), [validate Access JWTs](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/), [path precedence](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/).
 
 ### 2. Database and original-file storage
 
@@ -118,12 +114,6 @@ Run **Deploy owner CMS** from Actions on main. The workflow:
 
 The public Pages workflow remains the existing workflow. Secrets do not enter dist, page JSON or browser bundles. Changing a source page deploys an updated admin catalog without replacing the draft stored in D1.
 
-### Repository checks and deployment connections
-
-**Deploy portfolio to GitHub Pages** builds and deploys the public website. **Owner CMS checks** runs content preservation, language and design-setting regression checks, authentication/upload checks, browser syntax checks, the public build and private Worker bundle on pushes to main and owner-cms. It can also be run manually from Actions.
-
-The unused Cloudflare Worker named **nooruldeen-portfolio** has been disconnected from Git builds. It had no enabled URLs, routes, domains or bindings, and its root-level `wrangler deploy` job failed because the repository's generated static output was not built. Do not reconnect that Worker to the repository root. The private admin service is **noor-owner-cms** and uses the separate owner-service deployment configuration described above.
-
 Reference: [Worker secrets](https://developers.cloudflare.com/workers/configuration/secrets/), [Worker custom domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/).
 
 ### 5. Activate the public /admin entry and preview
@@ -153,6 +143,12 @@ For future structural template changes, preserve an element's content identity u
 
 ## Media behavior and limits
 
+The Colors button edits the shared palette across every page and language. Family replacements preserve related lighter/darker shades and alpha; exact shade overrides take precedence. CSS, gradients, shadows, static SVG illustrations and the piano canvas use the same palette.
+
+For a single text or area, use Pick one text or area in Preview or the page's area selector. Font, effect & colors includes direct text/background/border/shadow controls and palette replacements scoped to that item. Individual styles belong to the selected language; the explicit copy button can apply them to every language. Preview shows unsaved changes. Save draft retains them privately; Publish deploys them to the public site.
+
+Palette and local colors are optional additions to the version 1 content format. Only catalog color IDs and supported color values are accepted; owners cannot inject CSS or HTML. Reset removes the override and restores the authored default.
+
 - JPEG, PNG, WebP originals: 25 MB maximum; dimensions up to 12000 px and 80 million pixels.
 - Browser-generated WebP derivatives: up to 900 px and 2600 px on the longer side, quality 0.9; small images are not enlarged.
 - Optimized derivative validation: MIME and binary signature, size, dimensions.
@@ -178,3 +174,4 @@ Audit entries record saves, publications, uploads and deletions without storing 
 ## Local source copy
 
 The task workspace contains the changed implementation files under work/owner-cms. The GitHub branch/PR holds them against the complete current repository. Run the commands above from a full checkout of that branch or merged main, rather than from a folder containing only the changed-file snapshot.
+

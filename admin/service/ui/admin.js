@@ -1,4 +1,4 @@
-
+import "/color-tools.js";
 const $=s=>document.querySelector(s);
 const state={data:null,catalog:null,media:[],revision:0,view:"dashboard",selected:null,dirty:false,lang:"en",section:null,session:null};
 let pickMedia,toastTimer;
@@ -17,7 +17,7 @@ async function api(path,options={}){
   return data;
 }
 function changed(){state.dirty=true;$("#save-state").textContent="Unsaved changes";$("#save-state").classList.add("dirty");}
-function ready(){for(const id of ["save","preview","publish"])$("#"+id).disabled=false;}
+function ready(){for(const id of ["save","preview","publish","colors"])$("#"+id).disabled=false;}
 function field(label,value,update,{type="text",multiline=false,options,placeholder=""}={}){
   const wrap=element("label",{text:label});
   const input=options?element("select",{},options.map(x=>element("option",{value:x.value??x,text:x.label??x}))):element(multiline?"textarea":"input",multiline?{}:{type});
@@ -27,9 +27,9 @@ function field(label,value,update,{type="text",multiline=false,options,placehold
   wrap.append(input);return wrap;
 }
 function pageName(p){const names={"/":"Home","/design/":"Design","/idrl/":"IDRL","/incsmps/":"INCSMPS","/photos/":"Photography","/piano/":"Piano","/research/":"Research","/site-story/":"How the site was made"};return names[p.route]||p.route.split("/").filter(Boolean).at(-1).replaceAll("-"," ");}
-function navigate(view){state.view=view;state.selected=null;state.section=null;state.pageSearch="";render();navigation();}
+function navigate(view){state.view=view;state.selected=null;state.section=null;state.pageSearch="";state.colorTarget=null;render();navigation();}
 function navigation(){
-  const entries=[["dashboard","Dashboard"],["website","Website content"],["photos","Photography"],["piano","Piano"],["media","Media library"],["settings","Settings"]];
+  const entries=[["dashboard","Dashboard"],["website","Website content"],["colors","Colors"],["photos","Photography"],["piano","Piano"],["media","Media library"],["settings","Settings"]];
   const nav=$("#navigation"),mobile=$("#mobile-nav");nav.replaceChildren();mobile.replaceChildren();
   for(const [value,label] of entries){nav.append(button(label,()=>navigate(value),state.view===value?"active":""));mobile.append(element("option",{value,text:label}));}
   nav.append(text("div","PAGES","nav-label"));
@@ -193,14 +193,47 @@ function fontChooser(label,value,update){
   custom.hidden=!value||fontOptions.includes(value);
   wrap.append(field(label,!value?"":fontOptions.includes(value)?value:"custom",v=>{custom.hidden=v!=="custom";if(v!=="custom")update(v);else custom.lastElementChild.focus();},{options:[{value:"",label:"Use site font"},...fontOptions,{value:"custom",label:"Custom font…"}]}),custom);return wrap;
 }
+function colorControl(label,value,update,{defaultColor="#e9e0cf",transparent=false}={}){
+  const wrap=element("div",{class:"color-control"}),name=element("label",{text:label});
+  const row=element("div",{class:"color-inputs"});
+  const picker=element("input",{type:"color","aria-label":label+" color picker"});picker.value=window.noorColors.valid(value)?value:defaultColor;
+  const input=element("input",{type:"text","aria-label":label+" hex",placeholder:defaultColor,spellcheck:"false",maxlength:"11"});input.value=value||"";
+  const apply=value=>{update(value);picker.value=window.noorColors.valid(value)?value:defaultColor;input.value=value;input.setCustomValidity("");changed();};
+  picker.addEventListener("input",()=>apply(picker.value));
+  input.addEventListener("input",()=>{const value=input.value.trim().toLowerCase();if(!value||window.noorColors.valid(value)||transparent&&value==="transparent"){update(value);if(window.noorColors.valid(value))picker.value=value;input.setCustomValidity("");changed();}else input.setCustomValidity("Enter a six-digit hex color, for example #74263c");});
+  row.append(picker,input,button("Reset",()=>apply("")));
+  if(transparent)row.append(button("Transparent",()=>apply("transparent")));
+  name.append(row);wrap.append(name);return wrap;
+}
+function localColorControls(current,update){
+  const panel=element("details",{class:"local-colors"});panel.append(element("summary",{text:"Colors for this item"}),text("p","These changes apply only to this item in the selected language. Reset a color to follow the website palette.","muted"));
+  for(const [key,label,defaultColor] of [["color","Text color","#e9e0cf"],["background","Background color","#101312"],["border","Border color","#d18b98"],["shadow","Shadow color","#74263c"]])panel.append(colorControl(label,current[key]||"",value=>update(key,value),{defaultColor,transparent:key==="background"}));
+  const familyPanel=element("details",{class:"local-families"});familyPanel.append(element("summary",{text:"Replace a color family only inside this area"}),text("p","Keep the same gradients and shading, but change their color in this area. The rest of the site keeps its palette.","muted"));
+  for(const family of state.catalog.colorCatalog?.families||[]){
+    const inherited=state.data.palette?.families?.[family.key]||family.color;
+    familyPanel.append(colorControl(family.label,current.palette?.families?.[family.key]||"",value=>{
+      const palette=structuredClone(current.palette||{});palette.families??={};if(value)palette.families[family.key]=value;else delete palette.families[family.key];update("palette",palette);
+    },{defaultColor:inherited}));
+  }
+  panel.append(familyPanel);return panel;
+}
 function designControls(page,key,{media=false,container=false,fontOnly=false,targets=[{page,key}]}={}){
   const current=state.data.styles?.[page.id]?.[key]?.[state.lang]||{};
-  const details=element("details",{class:"design-controls"});details.append(element("summary",{text:fontOnly?"Page font":"Font & effect"}));
-  const update=(name,value)=>{for(const target of targets){state.data.styles??={};state.data.styles[target.page.id]??={};state.data.styles[target.page.id][target.key]??={};state.data.styles[target.page.id][target.key][state.lang]??={};state.data.styles[target.page.id][target.key][state.lang][name]=value;}changed();};
+  const details=element("details",{class:"design-controls"});details.append(element("summary",{text:fontOnly?"Page font":"Font, effect & colors"}));
+  const update=(name,value)=>{current[name]=value;for(const target of targets){state.data.styles??={};state.data.styles[target.page.id]??={};state.data.styles[target.page.id][target.key]??={};state.data.styles[target.page.id][target.key][state.lang]??={};state.data.styles[target.page.id][target.key][state.lang][name]=value;}changed();};
   if(!media)details.append(fontChooser("Font family",current.font||"",v=>update("font",v)));
   if(!fontOnly){
     details.append(field("Effect",current.effect||"default",v=>update("effect",v),{options:media||container?textEffects.filter(e=>["default","none","glow","wine-frame","cyan-frame","teal-frame","tilt"].includes(e.value)):textEffects}));
     if(!media&&!container)details.append(field("Highlight text (optional)",current.text||"",v=>update("text",v),{placeholder:"Leave empty to highlight the whole text"}));
+    details.append(localColorControls(current,update));
+    details.append(button("Use these colors in every language",()=>{
+      for(const target of targets)for(const lang of ["en","ro","ar"]){
+        state.data.styles??={};state.data.styles[target.page.id]??={};state.data.styles[target.page.id][target.key]??={};state.data.styles[target.page.id][target.key][lang]??={};
+        const settings=state.data.styles[target.page.id][target.key][lang];
+        for(const name of ["color","background","border","shadow","palette"])if(name in current)settings[name]=structuredClone(current[name]);else delete settings[name];
+      }
+      changed();notice("This item’s colors now apply in English, Romanian and Arabic.");
+    }));
   }
   details.append(button("Restore design defaults",()=>{for(const target of targets)if(state.data.styles?.[target.page.id]?.[target.key])delete state.data.styles[target.page.id][target.key][state.lang];changed();render();}));
   return details;
@@ -239,6 +272,15 @@ function pageEditor(main){
   toolbar.append(languageEditor(),field("Section",state.section,v=>{state.section=v;render();},{options:["All content",...sections.map(value=>({value,label:sectionLabel(value)}))]}));
   const search=element("input",{type:"search",placeholder:"Find a heading, paragraph, number, image or link","aria-label":"Search page content"});
   search.value=state.pageSearch||"";toolbar.append(element("label",{text:"Search content"},[search]),designControls(page,"$page",{fontOnly:true}));main.append(toolbar);
+  const areas=element("details",{class:"panel area-colors"});if(state.colorTarget)areas.open=true;
+  areas.append(element("summary",{text:"Colors for a specific text or area"}),text("p","Pick an item in Preview, or choose an area below. Colors belong to the selected language.","muted"));
+  const choices=[{value:"$page",label:"Whole page"},...(page.designTargets||[]).filter(availableInLanguage).map(t=>({value:t.key,label:sectionLabel(t.section)+" / "+t.label}))];
+  const pickedField=page.fields.find(f=>f.key===state.colorTarget);
+  if(pickedField)choices.push({value:pickedField.key,label:"Text / "+pickedField.value.slice(0,85)});
+  if(state.colorTarget&&!choices.some(t=>t.value===state.colorTarget))choices.push({value:state.colorTarget,label:state.colorTargetLabel||"Selected item"});
+  const chosen=state.colorTarget||"$page";
+  areas.append(field("Area to style",chosen,value=>{state.colorTarget=value;render();},{options:choices}),button("Pick text or area in Preview",()=>openPreview(page,true)));
+  const controls=designControls(page,chosen,{container:!pickedField,media:["src","poster"].includes(pickedField?.attribute)});controls.open=true;areas.append(controls);main.append(areas);
   const body=element("div");main.append(body);
   const values=state.data.pages[page.id]??={},byKey=new Map(fields.map(f=>[f.key,f]));
   const memberLabel=member=>{
@@ -317,9 +359,39 @@ function websiteEditor(main){
   };
   search.addEventListener("input",draw);draw();
 }
+function colorEditor(main){
+  main.append(...heading("Website colors","Change a color family across every page and language, or pick one item to style separately. Preview your draft before publishing."));
+  const catalog=state.catalog.colorCatalog,palette=state.data.palette??={};
+  const page=state.catalog.pages.find(p=>p.id===state.colorPreviewPage)||state.catalog.pages.find(p=>p.route==="/");
+  const toolbar=element("div",{class:"toolbar"});
+  toolbar.append(field("Preview page",page.id,value=>{state.colorPreviewPage=value;},{options:state.catalog.pages.map(p=>({value:p.id,label:pageName(p)+" · "+p.route}))}),button("Preview palette",()=>openPreview(state.catalog.pages.find(p=>p.id===state.colorPreviewPage)||page)),button("Pick one text or area",()=>openPreview(state.catalog.pages.find(p=>p.id===state.colorPreviewPage)||page,true)));
+  main.append(toolbar,text("h2","Site-wide color families"),text("p","A family change includes related light and dark shades, transparent overlays, shadows and site illustrations. Your photographs keep their original colors.","muted"));
+  const families=element("div",{class:"palette-grid"});let drawExact;
+  for(const family of catalog.families){
+    const card=element("section",{class:"panel palette-family"});
+    card.append(text("h3",family.label),text("p",family.description,"muted"),text("small",family.count+" authored color uses, including related shades"));
+    card.append(colorControl(family.label,palette.families?.[family.key]||"",value=>{palette.families??={};if(value)palette.families[family.key]=value;else delete palette.families[family.key];drawExact?.();},{defaultColor:family.color}));families.append(card);
+  }
+  main.append(families,button("Restore the default website palette",()=>{state.data.palette={};changed();render();}));
+  const exact=element("details",{class:"panel exact-colors"});exact.append(element("summary",{text:"Every individual site color"}),text("p","Replace only one original shade everywhere it occurs. These exact replacements take priority over color-family changes.","muted"));
+  const query=element("input",{type:"search","aria-label":"Search site colors",placeholder:"Search a hex color or color family"}),filter=field("Color family","",()=>{state.colorLimit=48;drawExact();},{options:[{value:"",label:"All colors"},...catalog.families.map(f=>({value:f.key,label:f.label})),{value:"other",label:"Other colors"}]});
+  exact.append(element("div",{class:"toolbar"},[query,filter]));const list=element("div",{class:"palette-grid"});exact.append(list);
+  drawExact=()=>{
+    list.replaceChildren();const term=query.value.toLowerCase().trim(),family=filter.lastElementChild.value;
+    const matches=catalog.colors.filter(c=>(!family||c.family===family)&&(!term||(c.value+" "+c.family+" "+(catalog.families.find(f=>f.key===c.family)?.label||"other")).toLowerCase().includes(term)));
+    for(const entry of matches.slice(0,state.colorLimit||48)){
+      const box=element("div",{class:"field exact-color"});box.append(text("small",entry.count+" authored uses · "+entry.family));
+      box.append(colorControl("Original "+entry.value,palette.colors?.[entry.key]||"",value=>{palette.colors??={};if(value)palette.colors[entry.key]=value;else delete palette.colors[entry.key];},{defaultColor:window.noorColors.resolve(entry,palette,catalog)}));list.append(box);
+    }
+    if(matches.length>(state.colorLimit||48))list.append(button("Show more colors",()=>{state.colorLimit=(state.colorLimit||48)+48;drawExact();}));
+    if(!matches.length)list.append(text("p","No matching colors.","muted"));
+  };
+  query.addEventListener("input",()=>{state.colorLimit=48;drawExact();});drawExact();main.append(exact);
+}
 function render(){
   const main=$("#workspace");main.replaceChildren();
   if(state.view==="photos"||state.view==="piano")editCollection(state.view,main);
+  else if(state.view==="colors")colorEditor(main);
   else if(state.view==="website")websiteEditor(main);
   else if(state.view.startsWith("page:"))pageEditor(main);
   else if(state.view==="media"){
@@ -377,24 +449,32 @@ $("#publish").addEventListener("click",async()=>{
   try{$("#publish").disabled=true;if(state.dirty)await save();const release=await api("publish",{method:"POST",body:JSON.stringify({revision:state.revision})});state.publishedRevision=release.revision;notice("Published to the repository. The website deployment is running.");render();}
   catch(e){notice(e.message,true);}finally{$("#publish").disabled=false;}
 });
-let previewPage,previewTimer;
+let previewPage,previewTimer,pickingColors=false;
 function sendPreview(){if(previewPage&&$("#preview-dialog").open)$("#preview-frame").contentWindow.postMessage({type:"noor-cms-preview",data:state.data,page:previewPage.id},state.session.siteOrigin);}
 window.addEventListener("message",event=>{
   if(!previewPage||event.origin!==state.session?.siteOrigin||event.source!==$("#preview-frame").contentWindow||event.data?.page!==previewPage.id)return;
   if(event.data.type==="noor-cms-preview-ready")sendPreview();
   if(event.data.type==="noor-cms-preview-applied"){
-    clearTimeout(previewTimer);$("#preview-status").textContent="Your current "+editorLanguages.find(l=>l.value===state.lang).label.replace(" editor","")+" edits are shown here, including unsaved changes.";
+    clearTimeout(previewTimer);$("#preview-status").textContent=pickingColors?"Click the text, card or area whose colors you want to change. Links stay inside the preview while you are picking.":"Your current "+editorLanguages.find(l=>l.value===state.lang).label.replace(" editor","")+" edits are shown here, including unsaved changes.";
+    if(pickingColors)$("#preview-frame").contentWindow.postMessage({type:"noor-cms-pick-start",page:previewPage.id},state.session.siteOrigin);
+  }
+  if(event.data.type==="noor-cms-color-picked"){
+    const page=previewPage,key=event.data.key;
+    if(typeof key!=="string"||!page.fields.some(f=>f.key===key)&&!page.designTargets?.some(t=>t.key===key)&&!/^(photo|piano):[a-z0-9-]+:(item|title|caption|alt|description)$/.test(key))return;
+    $("#preview-dialog").close();state.view="page:"+page.id;state.colorTarget=key;state.colorTargetLabel=String(event.data.label||"Selected item").slice(0,85);render();navigation();$(".area-colors")?.scrollIntoView({block:"start"});
   }
 });
-$("#preview").addEventListener("click",()=>{
-  const p=state.view.startsWith("page:")?state.catalog.pages.find(p=>"page:"+p.id===state.view):state.catalog.pages.find(p=>p.route===(state.view==="photos"?"/photos/":state.view==="piano"?"/piano/":"/"));
+function openPreview(p,pick=false){
+  pickingColors=pick;
   const url=new URL(p.route,state.session.siteOrigin);url.searchParams.set("cms-preview","1");url.searchParams.set("lang",state.lang);
   previewPage=p;clearTimeout(previewTimer);$("#preview-status").textContent="Loading your current edits…";
   const frame=$("#preview-frame");frame.onload=sendPreview;frame.src=url.href;$("#preview-dialog").showModal();
   previewTimer=setTimeout(()=>{$("#preview-status").textContent="The preview hasn’t confirmed your edits yet. Close it and try Preview again.";},15000);
-});
+}
+$("#preview").addEventListener("click",()=>openPreview(state.view.startsWith("page:")?state.catalog.pages.find(p=>"page:"+p.id===state.view):state.view==="colors"?state.catalog.pages.find(p=>p.id===state.colorPreviewPage)||state.catalog.pages.find(p=>p.route==="/"):state.catalog.pages.find(p=>p.route===(state.view==="photos"?"/photos/":state.view==="piano"?"/piano/":"/"))));
+$("#colors").addEventListener("click",()=>navigate("colors"));
 $("#close-preview").addEventListener("click",()=>$("#preview-dialog").close());
-$("#preview-dialog").addEventListener("close",()=>{previewPage=null;clearTimeout(previewTimer);$("#preview-frame").onload=null;$("#preview-frame").src="about:blank";});
+$("#preview-dialog").addEventListener("close",()=>{previewPage=null;pickingColors=false;clearTimeout(previewTimer);$("#preview-frame").onload=null;$("#preview-frame").src="about:blank";});
 $("#close-media").addEventListener("click",()=>$("#media-dialog").close());
 $("#media-search").addEventListener("input",renderChoices);
 $("#mobile-nav").addEventListener("change",event=>navigate(event.target.value));

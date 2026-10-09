@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#11110f" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="thumbnail" content="https://nooruldeen.com/assets/brand/noor-search-thumbnail.jpg" />
+    <link rel="image_src" href="https://nooruldeen.com/assets/brand/noor-search-thumbnail.jpg" />
     <meta name="description" content="I’m Noor. I make websites, apps and visual identities, study economics and statistics, and take photos of the details people pass by." />
     <meta property="og:title" content="Nooruldeen Al Sammarraie — Design, Code &amp; Research" />
     <meta property="og:description" content="I’m Noor. I make websites, apps and visual identities, study economics and statistics, and take photos of the details people pass by." />
@@ -38,7 +41,15 @@
         "Noor"
       ],
       "url": "https://nooruldeen.com/",
-      "image": "https://nooruldeen.com/assets/profile/noor-portrait.webp",
+      "image": {
+        "@type": "ImageObject",
+        "@id": "https://nooruldeen.com/#portrait",
+        "url": "https://nooruldeen.com/assets/brand/noor-search-thumbnail.jpg",
+        "contentUrl": "https://nooruldeen.com/assets/brand/noor-search-thumbnail.jpg",
+        "width": 1254,
+        "height": 1254,
+        "caption": "Nooruldeen Al Sammarraie"
+      },
       "description": "Web and app designer and developer with interests in economics, statistics, animation and photography.",
       "sameAs": [
         "https://www.linkedin.com/in/nooruldeen-al-sammarraie-942480313/",
@@ -61,6 +72,9 @@
       "@id": "https://nooruldeen.com/#profile",
       "url": "https://nooruldeen.com/",
       "name": "Nooruldeen Al Sammarraie | Web Design & Development",
+      "primaryImageOfPage": {
+        "@id": "https://nooruldeen.com/#portrait"
+      },
       "isPartOf": {
         "@id": "https://nooruldeen.com/#website"
       },
@@ -132,6 +146,7 @@
               <a href="design.html"><span>DESIGN / WORK</span><b aria-hidden="true" class="arrow-glyph">↗</b></a>
               <a href="research.html"><span>STATISTICS / RESEARCH</span><b aria-hidden="true" class="arrow-glyph">↗</b></a>
             </nav>
+            <img class="about-portrait" src="assets/brand/noor-search-thumbnail.jpg" alt="Portrait of Nooruldeen Al Sammarraie" width="1254" height="1254" loading="lazy" decoding="async" />
           </div>
           <div class="about-body">
             <p class="lede">I’m Noor, a designer and developer who likes turning ideas into useful digital things.</p>

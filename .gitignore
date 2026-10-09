@@ -23,4 +23,5 @@ admin/service/.wrangler/
 admin/service/wrangler.production.json
 admin/service/ui/catalog.json
 admin/service/ui/initial-content.json
+admin/service/ui/color-tools.js
 admin/service/.secrets.json

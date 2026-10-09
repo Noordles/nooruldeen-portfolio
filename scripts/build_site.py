@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import cms_content
+import site_colors
 import html
 import json
 import re
@@ -28,6 +29,7 @@ PUBLIC_SCRIPT_NAMES = {
     "research-presentation.js",
     "language-switcher.js",
     "cms-runtime.js",
+    "site-colors.js",
 }
 HTML_ATTRIBUTE = re.compile(
     r"""(?P<prefix>\b(?:href|src|poster|action|data-src|data-poster|data-href|srcset)\s*=\s*)(?P<quote>["'])(?P<value>.*?)(?P=quote)""",
@@ -214,7 +216,10 @@ def main() -> int:
         return fail("Required site input is missing: " + ", ".join(missing))
 
     configuration = cms_content.read_json(ROOT / "content" / "published.json", cms_content.CONFIG)
-    stylesheet_version = hashlib.sha256(STYLE_SOURCE.read_bytes()).hexdigest()[:12]
+    compiled_css = site_colors.rewrite_css(STYLE_SOURCE.read_text(encoding="utf-8"))
+    stylesheet_version = hashlib.sha256(compiled_css.encode()).hexdigest()[:12]
+    color_version = hashlib.sha256((BROWSER_SCRIPT_ROOT / "site-colors.js").read_bytes()).hexdigest()[:12]
+    color_catalog = json.dumps(site_colors.catalog(ROOT),ensure_ascii=False,separators=(",",":")).replace("<","\\u003c")
     language_script = BROWSER_SCRIPT_ROOT / "language-switcher.js"
     if not language_script.is_file():
         return fail("Required browser script is missing: scripts/browser/language-switcher.js")
@@ -265,6 +270,8 @@ def main() -> int:
         destination = OUTPUT / output_path
         destination.parent.mkdir(parents=True, exist_ok=True)
         document = cms_content.render(source.read_text(encoding="utf-8"), source.relative_to(PAGE_ROOT).as_posix(), configuration)
+        document = site_colors.rewrite_markup(document)
+        document = document.replace('<script src="/cms-runtime.js"', '<script id="cms-color-catalog" type="application/json">'+color_catalog+'</script><script src="/site-colors.js?v='+color_version+'" defer></script><script src="/cms-runtime.js"',1)
         document = rewrite_html_references(document, page_routes, stylesheet_version)
         if route == "/":
             document = add_homepage_alias_redirect(document)
@@ -276,7 +283,7 @@ def main() -> int:
             title = title_match.group(1).strip() if title_match else "Al Sammarraie Nooruldeen"
             write_legacy_redirect(OUTPUT / source.name, route, title)
 
-    shutil.copy2(STYLE_SOURCE, OUTPUT / "styles.css")
+    (OUTPUT / "styles.css").write_text(compiled_css,encoding="utf-8")
     for source in scripts:
         script_text = source.read_text(encoding="utf-8")
         script_text = re.sub(

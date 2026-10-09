@@ -16,7 +16,7 @@ export function safeUrl(value) {
 export function validateDocument(input,catalog,env) {
   assert(plain(input) && input.version===1,"Unsupported content format");
   assert(plain(input.pages) && plain(input.orders),"Invalid page data");
-  const out={version:1,pages:{},orders:{},photos:[],piano:[],styles:{},theme:{},adminOrigin:env.ADMIN_ORIGIN};
+  const out={version:1,pages:{},orders:{},photos:[],piano:[],styles:{},theme:{},palette:validatePalette(input.palette??{},catalog),adminOrigin:env.ADMIN_ORIGIN};
   const pages=new Map(catalog.pages.map(p=>[p.id,p]));
   for(const [id,values] of Object.entries(input.pages)) {
     assert(pages.has(id) && plain(values),"Unknown page");
@@ -74,13 +74,13 @@ export function validateDocument(input,catalog,env) {
   }
   for(const [id,values] of Object.entries(input.styles??{})){
     assert(pages.has(id)&&plain(values),"Unknown styled page");const page=pages.get(id);
-    const allowed=new Set(["$page",...page.fields.map(f=>f.key),...page.collections.flatMap(g=>g.members.map(m=>m.id))]);
+    const allowed=new Set(["$page",...page.fields.map(f=>f.key),...page.collections.flatMap(g=>g.members.map(m=>m.id)),...(page.designTargets||[]).map(t=>t.key)]);
     if(page.route==="/photos/")for(const p of out.photos)for(const key of ["item","title","caption","alt","gallery"])allowed.add("photo:"+p.id+":"+key);
     if(page.route==="/piano/")for(const p of out.piano)for(const key of ["item","title","description","notes","pieceStatus","difficulty"])allowed.add("piano:"+p.id+":"+key);
     out.styles[id]={};
     for(const [key,langs] of Object.entries(values)){
       assert(allowed.has(key)&&plain(langs),"Unknown styled content item");out.styles[id][key]={};
-      for(const [lang,value] of Object.entries(langs)){assert(["en","ro","ar"].includes(lang),"Unknown design language");out.styles[id][key][lang]=validateStyle(value);}
+      for(const [lang,value] of Object.entries(langs)){assert(["en","ro","ar"].includes(lang),"Unknown design language");out.styles[id][key][lang]=validateStyle(value,catalog);}
     }
   }
   assert(JSON.stringify(out).length<=1800000,"Content is too large");
@@ -99,13 +99,25 @@ export const mediaUses=(doc,id)=> {
   return result;
 };
 const effects=new Set(["default","none","wine-highlight","cyan-highlight","teal-highlight","wine-shadow","teal-shadow","duotone-shadow","outline","underline","glow","stamp","wine-frame","cyan-frame","teal-frame","tilt"]);
-export function validateStyle(value){
+const color=value=>typeof value==="string"&&/^#[0-9a-f]{6}$/i.test(value);
+export function validatePalette(value,catalog={}){
+  assert(plain(value)&&Object.keys(value).every(key=>["families","colors"].includes(key)),"Invalid color palette");
+  const out={},families=new Set((catalog.colorCatalog?.families||[]).map(f=>f.key)),colors=new Set((catalog.colorCatalog?.colors||[]).map(c=>c.key));
+  for(const [section,allowed] of [["families",families],["colors",colors]])if(value[section]!==undefined){
+    assert(plain(value[section]),"Invalid palette colors");out[section]={};
+    for(const [key,v] of Object.entries(value[section])){assert(allowed.has(key)&&color(v),"Unknown or invalid palette color");out[section][key]=v.toLowerCase();}
+  }
+  return out;
+}
+export function validateStyle(value,catalog={}){
   assert(plain(value),"Invalid design settings");const out={};
   for(const [key,v] of Object.entries(value)){
-    assert(["font","effect","text"].includes(key),"Unknown design setting");
+    assert(["font","effect","text","color","background","border","shadow","palette"].includes(key),"Unknown design setting");
     if(key==="effect"){assert(effects.has(v),"Unknown text effect");out.effect=v;}
     else if(key==="font"){assert(typeof v==="string"&&(v===""||/^[\p{L}\p{N} _-]{1,80}$/u.test(v)),"Invalid font family");out.font=v;}
-    else out.text=text(v,2048);
+    else if(key==="text")out.text=text(v,2048);
+    else if(key==="palette")out.palette=validatePalette(v,catalog);
+    else{assert(v===""||v==="transparent"||color(v),"Invalid content color");out[key]=v.toLowerCase();}
   }
   return out;
 }
