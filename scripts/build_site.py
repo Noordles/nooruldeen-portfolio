@@ -318,6 +318,19 @@ def main() -> int:
         owner_entry += '<p>The owner administration service is being set up.</p>'
     (admin_output / "index.html").write_text(owner_entry + "</main></body></html>", encoding="utf-8")
 
+    # My unlisted thesis showcase is exported from its separate private repository.
+    # Keep it outside the page catalog, navigation and search-discovery routes.
+    thesis_export = ROOT / "thesis"
+    if thesis_export.exists():
+        if thesis_export.is_symlink() or any(path.is_symlink() for path in thesis_export.rglob("*")):
+            return fail("Symbolic links are not allowed in the thesis showcase.")
+        if not (thesis_export / "index.html").is_file():
+            return fail("The thesis showcase needs its index.html export.")
+        for document in thesis_export.rglob("*.html"):
+            if not re.search(r'<meta\s+name="robots"\s+content="noindex,nofollow', document.read_text(encoding="utf-8")):
+                return fail("Thesis HTML must retain its unlisted indexing metadata.")
+        shutil.copytree(thesis_export, OUTPUT / "thesis")
+
     write_search_discovery(OUTPUT, list(page_routes.values()))
     shutil.copy2(ROOT / "CNAME", OUTPUT / "CNAME")
     (OUTPUT / ".nojekyll").touch()

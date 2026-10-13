@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="googlebot" content="noindex,nofollow">
+  <meta name="description" content="My work on Iraq's oil dependence, government finances and economic outlook. A Python application and bachelor's thesis in progress.">
+  <link rel="canonical" href="https://nooruldeen.com/thesis/">
+  <link rel="icon" type="image/svg+xml" href="/thesis/assets/noor-favicon.svg">
+  <link rel="stylesheet" href="/thesis/thesis.css?v=8438523f7eec">
+  <script src="/thesis/thesis.js?v=4acbf5bea6de" defer></script>
+  <title>My thesis — Iraq Economic Observatory | Nooruldeen</title>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to my project</a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Back to Nooruldeen's website"><span class="brand-mark">N</span><span>Nooruldeen<br><b>Al Sammarraie</b></span></a>
+    <span class="top-note"><i></i> MY BACHELOR'S THESIS / IN PROGRESS</span>
+    <a class="quiet-link" href="#downloads">The project files <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span>01</span> IRAQ ECONOMIC OBSERVATORY</p>
+        <h1 id="hero-title">IRAQ,<br><span class="wine-word">OIL &amp; THE</span><br>BUDGET<span class="teal-dot">.</span></h1>
+        <p class="hero-intro">I grew up in Iraq, and I want to understand how its oil wealth relates to pressure on public finances and the difficulty of building a more diverse economy. This is the Python application and research I am developing for my bachelor&#x27;s thesis at ASE.</p>
+        <div class="hero-actions"><a class="button primary" href="#prototype">Explore my prototype <span aria-hidden="true">↓</span></a><a class="text-link" href="/thesis/research-plan/">Read my research plan <span aria-hidden="true">↗</span></a></div>
+        <p class="hero-context">Economic Informatics · ASE Bucharest<br>My intended defence: July 2027</p>
+      </div>
+      <figure class="hero-photo"><img src="/thesis/assets/samarra-minaret.jpg" alt="The Malwiya minaret in Samarra, Iraq, photographed by David Stanley" fetchpriority="high"><figcaption><span>SAMARRA, IRAQ</span><span>Photograph: David Stanley.</span></figcaption><span class="photo-stamp" aria-hidden="true">MY COUNTRY<br>MY QUESTIONS</span></figure>
+    </section>
+
+    <section class="numbers" aria-label="The work I have prepared">
+      <div><strong>2003<span>→</span></strong><p>Where my annual<br>development history starts</p></div>
+      <div><strong>126</strong><p>Consecutive monthly<br>fiscal records</p></div>
+      <div><strong>24</strong><p>Shared months in my<br>forecast comparison</p></div>
+      <div><strong>33</strong><p>Passing checks on<br>the Python prototype</p></div>
+    </section>
+
+    <section class="research-section section-pad" aria-labelledby="why-title">
+      <div class="section-line"><span>02 / WHAT I WANT TO UNDERSTAND</span><span>DATA / ECONOMICS / CODE</span></div>
+      <div class="research-lead"><h2 id="why-title">I want to understand<br><em>Iraq better.</em></h2><p>What interests me is the space between having valuable resources and turning them into lasting development. I want to look at the evidence carefully, ask better questions, and build a tool that makes the numbers easier to explore.</p></div>
+      <div class="question-grid"><article class="question"><span>01</span><div><h3>How has Iraq developed since 2003?</h3><p>I want to compare growth, real income per person and manufacturing, then understand the context behind the patterns.</p></div></article><article class="question"><span>02</span><div><h3>What puts pressure on the budget?</h3><p>I am examining recorded revenue and spending month by month, while keeping oil-related income and accounting adjustments visible.</p></div></article><article class="question"><span>03</span><div><h3>Can a forecast improve on a simple baseline?</h3><p>I compare five methods on the same months and inspect their errors and uncertainty before choosing a final model.</p></div></article><article class="question"><span>04</span><div><h3>How much do the assumptions change the outlook?</h3><p>I can change an oil-price or spending assumption and calculate the resulting pressure around a published annual baseline.</p></div></article></div>
+      <p class="research-note">I want to understand what the evidence shows. A country comparison can help me spot a pattern, but it cannot prove what caused it.</p>
+    </section>
+
+    <section class="prototype section-pad" id="prototype" aria-labelledby="prototype-title">
+      <div class="section-line"><span>03 / THE APPLICATION I AM BUILDING</span><span class="status-dot">WORKING PROTOTYPE</span></div>
+      <div class="prototype-heading"><div><p class="eyebrow">IRAQ ECONOMIC OBSERVATORY</p><h2 id="prototype-title">Try the work<br>for yourself.</h2></div><p>This is a browser preview of my saved results and the controls I have prepared. The full Python application is in my private project repository.</p></div>
+      <div class="demo-shell">
+        <div class="demo-top"><span><i></i> MY RESEARCH WORKBENCH</span><span id="snapshot-label">Saved source snapshots: October 2026</span></div>
+        <div class="demo-tabs" role="tablist" aria-label="Explore my project">
+          <button role="tab" id="tab-history" aria-controls="panel-history" aria-selected="true" data-panel="history">Iraq over time</button>
+          <button role="tab" id="tab-forecasts" aria-controls="panel-forecasts" aria-selected="false" data-panel="forecasts">Monthly forecasts</button>
+          <button role="tab" id="tab-scenarios" aria-controls="panel-scenarios" aria-selected="false" data-panel="scenarios">Budget scenarios</button>
+          <button role="tab" id="tab-peers" aria-controls="panel-peers" aria-selected="false" data-panel="peers">Country comparisons</button>
+        </div>
+        <div class="demo-panel" role="tabpanel" id="panel-history" aria-labelledby="tab-history">
+          <div class="panel-copy"><h3>The longer economic picture</h3><p>I keep the history from 2003 and compare the yearly figures as they were published.</p></div>
+          <div class="controls two"><label>Indicator<select id="indicator"><option value="gdp_per_capita">Real GDP per person</option><option value="growth">Real GDP growth</option><option value="manufacturing">Manufacturing share</option><option value="oil_rents">Oil rents</option></select></label><label>Compare Iraq with<select id="compare-country"><option value="ARE">United Arab Emirates</option><option value="SAU">Saudi Arabia</option><option value="KWT">Kuwait</option><option value="DZA">Algeria</option><option value="AGO">Angola</option><option value="AZE">Azerbaijan</option><option value="">Iraq only</option></select></label></div>
+          <div class="chart" id="history-chart" aria-live="polite"></div><p class="chart-note" id="history-note"></p>
+        </div>
+        <div class="demo-panel" role="tabpanel" id="panel-forecasts" aria-labelledby="tab-forecasts" hidden>
+          <div class="panel-copy"><h3>Does a more complex model help?</h3><p>I test five methods on the same 24 months, July 2024–June 2026. Each predicts one month ahead. MAE is the average size of the errors; RMSE gives bigger mistakes more weight. Both are in trillion Iraqi dinars.</p></div>
+          <div class="table-scroll"><table id="forecast-scores"><caption class="sr-only">My initial monthly revenue forecast comparison</caption><thead><tr><th>Method</th><th>MAE</th><th>RMSE</th><th>Targets</th></tr></thead><tbody><tr data-best="false"><td>Last month</td><td>3.155</td><td>5.222</td><td>24/24</td></tr><tr data-best="false"><td>Same month last year</td><td>3.669</td><td>5.539</td><td>24/24</td></tr><tr data-best="true"><td>AR(1)<small>LOWEST MAE</small></td><td>2.815</td><td>4.551</td><td>24/24</td></tr><tr data-best="false"><td>ARIMA(1,1,1)<small>LOWEST RMSE</small></td><td>2.956</td><td>4.418</td><td>24/24</td></tr><tr data-best="false"><td>SARIMA(1,0,0)(0,1,1)[12]</td><td>3.528</td><td>5.000</td><td>24/24</td></tr></tbody></table></div>
+          <p class="result-callout"><span>WHAT I FOUND SO FAR</span> AR(1) has the lowest MAE. ARIMA(1,1,1) has the lowest RMSE. I still need to check the model assumptions and remaining patterns in the errors before making my final choice.</p>
+          <div class="controls"><label>Inspect a fitted method<select id="forecast-model"><option value="AR(1)">AR(1)</option><option value="ARIMA(1,1,1)">ARIMA(1,1,1)</option><option value="SARIMA(1,0,0)(0,1,1)[12]">SARIMA(1,0,0)(0,1,1)[12]</option></select></label></div>
+          <div class="chart" id="forecast-chart" aria-live="polite"></div><p class="chart-note">These saved predictions use data ending in June 2026 to look at July–September. They are not a fresh forecast made today. The shaded 95% band shows uncertainty under the model's assumptions. So far, I have tested accuracy one month ahead.</p>
+        </div>
+        <div class="demo-panel" role="tabpanel" id="panel-scenarios" aria-labelledby="tab-scenarios" hidden>
+          <div class="panel-copy"><h3>What if oil prices fall?</h3><p>I use the IMF's April 2026 yearly projections as a starting point. Change the assumptions to see how the budget balance changes.</p></div>
+          <div class="controls scenario-controls"><label>Oil-price change <output id="price-label">−10%</output><input type="range" id="oil-price" min="-30" max="30" value="-10" step="1"></label><label>Assumed price-sensitive revenue share <output id="share-label">90%</output><input type="range" id="oil-share" min="0" max="100" value="90" step="5"></label></div>
+          <div class="scenario-stats" id="scenario-stats" aria-live="polite"></div><div class="chart" id="scenario-chart" aria-live="polite"></div>
+          <p class="chart-note">I keep spending, export quantities, other revenue, GDP and the exchange rate fixed here. I choose the share of revenue that responds to oil prices. This shows what happens under those assumptions; it does not say how likely the scenario is.</p><button class="small-button" id="export-scenario">Download this scenario and its assumptions <span aria-hidden="true">↓</span></button>
+        </div>
+        <div class="demo-panel" role="tabpanel" id="panel-peers" aria-labelledby="tab-peers" hidden>
+          <div class="panel-copy"><h3>What makes a country comparable?</h3><p>I compare countries using their 2003–2007 oil rents, real GDP per person and manufacturing. Change how much each feature matters to see how the ranking changes. My calculation uses log GDP per person to reduce the effect of very large income differences.</p></div>
+          <div class="controls three"><label>Oil-rent weight <output id="oil-weight-label">1</output><input type="range" id="oil-weight" min="0" max="3" value="1" step="0.25"></label><label>Income weight <output id="income-weight-label">1</output><input type="range" id="income-weight" min="0" max="3" value="1" step="0.25"></label><label>Manufacturing weight <output id="manufacturing-weight-label">1</output><input type="range" id="manufacturing-weight" min="0" max="3" value="1" step="0.25"></label></div>
+          <p id="peer-warning" class="chart-note" role="status"></p><div class="peer-results" id="peer-results" aria-live="polite"></div><p class="chart-note">A lower distance means a closer match on these features, among the countries I have loaded. This does not prove why their economies developed differently. I may add Bahrain after checking its data.</p>
+        </div>
+        <p class="demo-error" id="demo-error" role="alert" hidden></p>
+      </div>
+      <div class="prototype-bottom"><p>I use Python to check the inputs, prepare the observations and run the experiments. The interface helps me inspect the results and export their evidence.</p><a class="text-link" href="https://github.com/Noordles/iraq-economic-observatory">My Python project <span aria-hidden="true">↗</span><small>Private repository · access required</small></a></div>
+    </section>
+
+    <section class="evidence-section section-pad" aria-labelledby="evidence-title">
+      <div class="section-line"><span>04 / REAL SOURCES AND CLEAR WINDOWS</span><span>THE DATA COMES FIRST</span></div>
+      <h2 id="evidence-title">The study still<br>starts in <em>2003.</em></h2>
+      <div class="evidence-grid"><article><span class="card-index">01 / DEVELOPMENT</span><h3>Annual history</h3><p>Growth, real income per person and manufacturing run through 2025. Oil rents keep their available 2003–2021 window.</p><a href="https://datacatalog.worldbank.org/search/dataset/0037712/world-development-indicators" target="_blank" rel="noopener">World Bank WDI ↗</a></article><article><span class="card-index">02 / GOVERNMENT ACCOUNTS</span><h3>Monthly fiscal detail</h3><p>The continuous model uses 2016–June 2026. I preserve cumulative accounts, derive monthly increments and keep the earlier archive separate for review.</p><a href="https://cbi.iq/page/142" target="_blank" rel="noopener">CBI statistical bulletins ↗</a></article><article><span class="card-index">03 / FUTURE SCENARIOS</span><h3>A published annual outlook</h3><p>The IMF April 2026 projections through 2031 provide a separate baseline for sensitivity calculations.</p><a href="https://data.imf.org/Datasets/WEO" target="_blank" rel="noopener">IMF World Economic Outlook ↗</a></article></div>
+      <p class="research-note">I keep each measurement at its original frequency. I do not repeat annual GDP twelve times to create monthly observations, and I do not treat a partial year as a completed year.</p>
+    </section>
+
+    <section class="work-section section-pad" aria-labelledby="work-title">
+      <div class="section-line"><span>05 / WHAT I HAVE BUILT</span><span>A PROGRAM AND A RESEARCH PROCESS</span></div>
+      <div class="work-grid"><figure class="application-shot"><img src="/thesis/assets/observatory-monthly.png" alt="The working Python application showing its 126-month fiscal dataset and the monthly revenue and spending chart" loading="lazy"><figcaption>My actual Streamlit prototype · captured October 2026</figcaption></figure><div><h2 id="work-title">More than<br>the final chart.</h2><p>I want to be able to follow a value from its source to the result on screen. That means preserving definitions, checking the calculations and making the analysis reproducible.</p><ol class="work-list"><li><span>01</span><div><h3>A documented data pipeline</h3><p>Source snapshots, units, gaps, fingerprints and cumulative-to-monthly conversion.</p></div></li><li><span>02</span><div><h3>Explainable computations</h3><p>Country distances, chronological forecast tests, visible uncertainty and scenario assumptions.</p></div></li><li><span>03</span><div><h3>A working interface</h3><p>Controls, source-quality views and exportable results that I can demonstrate and improve.</p></div></li></ol></div></div>
+    </section>
+
+    <section class="downloads section-pad" id="downloads" aria-labelledby="downloads-title">
+      <div class="section-line"><span>06 / LOOK THROUGH THE WORK</span><span>MY CURRENT MATERIALS</span></div>
+      <h2 id="downloads-title">The project,<br>in your hands.</h2><div class="download-grid"><a class="download-card" href="/thesis/downloads/my-thesis-presentation.zip" download><span class="card-index">01 / PRESENTATION</span><h3>My thesis pitch</h3><p>The current 19-slide presentation, with both PowerPoint and PDF copies.</p><span class="download-action">Download the presentation pack ↓</span></a><a class="download-card" href="/thesis/research-plan/"><span class="card-index">02 / RESEARCH</span><h3>The plan behind it</h3><p>My question, verified data, proposed methods and the work I still need to complete.</p><span class="download-action">Read my research plan ↗</span></a><a class="download-card" href="https://github.com/Noordles/iraq-economic-observatory/archive/refs/heads/main.zip"><span class="card-index">03 / PYTHON PROJECT</span><h3>The full application</h3><p>My program, data inventories, tests, research and chapter drafts in one organized repository.</p><span class="download-action">Download from GitHub ↗</span><small>The repository is private while I develop it. GitHub sign-in and repository access are required.</small></a></div>
+    </section>
+
+    <section class="progress-section section-pad" aria-labelledby="progress-title"><div class="section-line"><span>07 / KEEPING THE WORK MOVING</span><span>MY ROUTE TO July 2027</span></div><div class="progress-grid"><div><h2 id="progress-title">What I'm<br>working on.</h2><div class="progress-log"><article class="progress-entry"><time datetime="2026-10-13">2026-10-13</time><h3>A place to keep the work together</h3><p>I have organized the program, data, research and writing into one private repository, with this page as a way to share the project as it develops.</p></article><article class="progress-entry"><time datetime="2026-10-12">2026-10-12</time><h3>Moving the fiscal experiment to monthly data</h3><p>After checking the archived CBI tables, I prepared a continuous 126-month fiscal core and tested five forecasting methods on 24 shared targets.</p></article><article class="progress-entry"><time datetime="2026-10-10">2026-10-10</time><h3>Starting with evidence</h3><p>I checked the available datasets before choosing the direction, prepared the annual development history and started the first Python prototype.</p></article></div></div><div class="next-card"><span class="card-index">NEXT STEPS</span><h3>There is still<br>work to do.</h3><ul><li>Agree a focused thesis question and scope with my professors.</li><li>Review the statistical diagnostics, source adjustments and final evaluation plan.</li><li>Improve the fiscal database, experiment records and application performance.</li><li>Investigate a comparable breakdown of executed spending where the data support it.</li><li>Write the thesis, evaluate the application and prepare my defence.</li></ul><p>I will refine the question, methods and software contribution with my professors' advice.</p></div></div></section>
+
+    <section class="closing"><img src="/thesis/assets/iraqi-marshes.jpg" alt="A boat and water buffalo in the Iraqi marshes, photographed by Taisir Mahdi" loading="lazy"><div><p class="eyebrow">THE REASON I KEEP COMING BACK TO THIS</p><h2>A place I know.<br>An economy I want<br>to understand.</h2><p>I want this project to help me ask better questions, become a better programmer and learn statistics I can keep building on.</p><a class="button primary" href="/#contact">Talk to me about the project <span aria-hidden="true">↗</span></a></div></section>
+  </main>
+  <footer><div><a href="/">NOORULDEEN AL SAMMARRAIE</a><span>My thesis · work in progress</span></div><p id="publication-note">Published 2026-10-13 · Monthly fiscal source window ends June 2026 · Source snapshots: 10 and 12 October 2026</p><details><summary>Sources and image credits</summary><p>Development data: World Bank WDI, CC BY 4.0. Scenario baseline: IMF WEO, April 2026. Model results are my saved exploratory calculations using documented CBI accounts. Source snapshots remain labelled.</p><p>Samarra: <a href="https://commons.wikimedia.org/wiki/File:Malwiya_Minaret_(30553349415).jpg" target="_blank" rel="noopener">David Stanley</a>, <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener">CC BY 2.0</a>. Iraqi marshes: <a href="https://commons.wikimedia.org/wiki/File:The_marshes_of_Iraq.jpg" target="_blank" rel="noopener">Taisir Mahdi</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Photos are displayed with proportional crops; original pixels are preserved.</p></details></footer>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# Preserve the separately generated thesis export and its publication hashes.
+thesis/** -text

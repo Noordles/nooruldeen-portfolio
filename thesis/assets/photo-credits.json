@@ -1,0 +1,46 @@
+[
+  {
+    "file": "samarra-minaret.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Malwiya_Minaret_(30553349415).jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Malwiya_Minaret_%2830553349415%29.jpg",
+    "author": "David Stanley",
+    "date": "2016-04-05",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "changes": "No pixel edits. Displayed with a proportional crop to a portrait frame.",
+    "sha256": "51ed9674661ceaf5b4f2552fd412db3c676e251cdee11f05fcf86f028864c8de"
+  },
+  {
+    "file": "mutanabbi-street.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:001126-AlMutanabbi-Baghdad-IMG_8168-2.jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/2/21/001126-AlMutanabbi-Baghdad-IMG_8168-2.jpg",
+    "author": "Safa Daneshvar",
+    "date": "2022-02-15",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "changes": "No pixel edits; displayed with proportional crop or fit where stated. Any adapted photo remains CC BY-SA 4.0.",
+    "sha256": "d160fa3f6a66501ddfc745d5c0340c78fec4b5aa91e3798fd2709a4d2ed49d1f"
+  },
+  {
+    "file": "iraqi-marshes.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:The_marshes_of_Iraq.jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/The_marshes_of_Iraq.jpg",
+    "author": "Taisir Mahdi",
+    "date": "2016-09-18",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "changes": "No pixel edits; displayed with proportional crop or fit where stated. Any adapted photo remains CC BY-SA 4.0.",
+    "sha256": "f6f5c0e9be1aefb07892c20eea0c9ba3e28bedbe943099522c9f51a4856483be"
+  },
+  {
+    "file": "baghdad-tigris.png",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Tigris_river_in_Baghdad.png",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Tigris_river_in_Baghdad.png",
+    "author": "MohammadHuzam",
+    "date": "2017-12-29",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "changes": "No pixel edits; displayed with proportional crop or fit where stated. Any adapted photo remains CC BY-SA 4.0.",
+    "sha256": "e0d027bb71188314f9e52231dfcc8300bad0cba3befd0bb9ec8b5e1b2a45f394"
+  }
+]
