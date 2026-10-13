@@ -14,6 +14,15 @@
   }
 
   const entries = [
+    ["404 / PAGE NOT FOUND","404 / PAGINĂ NEGĂSITĂ","404 / الصفحة غير موجودة"],
+    ["LOCATION UNKNOWN","LOCAȚIE NECUNOSCUTĂ","المكان غير معروف"],
+    ["A WRONG TURN. A NEW PLACE TO START.","UN DRUM GREȘIT. UN NOU PUNCT DE PLECARE.","منعطف خاطئ. بداية جديدة."],
+    ["This page","Această pagină","هذه الصفحة"],
+    ["wandered off.","s-a rătăcit.","تاهت قليلًا."],
+    ["The address you followed doesn’t lead anywhere here. Head back home or have a look at what I’ve been working on.","Adresa pe care ai urmat-o nu duce nicăieri aici. Revino la pagina principală sau vezi la ce am lucrat.","هذا العنوان لا يقود إلى صفحة هنا. عد إلى الصفحة الرئيسية أو ألقِ نظرة على أعمالي."],
+    ["BACK TO HOME","ÎNAPOI ACASĂ","العودة للرئيسية"],
+    ["EXPLORE MY WORK","DESCOPERĂ LUCRĂRILE MELE","استكشف أعمالي"],
+    ["EXPLORE MY THESIS","DESCOPERĂ LUCRAREA MEA DE LICENȚĂ","استكشف مشروع تخرجي"],
     ["Skip to content","Sari la conținut","انتقل إلى المحتوى"],
     ["CONTACT","CONTACT","اتصل بي"],
     ["HOME","ACASĂ","الرئيسية"],

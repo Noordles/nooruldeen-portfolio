@@ -218,6 +218,7 @@ def main() -> int:
         STYLE_SOURCE,
         BROWSER_SCRIPT_ROOT,
         ROOT / "CNAME",
+        ROOT / "404.html",
         *(ROOT / name for name in ASSET_DIRECTORIES),
     ]
     missing = [str(path.relative_to(ROOT)) for path in required if not path.exists()]
@@ -318,8 +319,8 @@ def main() -> int:
         owner_entry += '<p>The owner administration service is being set up.</p>'
     (admin_output / "index.html").write_text(owner_entry + "</main></body></html>", encoding="utf-8")
 
-    # My unlisted thesis showcase is exported from its separate private repository.
-    # Keep it outside the page catalog, navigation and search-discovery routes.
+    # The thesis showcase is exported from its separate repository and keeps
+    # its own content pipeline and indexing preferences.
     thesis_export = ROOT / "thesis"
     if thesis_export.exists():
         if thesis_export.is_symlink() or any(path.is_symlink() for path in thesis_export.rglob("*")):
@@ -330,6 +331,15 @@ def main() -> int:
             if not re.search(r'<meta\s+name="robots"\s+content="noindex,nofollow', document.read_text(encoding="utf-8")):
                 return fail("Thesis HTML must retain its unlisted indexing metadata.")
         shutil.copytree(thesis_export, OUTPUT / "thesis")
+        plan_alias = OUTPUT / "research-plan"
+        plan_alias.mkdir()
+        write_legacy_redirect(plan_alias / "index.html", "/thesis/research-plan/", "My thesis research plan")
+
+    not_found = (ROOT / "404.html").read_text(encoding="utf-8")
+    not_found = site_colors.rewrite_markup(not_found)
+    not_found = rewrite_html_references(not_found, page_routes, stylesheet_version)
+    not_found = not_found.replace('src="/language-switcher.js"', f'src="/language-switcher.js?v={language_version}"')
+    (OUTPUT / "404.html").write_text(not_found, encoding="utf-8")
 
     write_search_discovery(OUTPUT, list(page_routes.values()))
     shutil.copy2(ROOT / "CNAME", OUTPUT / "CNAME")
