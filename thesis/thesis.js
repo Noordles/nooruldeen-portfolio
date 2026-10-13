@@ -1,14 +1,17 @@
 /* Browser preview of saved results. New model fits remain in the Python app. */
 (() => {
   "use strict";
-  let data = null, activePanel = "history", latestScenario = [], loadController;
+  let data = null, activePanel = "history", latestScenario = [], loadController, errorMessage = null;
+  const selectedCountries = new Set();
+  const t = (source, values = {}) => window.noorThesisI18n?.t(source,values) ?? source.replace(/\{([a-z_]+)\}/g, (_,key) => String(values[key] ?? "{"+key+"}"));
+  const locale = () => window.noorThesisI18n?.locale || "en-GB";
   const $ = id => document.getElementById(id);
   const escape = value => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
-  const number = (value, digits = 2) => Number(value).toLocaleString("en-GB", {maximumFractionDigits:digits, minimumFractionDigits:digits});
-  const exactNumber = value => value.toLocaleString("en-GB", {maximumFractionDigits:12});
+  const number = (value, digits = 2) => Number(value).toLocaleString(locale(), {maximumFractionDigits:digits, minimumFractionDigits:digits});
+  const exactNumber = value => value.toLocaleString(locale(), {maximumFractionDigits:12});
   const finite = value => typeof value === "number" && Number.isFinite(value);
-  const periodLabel = period => new Date(period + "-01T12:00:00Z").toLocaleDateString("en-GB", {month:"short", year:"2-digit"});
-  const controls = [...document.querySelectorAll(".demo-shell select, .demo-shell input, #export-scenario")];
+  const periodLabel = period => new Date(period + "-01T12:00:00Z").toLocaleDateString(locale(), {month:"short", year:"numeric",timeZone:"UTC"});
+  const controls = [...document.querySelectorAll(".demo-shell select, .demo-shell input, #export-scenario, #show-all-countries")];
 
   function validate(payload) {
     if (!payload?.annual || !Array.isArray(payload.annual.years) || !payload.annual.years.length ||
@@ -42,7 +45,7 @@
     const values = series.flatMap(item => item.y.filter(finite));
     if (options.band) values.push(...options.band.low.filter(finite), ...options.band.high.filter(finite));
     if (!x.length || !values.length) {
-      target.innerHTML = '<p class="chart-note">No observations are available in this saved window.</p>';
+      target.innerHTML = '<p class="chart-note">'+escape(t('No observations are available in this saved window.'))+'</p>';
       return;
     }
     let low = Math.min(...values), high = Math.max(...values);
@@ -62,16 +65,16 @@
       }).join(" ");
     };
     const tick = value => (Math.abs(value) >= 10000
-      ? new Intl.NumberFormat("en-GB", {notation:"compact", maximumFractionDigits:1}).format(value)
+      ? new Intl.NumberFormat(locale(), {notation:"compact", maximumFractionDigits:1}).format(value)
       : number(value, Math.max(Math.abs(low), Math.abs(high)) >= 1000 ? 0 : 1)) + (options.percent ? "%" : "");
-    const title = options.title || "Saved research chart";
+    const title = options.title || t("Saved research chart");
     let svg = '<svg viewBox="0 0 ' + width + " " + height + '" role="img" tabindex="0" aria-describedby="' + id + '-help" aria-labelledby="' + id + '-title ' + id + '-description">' +
       '<title id="' + id + '-title">' + escape(title) + '</title><desc id="' + id + '-description">' +
-      escape(series.map(item => item.name).join(" and ")) + ". Horizontal axis: " + escape(options.periods ? "month" : "year") +
-      ". Vertical axis: " + escape(options.axisLabel || options.units || "value") + ". Exact observations are available in the chart data table below.</desc>";
-    svg += '<text x="' + left + '" y="15" class="chart-axis-title">' + escape(options.axisLabel || options.units || "Value") +
+      escape(series.map(item => item.name).join(" · ")) + ". " + escape(t("Horizontal axis: {period}. Vertical axis: {unit}. Exact observations are available in the chart data table below.",
+        {period:t(options.periods ? "Month" : "Year"),unit:options.axisLabel || options.units || t("Value")})) + "</desc>";
+    svg += '<text x="' + left + '" y="15" class="chart-axis-title">' + escape(options.axisLabel || options.units || t("Value")) +
       '</text><text x="' + ((left+width-right)/2) + '" y="' + (height-3) + '" text-anchor="middle" class="chart-axis-title">' +
-      (options.periods ? "Month" : "Year") + "</text>";
+      escape(t(options.periods ? "Month" : "Year")) + "</text>";
     for (let index = 0; index <= 4; index++) {
       const value = low + (high - low) * index / 4, y = Y(value);
       svg += '<line x1="' + left + '" y1="' + y + '" x2="' + (width - right) + '" y2="' + y + '" class="chart-gridline"/>' +
@@ -101,22 +104,27 @@
       finishBand();
     }
     series.forEach((item,index) => {
-      svg += '<path data-series-index="' + index + '" class="chart-series' + (item.reference ? ' chart-reference' : '') + '" d="' + path(item.y) + '" fill="none" stroke="' + item.color + '"' +
+      svg += '<path data-series-index="' + index + '" class="chart-series' + (item.reference ? ' chart-reference' : '') + (selectedCountries.has(item.code) ? ' is-selected' : '') + '" d="' + path(item.y) + '" fill="none" stroke="' + item.color + '"' +
         (item.dash ? ' stroke-dasharray="7 5"' : "") + "/>";
       if (x.length <= 6) for (const point of points(item.y).filter(Boolean)) {
         svg += '<circle cx="' + point[0] + '" cy="' + point[1] + '" r="3.5" fill="' + item.color + '"/>';
       }
     });
     svg += '<g class="chart-focus" hidden><line x1="0" y1="' + top + '" x2="0" y2="' + (height-bottom) + '"/><circle r="5"/></g></svg>';
-    const legend = '<div class="chart-legend">' + [...series].sort((a,b) => Number(!!b.reference)-Number(!!a.reference)).map(item => '<span><i style="--series-color:' + item.color + '"></i>' + escape(item.name) + "</span>").join("") +
-      (options.band ? '<span class="interval-key"><i></i>95% prediction interval</span>' : "") + "</div>";
+    const legendSeries = options.legendSeries || series;
+    const legend = '<div class="chart-legend">' + [...legendSeries].sort((a,b) => Number(!!b.reference)-Number(!!a.reference)).map(item => options.onCountrySelect
+      ? '<button type="button" data-country="'+escape(item.code)+'" aria-pressed="'+String(selectedCountries.has(item.code))+'" aria-label="'+escape(t("Select {country}",{country:item.name}))+'"><i style="--series-color:'+item.color+'"></i>'+escape(item.name)+'</button>'
+      : '<span><i style="--series-color:' + item.color + '"></i>' + escape(item.name) + "</span>").join("") +
+      (options.band ? '<span class="interval-key"><i></i>'+escape(t("95% prediction interval"))+'</span>' : "") + "</div>";
     const headings = series.map(item => "<th scope=\"col\">" + escape(item.name) + "</th>").join("") +
-      (options.band ? '<th scope="col">95% lower</th><th scope="col">95% upper</th>' : "");
+      (options.band ? '<th scope="col">'+escape(t("95% lower"))+'</th><th scope="col">'+escape(t("95% upper"))+'</th>' : "");
     const cell = value => "<td>" + (finite(value) ? escape(exactNumber(value)) : "—") + "</td>";
     const rows = x.map((value, index) => '<tr><th scope="row">' + escape(options.periods ? periodLabel(value) : value) + "</th>" +
       series.map(item => cell(item.y[index])).join("") + (options.band ? cell(options.band.low[index]) + cell(options.band.high[index]) : "") + "</tr>").join("");
-    target.innerHTML = legend + svg + '<p class="sr-only" id="' + id + '-help">Hover or tap a line for its saved value. With the chart focused, use left and right arrows for periods, up and down for series, and Escape to close the details.</p><div class="chart-tooltip" role="tooltip" hidden></div><details class="chart-data"><summary>View chart values</summary><div class="table-scroll"><table><caption>' +
-      escape(title) + '</caption><thead><tr><th scope="col">Period</th>' + headings + "</tr></thead><tbody>" + rows + "</tbody></table></div></details>";
+    target.classList.toggle("chart-has-selection",!!options.onCountrySelect && selectedCountries.size>0);
+    target.innerHTML = legend + svg + '<p class="sr-only" id="' + id + '-help">'+escape(t("Hover or tap a line for its saved value. With the chart focused, use left and right arrows for periods, up and down for series, and Escape to close the details."))+'</p><div class="chart-tooltip" role="tooltip" hidden></div><details class="chart-data"><summary>'+escape(t("View chart values"))+'</summary><div class="table-scroll"><table><caption>' +
+      escape(title) + '</caption><thead><tr><th scope="col">'+escape(t("Period"))+'</th>' + headings + "</tr></thead><tbody>" + rows + "</tbody></table></div></details>";
+    target.querySelectorAll("button[data-country]").forEach(button => button.addEventListener("click",() => options.onCountrySelect(button.dataset.country,false)));
     const chart = target.querySelector("svg"), tooltip = target.querySelector(".chart-tooltip"), focus = chart.querySelector(".chart-focus");
     const focusLine = focus.querySelector("line"), focusPoint = focus.querySelector("circle");
     let selectedIndex = x.length-1, selectedSeries = 0;
@@ -133,7 +141,7 @@
         '</strong><span class="tooltip-value">' + escape(exactNumber(value)) + '</span>' +
         (options.units ? '<span class="tooltip-units">' + escape(options.units) + '</span>' : '') +
         (options.band && finite(options.band.low[index]) && finite(options.band.high[index]) ?
-          '<span class="tooltip-interval">95% interval<br>' + escape(exactNumber(options.band.low[index])) + ' to ' + escape(exactNumber(options.band.high[index])) + '</span>' : '');
+          '<span class="tooltip-interval">'+escape(t('95% interval'))+'<br>' + escape(exactNumber(options.band.low[index])) + ' '+escape(t('to'))+' ' + escape(exactNumber(options.band.high[index])) + '</span>' : '');
       tooltip.hidden = false; focus.removeAttribute("hidden");
       focusLine.setAttribute("x1",X(index)); focusLine.setAttribute("x2",X(index));
       focusPoint.setAttribute("cx",X(index)); focusPoint.setAttribute("cy",Y(value)); focusPoint.setAttribute("fill",item.color);
@@ -150,7 +158,10 @@
       const index = Math.max(0,Math.min(x.length-1,Math.round((px-left)/(width-left-right)*Math.max(1,x.length-1))));
       const candidates = series.map((item,seriesIndex) => ({seriesIndex,value:item.y[index]})).filter(item => finite(item.value));
       candidates.sort((a,b) => Math.abs(Y(a.value)-py)-Math.abs(Y(b.value)-py));
-      if (candidates.length) showDetails(index,candidates[0].seriesIndex,event);
+      if (candidates.length) {
+        if (event.type === "pointerdown" && options.onCountrySelect) { options.onCountrySelect(series[candidates[0].seriesIndex].code,true,event); return; }
+        showDetails(index,candidates[0].seriesIndex,event);
+      }
       else hideDetails();
     }
     chart.addEventListener("pointermove",inspect);
@@ -158,6 +169,7 @@
     chart.addEventListener("pointerleave",event => { if(event.pointerType!=="touch") hideDetails(); });
     chart.addEventListener("blur",hideDetails);
     chart.addEventListener("keydown",event => {
+      if (["Enter"," "].includes(event.key) && options.onCountrySelect) { event.preventDefault(); options.onCountrySelect(series[selectedSeries].code,true); return; }
       if (!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Escape"].includes(event.key)) return;
       event.preventDefault();
       if(event.key==="Escape") { hideDetails(); return; }
@@ -166,29 +178,41 @@
       else seriesIndex=(seriesIndex+(event.key==="ArrowDown"?1:-1)+series.length)%series.length;
       showDetails(index,seriesIndex);
     });
+    if(options.initialPointer) inspect({...options.initialPointer,type:"pointermove"});
   }
 
-  function history() {
+  function history(initialPointer) {
     if (!data) return;
     const key = $("indicator").value, definition = data.annual.indicators[key];
     if (!definition) return;
     const years = data.annual.years;
     const countries = Object.keys(data.annual.countries).filter(country => country!=="IRQ").sort((a,b) => data.annual.countries[a].localeCompare(data.annual.countries[b]));
     countries.push("IRQ");
-    const series = countries.map(country => ({name:data.annual.countries[country],color:country==="IRQ"?"#d18b98":"#30c4a0",reference:country==="IRQ",
+    const series = countries.map(country => ({code:country,name:t(data.annual.countries[country]),color:country==="IRQ"?"#d18b98":"#30c4a0",reference:country==="IRQ",
       y:years.map(year => data.annual.rows.find(row => row.country===country && row.year===year)?.[key] ?? null)}));
-    drawChart("history-chart", years, series, {title:definition.label + " in " + definition.units,units:definition.units,
-      axisLabel:key==="gdp_per_capita" ? "USD per person · 2015 prices" : definition.units,percent:key!=="gdp_per_capita",nonNegative:key!=="growth"});
+    const selectedOnly = $("selected-only").checked && selectedCountries.size>0;
+    const visible = selectedOnly ? series.filter(item => selectedCountries.has(item.code)) : series;
+    drawChart("history-chart", years, visible, {title:t("{label} in {units}",{label:t(definition.label),units:t(definition.units)}),units:t(definition.units),
+      axisLabel:key==="gdp_per_capita" ? t("USD per person · 2015 prices") : t(definition.units),percent:key!=="gdp_per_capita",nonNegative:key!=="growth",
+      legendSeries:series,initialPointer,onCountrySelect:(country,exclusive,pointer) => {
+        if(exclusive) { selectedCountries.clear(); selectedCountries.add(country); }
+        else if(selectedCountries.has(country)) selectedCountries.delete(country);
+        else selectedCountries.add(country);
+        history(pointer && {clientX:pointer.clientX,clientY:pointer.clientY});
+        if(!exclusive) $("history-chart").querySelector('button[data-country="'+country+'"]').focus({preventScroll:true});
+      }});
+    $("country-selection-status").textContent = selectedCountries.size ? t(selectedOnly ? "Showing only: {countries}." : "Focused: {countries}. All countries remain visible.",
+      {countries:series.filter(item => selectedCountries.has(item.code)).map(item => item.name).join(" · ")}) : t($("selected-only").checked ? "Choose countries from the legend to filter the chart." : "All {count} countries are visible.",{count:series.length});
     const rows = data.annual.rows.filter(row => row.country === "IRQ" && finite(row[key])).sort((a,b) => a.year - b.year);
-    $("history-note").textContent = definition.label + " · " + definition.units + ". Iraq has " + rows.length + " available annual values" +
-      (rows.length ? ", " + rows[0].year + "–" + rows.at(-1).year : "") + ". " + definition.note;
+    $("history-note").textContent = t("{label} · {units}. Iraq has {count} available annual values{window}. {note}",
+      {label:t(definition.label),units:t(definition.units),count:rows.length,window:rows.length ? ", "+rows[0].year+"–"+rows.at(-1).year : "",note:t(definition.note)});
   }
 
   function forecasts() {
     if (!data) return;
     const model = $("forecast-model").value, rows = data.monthly_forecasts.filter(row => row.model === model);
     drawChart("forecast-chart", rows.map(row => row.period), [{name:model,color:"#d18b98",y:rows.map(row => row.prediction_trillion_iqd),dash:true}],
-      {title:"Saved monthly revenue forecast in nominal trillion IQD",units:"nominal trillion IQD",axisLabel:"Revenue · trillion IQD",periods:true,band:{low:rows.map(row => row.pi95_low),high:rows.map(row => row.pi95_high)}});
+      {title:t("Saved monthly revenue forecast in nominal trillion IQD"),units:t("nominal trillion IQD"),axisLabel:t("Revenue · trillion IQD"),periods:true,band:{low:rows.map(row => row.pi95_low),high:rows.map(row => row.pi95_high)}});
   }
 
   function scenarios() {
@@ -203,14 +227,14 @@
         scenario_revenue_billion_iqd:revenue,fixed_expenditure_billion_iqd:row.expenditure_billion_iqd,fixed_gdp_billion_iqd:row.gdp_billion_iqd};
     });
     const first = latestScenario[0];
-    $("scenario-stats").innerHTML = '<div><small>' + first.year + ' baseline balance</small><strong>' + number(first.baseline_balance_pct_gdp) +
-      '%</strong><small>of baseline GDP</small></div><div><small>' + first.year + ' scenario balance</small><strong>' + number(first.scenario_balance_pct_gdp) +
-      '%</strong><small>of fixed baseline GDP</small></div><div><small>Change in balance</small><strong>' + number(first.change_percentage_points) +
-      "</strong><small>percentage points</small></div>";
+    $("scenario-stats").innerHTML = '<div><small>' + escape(t("{year} baseline balance",{year:first.year})) + '</small><strong>' + number(first.baseline_balance_pct_gdp) +
+      '%</strong><small>'+escape(t("of baseline GDP"))+'</small></div><div><small>' + escape(t("{year} scenario balance",{year:first.year})) + '</small><strong>' + number(first.scenario_balance_pct_gdp) +
+      '%</strong><small>'+escape(t("of fixed baseline GDP"))+'</small></div><div><small>'+escape(t("Change in balance"))+'</small><strong>' + number(first.change_percentage_points) +
+      '</strong><small>'+escape(t("percentage points"))+'</small></div>';
     drawChart("scenario-chart", latestScenario.map(row => row.year),
-      [{name:"IMF baseline",color:"#aaa99c",y:latestScenario.map(row => row.baseline_balance_pct_gdp)},
-       {name:"My scenario",color:"#30c4a0",y:latestScenario.map(row => row.scenario_balance_pct_gdp)}],
-      {title:"Conditional annual fiscal balance as percent of fixed GDP",units:"% of fixed baseline GDP",axisLabel:"Budget balance · % of GDP",percent:true});
+      [{name:t("IMF baseline"),color:"#aaa99c",y:latestScenario.map(row => row.baseline_balance_pct_gdp)},
+       {name:t("My scenario"),color:"#30c4a0",y:latestScenario.map(row => row.scenario_balance_pct_gdp)}],
+      {title:t("Conditional annual fiscal balance as percent of fixed GDP"),units:t("% of fixed baseline GDP"),axisLabel:t("Budget balance · % of GDP"),percent:true});
   }
 
   function peers() {
@@ -218,14 +242,14 @@
     const ids = ["oil","income","manufacturing"], weights = ids.map(id => Number($(id + "-weight").value));
     ids.forEach((id,index) => $(id + "-weight-label").value = String(weights[index]));
     const sum = weights.reduce((a,b) => a+b,0);
-    $("peer-warning").textContent = sum ? "I put the three features on a common scale so that their different units do not decide the ranking." :
-      "Choose at least one positive weight to calculate a ranking. All loaded countries are still listed below.";
+    $("peer-warning").textContent = t(sum ? "I put the three features on a common scale so that their different units do not decide the ranking." :
+      "Choose at least one positive weight to calculate a ranking. All loaded countries are still listed below.");
     const ranked = data.peers.map(row => ({...row,distance:sum ? Math.sqrt(ids.reduce((total,id,index) => total + row.delta_squared[id] * weights[index] / sum, 0)) : null}))
-      .sort((a,b) => sum ? a.distance - b.distance || a.country.localeCompare(b.country) : a.country_name.localeCompare(b.country_name));
+      .sort((a,b) => sum ? a.distance - b.distance || a.country.localeCompare(b.country) : t(a.country_name).localeCompare(t(b.country_name),locale()));
     const max = Math.max(...ranked.map(row => row.distance ?? 0), .001);
-    $("peer-results").innerHTML = '<div class="peer-row peer-reference"><span class="rank">REF</span><span>Iraq <small>reference country</small></span><div class="peer-bar"><span style="width:0%"></span></div><span class="distance">0.000</span></div>' +
+    $("peer-results").innerHTML = '<div class="peer-row peer-reference"><span class="rank">'+escape(t('REF'))+'</span><span>'+escape(t('Iraq'))+' <small>'+escape(t('reference country'))+'</small></span><div class="peer-bar"><span style="width:0%"></span></div><span class="distance">'+number(0,3)+'</span></div>' +
       ranked.map((row,index) => '<div class="peer-row"><span class="rank">' + (sum ? String(index + 1).padStart(2,"0") : "—") +
-      '</span><span>' + escape(row.country_name) + '</span><div class="peer-bar"><span style="width:' + (sum ? Math.max(3,row.distance / max * 100) : 0) +
+      '</span><span>' + escape(t(row.country_name)) + '</span><div class="peer-bar"><span style="width:' + (sum ? Math.max(3,row.distance / max * 100) : 0) +
       '%"></span></div><span class="distance">' + (sum ? number(row.distance,3) : "—") + "</span></div>").join("");
   }
 
@@ -233,6 +257,8 @@
     if (!data) return;
     ({history,forecasts,scenarios,peers}[activePanel])();
   }
+  $("selected-only").addEventListener("change",render);
+  $("show-all-countries").addEventListener("click",() => { selectedCountries.clear(); $("selected-only").checked=false; render(); });
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   tabs.forEach((button,index) => {
     button.tabIndex = index ? -1 : 0;
@@ -249,7 +275,7 @@
       if (!["ArrowLeft","ArrowRight","Home","End"].includes(event.key)) return;
       event.preventDefault();
       const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 :
-        (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        (index + (event.key === "ArrowRight" ? 1 : -1) * (window.noorThesisI18n?.language === "ar" ? -1 : 1) + tabs.length) % tabs.length;
       tabs[next].focus(); tabs[next].click();
     });
   });
@@ -269,10 +295,10 @@
   async function loadData() {
     loadController?.abort(); loadController = new AbortController();
     const controller = loadController, timeout = setTimeout(() => controller.abort(), 15000);
-    data = null; latestScenario = [];
+    data = null; latestScenario = []; errorMessage = null;
     controls.forEach(control => control.disabled = true);
     $("demo-shell").setAttribute("aria-busy","true");
-    $("demo-status").hidden = false; $("demo-status").textContent = "Loading the saved research preview…";
+    $("demo-status").hidden = false; $("demo-status").textContent = t("Loading the saved research preview…");
     $("demo-error").hidden = true; $("retry-preview").hidden = true;
     try {
       const response = await fetch("/thesis/data.json", {cache:"no-cache",signal:controller.signal});
@@ -285,8 +311,9 @@
       if (controller !== loadController) return;
       $("demo-status").hidden = true;
       $("demo-error").hidden = false;
-      $("demo-error").textContent = (error.name === "AbortError" ? "The saved preview took too long to load." : error.message) +
-        " You can retry, or read the research plan and presentation below.";
+      errorMessage = error.name === "AbortError" ? "The saved preview took too long to load." :
+        (error.message.startsWith("The saved") ? error.message : "The saved preview could not load.");
+      $("demo-error").textContent = t(errorMessage) + " " + t("You can retry, or read the research plan below.");
       $("retry-preview").hidden = false;
     } finally {
       clearTimeout(timeout);
@@ -296,6 +323,11 @@
   $("retry-preview").addEventListener("click", loadData);
   let resizeTimer;
   window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(render,140); });
+  window.addEventListener("noor-thesis-language", () => {
+    if (!$("demo-status").hidden) $("demo-status").textContent=t("Loading the saved research preview…");
+    if (errorMessage) $("demo-error").textContent=t(errorMessage)+" "+t("You can retry, or read the research plan below.");
+    render(); document.fonts?.ready.then(render);
+  });
   document.fonts?.ready.then(render);
   loadData();
 })();
