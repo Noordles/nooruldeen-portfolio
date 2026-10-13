@@ -1,6 +1,6 @@
 {
-  "source_commit": "85097fe37a5c614189e92f8bed5cd60a346e8da6",
-  "published_utc": "2026-10-13T18:43:57+00:00",
+  "source_commit": "26923f7f0ac920c2418489bbfc6af4a6b38bbda4",
+  "published_utc": "2026-10-13T19:59:38+00:00",
   "route": "/thesis/",
   "source_repository_private": true,
   "public_files": {
@@ -42,7 +42,7 @@
     "assets/pitch/slide-18.webp": "f7c8f776f54eace641e05ac4ac6cd4480a27666b0bc23358e4b98ba6480513b2",
     "assets/pitch/slide-19.webp": "12276069ee6ce6f132de727f77524f6a098022b0ca1570d9f781ade5df3a39c3",
     "assets/samarra-minaret.jpg": "51ed9674661ceaf5b4f2552fd412db3c676e251cdee11f05fcf86f028864c8de",
-    "data.json": "f6896a54ef915fac6fe366bdf5767f2ff903c265111ac6f85827c8c5d2d699ac",
+    "data.json": "09d328488fad67cdd29f6c3f498ebfd49f67c0e1c16b7ff15210969f7695fd32",
     "index.html": "b70544bf9dd123a55082d3fd147add8bffcacf5c49ce86b22c0f5b09eb292b9b",
     "interpretation.js": "f0d7ebe1cd4007f2f4c253a7e70847211ff909b13fae2e7ee10b51d72e3bc975",
     "language.js": "fcae63af2251264556187005619ff601b3b9bf44c216fa4cdb4c0440e7ff231e",
