@@ -27,6 +27,7 @@ PUBLIC_SCRIPT_NAMES = {
     "piano-player.js",
     "piano-melting.js",
     "research-presentation.js",
+    "presentation-seek.js",
     "language-switcher.js",
     "cms-runtime.js",
     "site-colors.js",
@@ -133,6 +134,12 @@ def add_site_metadata(document: str, route: str, language_version: str, script_v
             document,
             flags=re.IGNORECASE,
         )
+    if "data-research-presentation" in document:
+        seek_version = hashlib.sha256((BROWSER_SCRIPT_ROOT / "presentation-seek.js").read_bytes()).hexdigest()[:12]
+        presentation_version = hashlib.sha256((BROWSER_SCRIPT_ROOT / "research-presentation.js").read_bytes()).hexdigest()[:12]
+        seek_script = f'<script src="/presentation-seek.js?v={seek_version}" defer></script>'
+        document = re.sub(r"<head(\s[^>]*)?>", lambda match: match.group(0) + "\n  " + seek_script, document, count=1, flags=re.IGNORECASE)
+        document = re.sub(r'(?P<prefix><script\s+[^>]*src=["\'])/research-presentation\.js(?:\?[^"\']*)?(?P<quote>["\'])', lambda match: f'{match.group("prefix")}/research-presentation.js?v={presentation_version}{match.group("quote")}', document, flags=re.IGNORECASE)
     additions = []
     if not re.search(r'<link\s+[^>]*rel=["\']canonical["\']', document, re.IGNORECASE):
         additions.append(f'<link rel="canonical" href="https://nooruldeen.com{route}" />')
