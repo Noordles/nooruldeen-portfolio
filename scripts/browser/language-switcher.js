@@ -14,6 +14,13 @@
   }
 
   const entries = [
+    ["Two ID card designs", "Două modele de legitimație", "تصميمان للبطاقات"],
+    ["for BEDSL.", "pentru BEDSL.", "لـBEDSL."],
+    ["I designed two different ID cards for BEDSL. Each design includes a front and back.", "Am creat două modele diferite de legitimație pentru BEDSL. Fiecare include fața și verso-ul.", "صممت بطاقتين مختلفتين لـBEDSL، ولكل تصميم وجه أمامي وخلفي."],
+    ["FRONT + BACK", "FAȚĂ + VERSO", "الوجه الأمامي والخلفي"],
+    ["Design 01", "Design 01", "التصميم 01"],
+    ["Design 02", "Design 02", "التصميم 02"],
+
     ["BEDSL / ID CARD DESIGN", "BEDSL / DESIGN DE LEGITIMAȚII", "BEDSL / تصميم البطاقات"],
     ["Two directions,", "Două direcții,", "اتجاهان،"],
     ["one lab identity.", "o identitate de laborator.", "وهوية واحدة للمختبر."],

@@ -150,6 +150,7 @@ main > section[id] { scroll-margin-top: 84px; }
 .work-card-feature { grid-column: 1/-1; display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; align-items: end; }
 .work-card-feature .card-art { grid-row: span 5; min-height: 340px; }
 .card-art { height: 256px; position: relative; overflow: hidden; background: #121413; }
+.work-card-feature > a.card-art { display:block; }
 .card-meta { display: flex; justify-content: space-between; gap: 9px; padding: 17px 9px 11px; color: #9f9b8d; font-size: 7px; letter-spacing: .08em; }
 .work-card h3 { margin: 0; padding: 0 9px; color: var(--paper); font: 700 clamp(1.8rem,3vw,2.65rem)/1.02 var(--display); letter-spacing: .005em; }
 .project-title { display: flex; align-items: center; gap: 16px; padding-left: 7px; }
@@ -1680,6 +1681,7 @@ html[dir="rtl"] .incsmps-screen-open { right:auto;left:12px; }
 .thesis-art-sheet{position:absolute;inset:10% 9%;display:flex;flex-direction:column;justify-content:space-between;padding:18px 22px;border:1px solid rgba(209,139,152,.45);background:rgba(14,22,20,.93);box-shadow:7px 8px 0 rgba(15,91,73,.55),11px 12px 0 rgba(126,40,63,.6);transform:rotate(-1.4deg)}
 .thesis-art-sheet img{width:100%;min-height:0;flex:1;object-fit:contain}.thesis-art-kicker{color:var(--wine-light);font:8px/1.5 var(--mono);letter-spacing:.08em}.thesis-art-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--paper-muted);font:7px/1.5 var(--mono)}.thesis-art-footer b{font:700 29px/1 var(--display);color:var(--teal)}
 .thesis-project-mark{width:59px;height:59px;flex:none;display:grid;place-items:center;border:1px solid rgba(48,196,160,.46);border-radius:50%;background:radial-gradient(circle,rgba(48,196,160,.16),rgba(116,38,60,.18));color:var(--teal);font:34px/1 var(--display)}
+.thesis-project-mark img{display:block;width:36px;height:36px}
 .work-card>.thesis-feature-subtitle{color:var(--paper);font-size:15px;line-height:1.55;margin-bottom:0}.thesis-feature-actions{display:flex;flex-wrap:wrap;gap:8px;padding-block-start:4px}.thesis-feature-actions .profile-cta{min-width:min(221px,calc(100% - 18px))}
 html[dir=rtl] .thesis-art-kicker,html[dir=rtl] .thesis-art-footer{font-family:"Noto Sans Arabic",sans-serif;letter-spacing:0}
 @media(max-width:640px){.thesis-art-sheet{padding:13px 17px}.thesis-art-footer{font-size:6px}.thesis-art-footer b{font-size:26px}.thesis-feature-actions{gap:5px}.thesis-feature .project-title h3{font-size:clamp(25px,6.5vw,36px)}.thesis-project-mark{width:48px;height:48px}.work-card>.thesis-feature-subtitle{font-size:15px}}
