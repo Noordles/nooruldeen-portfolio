@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" fill="none">
+  <title>Iraq: architecture, the river, oil and the questions I want to explore</title>
+  <desc>An original decorative illustration in my website colours. The small chart is a design element, not statistical data.</desc>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M52 419H748M87 445H711" stroke="#E9E0CF" stroke-opacity=".22" stroke-width="2"/>
+    <path d="M256 95C378 98 361 179 423 237S470 324 427 374S512 438 683 431" stroke="#267E94" stroke-opacity=".33" stroke-width="38"/>
+    <path d="M256 95C378 98 361 179 423 237S470 324 427 374S512 438 683 431" stroke="#30C4A0" stroke-opacity=".72" stroke-width="3" stroke-dasharray="8 11"/>
+    <g transform="translate(53 53)">
+      <path d="M27 348H222L214 310H37Z" fill="#74263C" fill-opacity=".6" stroke="#D18B98" stroke-width="3"/>
+      <path d="M51 310H198L189 268H63L73 226H179L169 185H84L95 145H158L150 111H102L109 78H142V52H115V34H137" fill="#151F1B" stroke="#E9E0CF" stroke-opacity=".85" stroke-width="3"/>
+      <path d="M64 310C202 289 195 267 73 249C187 228 184 205 89 186C168 168 167 146 105 128C153 115 151 92 113 79" stroke="#30C4A0" stroke-opacity=".75" stroke-width="3"/>
+      <path d="M107 346V324Q124 302 142 324V346" stroke="#E9E0CF" stroke-width="3"/>
+      <path d="M10 361H244M45 380H198" stroke="#D18B98" stroke-opacity=".5" stroke-width="2"/>
+    </g>
+    <g transform="translate(487 74)">
+      <path d="M39 277L77 125H114L150 277M70 170H126M59 217H138M39 277H165" stroke="#E9E0CF" stroke-opacity=".72" stroke-width="3"/>
+      <path d="M43 89L164 47L212 89L193 113L153 83L55 119Z" fill="#74263C" fill-opacity=".72" stroke="#D18B98" stroke-width="3"/>
+      <path d="M157 51L154 84M206 88V266M199 266H213M77 125L100 102M89 217L137 170M67 170L118 125" stroke="#30C4A0" stroke-width="3"/>
+      <circle cx="94" cy="116" r="10" fill="#101514" stroke="#D18B98" stroke-width="3"/>
+      <rect x="183" y="276" width="53" height="59" rx="5" fill="#267E94" fill-opacity=".28" stroke="#30C4A0" stroke-width="2"/>
+      <path d="M183 293H236M183 319H236M195 282H222" stroke="#E9E0CF" stroke-opacity=".4" stroke-width="2"/>
+      <path d="M20 335H251" stroke="#D18B98" stroke-opacity=".4" stroke-width="2"/>
+    </g>
+    <g transform="translate(291 266) rotate(-5)">
+      <rect x="9" y="10" width="179" height="114" rx="3" fill="#74263C" fill-opacity=".55"/>
+      <rect width="179" height="114" rx="3" fill="#101B17" stroke="#E9E0CF" stroke-opacity=".6" stroke-width="2"/>
+      <path d="M0 23H179" stroke="#D18B98" stroke-opacity=".6" stroke-width="2"/>
+      <circle cx="12" cy="12" r="3" fill="#30C4A0"/><circle cx="24" cy="12" r="3" fill="#D18B98"/>
+      <path d="M22 37V91H158M22 66H159" stroke="#E9E0CF" stroke-opacity=".16" stroke-width="2"/>
+      <path d="M28 77L50 56L72 65L96 46L123 72L151 58" stroke="#30C4A0" stroke-width="3"/>
+      <path d="M28 90L50 75L72 87L96 69L123 79L151 76" stroke="#D18B98" stroke-width="3"/>
+    </g>
+    <path d="M353 43V73M338 58H368M717 184V210M704 197H730" stroke="#30C4A0" stroke-opacity=".65" stroke-width="2"/>
+    <circle cx="278" cy="207" r="5" stroke="#D18B98" stroke-width="2"/>
+    <path d="M400 464H548M260 464H382" stroke="#D18B98" stroke-opacity=".35" stroke-width="2"/>
+  </g>
+</svg>

@@ -1,6 +1,6 @@
 {
-  "source_commit": "0e622299d2b72f456579d51bc545797a83601395",
-  "published_utc": "2026-10-13T07:38:54+00:00",
+  "source_commit": "2e371c1bab5efafffb57dd80c04dde91fe539c70",
+  "published_utc": "2026-10-13T08:00:33+00:00",
   "route": "/thesis/",
   "source_repository_private": true,
   "public_files": {
@@ -13,15 +13,18 @@
     "assets/fonts/OFL-barlowcondensed.txt": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f",
     "assets/fonts/OFL-ibmplexmono.txt": "40b12494366ea515cc612a84cd75fba61e31cf2ddade62146ee38de1a2a1f6b9",
     "assets/fonts/RobotoSlab-700.ttf": "f8dbdb3617fd43fdce94e990aa4f259e9e62a4f4462f60c21d76151e7c372c1b",
+    "assets/iraq-illustration.svg": "ae947cca67a646efba934b3eb12cd6adb07fe93fbb16c00423ded79777792578",
     "assets/iraqi-marshes.jpg": "f6f5c0e9be1aefb07892c20eea0c9ba3e28bedbe943099522c9f51a4856483be",
     "assets/noor-favicon.svg": "326a7491321baf57672a79fe3ebd21b51c7b691c4b540f2a34b9fe557e6f10d8",
+    "assets/noor-portrait.webp": "61f6f9983749893d7feed0f5212c826374db38d14a86cbeb2b8e675223443252",
     "assets/observatory-monthly.png": "9fb6ee66b5d973a565cb84a2db9339f8495bc2800157310e6c3958098340b337",
     "assets/photo-credits.json": "fd1e38a3f785b5f2faca1c1f3c3f6bbf8f7bd1144d1beb1daf29fbc79ab670fa",
     "assets/samarra-minaret.jpg": "51ed9674661ceaf5b4f2552fd412db3c676e251cdee11f05fcf86f028864c8de",
-    "data.json": "f46183ec7620b6fe9236050e1d6a3dd3f89ebddaa9f88e09144d34aa32d3b484",
-    "downloads/my-thesis-presentation.zip": "9a17e2a70051906ebd27a26dd36bb4a803c05fbdbdd26c1bfb3f584fdc32a8f8",
-    "index.html": "748892cacf4026ff05419fc6ce77ef46a99f8824ee15c3fba344d5f09d697f3e",
-    "research-plan/index.html": "0b50dadc13e72ab10f9dc7b5007167384ff29d3c41b28bf4c1acd46c7af03b67",
+    "data.json": "b5447098ad72b80c433db3445b3f31a30e555e9602bdd30a7fa5b0ddef2f282c",
+    "downloads/my-thesis-presentation.zip": "8724b9afd3be028989fbe53e5f20724eb5b7889553e4802d40bfb8dce2a3939b",
+    "index.html": "1eb02d8221cee4a724556d938dcb18c3178f062699daee5e3012ed3d9f6a5b0d",
+    "portfolio-theme.css": "9083307385ba060b708b81369eda0fa5d2ab6c45f65ad41a323411b0921f1d9f",
+    "research-plan/index.html": "da9faf2d48ef42c7e8ddfdc4bb01d13a6607c56e2e7832b3ee865d81bf61dca9",
     "thesis.css": "521fd4641e004ca8aee4a3846ce0c68cfd0208364de14d4c77daf85d05c6f30c",
     "thesis.js": "4acbf5bea6de5229fff2670fbd53ad1931a7488d8c361caf2ce6aa26ed27bc75"
   }
