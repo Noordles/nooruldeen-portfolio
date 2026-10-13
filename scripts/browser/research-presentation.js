@@ -110,7 +110,7 @@ if (presentation) {
     const next = presentation.querySelector("[data-slide-next]");
     const progress = presentation.querySelector("[data-slide-progress]");
     const progressTrack = presentation.querySelector(".presentation-progress");
-    let activeSlide = 0;
+    let activeSlide = 0, seeker;
 
     slides.slice(1).forEach((slide) => {
       const preload = new Image();
@@ -131,6 +131,7 @@ if (presentation) {
       progress.style.width = `${((activeSlide + 1) / slides.length) * 100}%`;
       progressTrack.setAttribute("aria-valuenow", String(activeSlide + 1));
       progressTrack.setAttribute("aria-valuemax", String(slides.length));
+      seeker?.update(activeSlide);
     };
 
     previous.addEventListener("click", () => showSlide(activeSlide - 1));
@@ -145,6 +146,7 @@ if (presentation) {
         showSlide(activeSlide + 1);
       }
     });
+    seeker=window.NoorPresentationSeek?.attach(progressTrack,slides.length,showSlide,()=>activeSlide);
     showSlide(0);
   }
 }

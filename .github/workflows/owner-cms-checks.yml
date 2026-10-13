@@ -21,6 +21,8 @@ jobs:
           python3 scripts/test_site_colors.py -v
       - name: Run authentication and upload checks
         run: node --test admin/service/tests/*.test.mjs
+      - name: Check shared presentation seeking
+        run: node --test tests/presentation-seek.test.mjs
       - name: Check browser JavaScript syntax
         run: |
           node --check admin/service/ui/admin.js
@@ -29,6 +31,8 @@ jobs:
           node --check scripts/browser/photos-gallery.js
           node --check scripts/browser/piano-player.js
           node --check scripts/browser/language-switcher.js
+          node --check scripts/browser/presentation-seek.js
+          node --check scripts/browser/research-presentation.js
       - name: Build public pages without altering their layout
         run: python3 scripts/build_site.py
       - name: Validate public pages
