@@ -67,7 +67,7 @@
     if (updateUrl) { const url = new URL(location.href); url.searchParams.set("lang", next); history.replaceState(null, "", url.pathname + url.search + url.hash); }
     window.dispatchEvent(new Event("noor-thesis-language"));
   }
-  const switcher = document.createElement("nav"); switcher.className = "language-switcher";
+  const switcher = document.createElement("div"); switcher.className = "language-switcher"; switcher.setAttribute("role", "group");
   [["en", "EN", "English"], ["ro", "RO", "Romanian"], ["ar", "عربي", "Arabic"]].forEach(([code, label, name]) => {
     const button = document.createElement("button"); button.type = "button"; button.textContent = label; button.lang = code;
     button.dataset.thesisLang = code; button.dataset.languageName = name; button.addEventListener("click", () => setLanguage(code)); switcher.appendChild(button);
