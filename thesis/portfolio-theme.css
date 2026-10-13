@@ -272,6 +272,7 @@ footer { padding:28px var(--content-gutter); background:rgba(7,12,9,.45); }
 /* Every overview block uses the same centered column, including on wide screens. */
 .thesis-working-title{max-width:560px;margin:0 0 24px;padding-inline-start:16px;border-inline-start:2px solid var(--teal);font:600 20px/1.55 Barlow,sans-serif;color:var(--paper)}
 .hero h1{font-size:clamp(44px,5.3vw,78px);line-height:1.2;margin-bottom:26px}
+.rail-icon .oil-rig-icon{display:block;width:1em;height:1em}
 .project-scope{max-width:1440px;margin-inline:auto;padding:0 var(--content-gutter)}
 .hero{max-width:1440px}
 .section-pad>*,.closing>div,body>footer>*{max-width:calc(1440px - 2 * var(--content-gutter))}
