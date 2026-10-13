@@ -29,6 +29,18 @@
         !Array.isArray(payload.peers) || !payload.peers.length) {
       throw new Error("The saved preview has an unexpected data format.");
     }
+    const outlook=payload.international;
+    if(!outlook || outlook.vintage!=="April 2026" || !Array.isArray(outlook.rows) || outlook.rows.length!==45 ||
+      !["NGDP_RPCH","PCPIPCH","GGXWDG_NGDP","GGXCNL_NGDP","BCA_NGDPD"].every(code=>outlook.indicators?.[code]))
+      throw new Error("The saved preview has an unexpected data format.");
+    const outlookKeys=new Set();
+    for(const row of outlook.rows){
+      const def=outlook.indicators[row.indicator],key=row.indicator+":"+row.year;
+      if(!def||!Number.isInteger(row.year)||row.year<2023||row.year>2031||!finite(row.value)||outlookKeys.has(key)||
+        row.status!==(row.year>def.latest_actual_year_as_reported?"IMF_projection":"historical_or_estimate"))
+        throw new Error("The saved preview has an unexpected data format.");
+      outlookKeys.add(key);
+    }
     for (const row of payload.scenario_baseline) {
       if (!finite(row.year) || !finite(row.revenue_billion_iqd) || !finite(row.expenditure_billion_iqd) ||
           !finite(row.gdp_billion_iqd) || row.gdp_billion_iqd <= 0) {
@@ -118,6 +130,10 @@
         svg += '<circle cx="' + point[0] + '" cy="' + point[1] + '" r="3.5" fill="' + item.color + '"/>';
       }
     });
+    const highlightedIndex=x.indexOf(options.highlightPeriod),highlightedSeries=series.findIndex(item=>finite(item.y[highlightedIndex]));
+    if(highlightedIndex>=0&&highlightedSeries>=0){const item=series[highlightedSeries];
+      svg+='<g class="chart-selected-period"><title>'+escape(t("Selected projection year: {year}",{year:options.highlightPeriod}))+'</title><line x1="'+X(highlightedIndex)+'" x2="'+X(highlightedIndex)+'" y1="'+top+'" y2="'+(height-bottom)+'" stroke="#e9e0cf" stroke-opacity=".4" stroke-dasharray="3 4"/><circle cx="'+X(highlightedIndex)+'" cy="'+Y(item.y[highlightedIndex])+'" r="5" fill="'+item.color+'" stroke="#e9e0cf" stroke-width="2"/></g>';
+    }
     svg += '<g class="chart-focus" hidden><line x1="0" y1="' + top + '" x2="0" y2="' + (height-bottom) + '"/><circle r="5"/></g></svg>';
     const legendSeries = options.legendSeries || series;
     const legend = '<div class="chart-legend">' + [...legendSeries].sort((a,b) => Number(!!b.reference)-Number(!!a.reference)).map(item => options.onCountrySelect
@@ -135,7 +151,7 @@
     target.querySelectorAll("button[data-country]").forEach(button => button.addEventListener("click",() => options.onCountrySelect(button.dataset.country,false)));
     const chart = target.querySelector("svg"), tooltip = target.querySelector(".chart-tooltip"), focus = chart.querySelector(".chart-focus");
     const focusLine = focus.querySelector("line"), focusPoint = focus.querySelector("circle");
-    let selectedIndex = x.length-1, selectedSeries = 0;
+    let selectedIndex = highlightedIndex>=0?highlightedIndex:x.length-1, selectedSeries = highlightedSeries>=0?highlightedSeries:0;
     function hideDetails() {
       tooltip.hidden = true; focus.setAttribute("hidden","");
       chart.querySelectorAll(".chart-series").forEach(line => line.classList.remove("is-active"));
@@ -182,8 +198,20 @@
       event.preventDefault();
       if(event.key==="Escape") { hideDetails(); return; }
       let index=selectedIndex, seriesIndex=selectedSeries;
-      if(event.key==="ArrowLeft" || event.key==="ArrowRight") index=Math.max(0,Math.min(x.length-1,index+(event.key==="ArrowRight"?1:-1)));
-      else seriesIndex=(seriesIndex+(event.key==="ArrowDown"?1:-1)+series.length)%series.length;
+      if(event.key==="ArrowLeft" || event.key==="ArrowRight"){
+        const step=event.key==="ArrowRight"?1:-1;
+        let candidate=index+step;
+        while(candidate>=0&&candidate<x.length&&!finite(series[seriesIndex].y[candidate]))candidate+=step;
+        if(candidate<0||candidate>=x.length)return;
+        index=candidate;
+      }else{
+        const step=event.key==="ArrowDown"?1:-1;
+        for(let attempt=0;attempt<series.length;attempt++){
+          seriesIndex=(seriesIndex+step+series.length)%series.length;
+          const available=series[seriesIndex].y.map((value,i)=>finite(value)?i:null).filter(i=>i!==null);
+          if(available.length){index=available.reduce((a,b)=>Math.abs(b-index)<Math.abs(a-index)?b:a);break;}
+        }
+      }
       showDetails(index,seriesIndex);
     });
     if(options.initialPointer) inspect({...options.initialPointer,type:"pointermove"});
@@ -193,7 +221,8 @@
     if (!data) return;
     const key = $("indicator").value, definition = data.annual.indicators[key];
     if (!definition) return;
-    const years = data.annual.years;
+    const first=Number($("history-start").value),last=Number($("history-end").value);
+    const years = data.annual.years.filter(year=>(data.annual.years.includes(first)?year>=first:true)&&(data.annual.years.includes(last)?year<=last:true));
     const countries = Object.keys(data.annual.countries).filter(country => country!=="IRQ").sort((a,b) => data.annual.countries[a].localeCompare(data.annual.countries[b]));
     countries.push("IRQ");
     const series = countries.map(country => ({code:country,name:t(data.annual.countries[country]),color:country==="IRQ"?"#d18b98":"#30c4a0",reference:country==="IRQ",
@@ -207,11 +236,12 @@
         else if(selectedCountries.has(country)) selectedCountries.delete(country);
         else selectedCountries.add(country);
         history(pointer && {clientX:pointer.clientX,clientY:pointer.clientY});
+        window.noorResearchOverview?.render(data,{selectedCountries,drawChart});
         if(!exclusive) $("history-chart").querySelector('button[data-country="'+country+'"]').focus({preventScroll:true});
       }});
     $("country-selection-status").textContent = selectedCountries.size ? t(selectedOnly ? "Showing only: {countries}." : "Focused: {countries}. All countries remain visible.",
       {countries:series.filter(item => selectedCountries.has(item.code)).map(item => item.name).join(" · ")}) : t($("selected-only").checked ? "Choose countries from the legend to filter the chart." : "All {count} countries are visible.",{count:series.length});
-    const rows = data.annual.rows.filter(row => row.country === "IRQ" && finite(row[key])).sort((a,b) => a.year - b.year);
+    const rows = data.annual.rows.filter(row => row.country === "IRQ" && finite(row[key]) && years.includes(row.year)).sort((a,b) => a.year - b.year);
     $("history-note").textContent = t("{label} · {units}. Iraq has {count} available annual values{window}. {note}",
       {label:t(definition.label),units:t(definition.units),count:rows.length,window:rows.length ? ", "+rows[0].year+"–"+rows.at(-1).year : "",note:t(definition.note)});
   }
@@ -265,6 +295,7 @@
     if (!data) return;
     syncRanges();
     ({history,forecasts,scenarios,peers}[activePanel])();
+    window.noorResearchOverview?.render(data,{selectedCountries,drawChart});
   }
   $("selected-only").addEventListener("change",render);
   $("show-all-countries").addEventListener("click",() => { selectedCountries.clear(); $("selected-only").checked=false; render(); });
@@ -289,6 +320,10 @@
     });
   });
   ["indicator","forecast-model"].forEach(id => $(id).addEventListener("change", render));
+  ["history-start","history-end"].forEach(id=>$(id).addEventListener("change",()=>{
+    if(Number($("history-start").value)>Number($("history-end").value)) $(id==="history-start"?"history-end":"history-start").value=$(id).value;
+    render();
+  }));
   ["oil-price","oil-share","oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id).addEventListener("input", render));
   $("reset-weights").addEventListener("click", () => {
     ["oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id).value = "1"); render();
@@ -311,6 +346,7 @@
     loadController?.abort(); loadController = new AbortController();
     const controller = loadController, timeout = setTimeout(() => controller.abort(), 15000);
     data = null; latestScenario = []; errorMessage = null;
+    window.noorResearchOverview?.clear();
     controls.forEach(control => control.disabled = true);
     $("demo-shell").setAttribute("aria-busy","true");
     $("demo-status").hidden = false; $("demo-status").textContent = t("Loading the saved research preview…");
@@ -319,15 +355,19 @@
       const response = await fetch("/thesis/data.json", {cache:"no-cache",signal:controller.signal});
       if (!response.ok) throw new Error("The saved preview could not load.");
       data = validate(await response.json());
+      ["history-start","history-end"].forEach(id=>$(id).innerHTML=data.annual.years.map(year=>'<option value="'+year+'">'+year+'</option>').join(""));
+      $("history-start").value=String(data.annual.years[0]);$("history-end").value=String(data.annual.years.at(-1));
       controls.forEach(control => control.disabled = false);
       $("demo-status").hidden = true;
       render();
     } catch (error) {
       if (controller !== loadController) return;
+      data=null;latestScenario=[];controls.forEach(control=>control.disabled=true);
       $("demo-status").hidden = true;
       $("demo-error").hidden = false;
       errorMessage = error.name === "AbortError" ? "The saved preview took too long to load." :
         (error.message.startsWith("The saved") ? error.message : "The saved preview could not load.");
+      window.noorResearchOverview?.clear(errorMessage);
       $("demo-error").textContent = t(errorMessage) + " " + t("You can retry, or read the research plan below.");
       $("retry-preview").hidden = false;
     } finally {

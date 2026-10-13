@@ -1,0 +1,11 @@
+{
+  "dataset": "Natural Earth Admin 0 - Countries, 1:110m",
+  "license": "Public domain",
+  "source": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson",
+  "attribution_url": "https://www.naturalearthdata.com/downloads/110m-cultural-vectors/110m-admin-0-countries/",
+  "retrieved": "2026-10-13",
+  "source_sha256": "6866c877d39cba9c357620878839b336d569f8c662d3cfab4cb1dbe2d39c977f",
+  "country": "Iraq",
+  "geometry": "National outline only; no regional indicator allocation",
+  "projection": "Local equirectangular display centered at latitude 33 degrees"
+}
