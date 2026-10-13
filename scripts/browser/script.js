@@ -90,7 +90,7 @@ if ("IntersectionObserver" in window) {
   const sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        const activeLink = railLinks.find((link) => link.hash === `#${entry.target.id}`);
+        const activeLink = railLinks.find((link) => link.hash === `#${entry.target.id}` && new URL(link.href, window.location.href).pathname === window.location.pathname);
         if (activeLink) {
           railLinks.forEach((link) => {
             const isActive = link === activeLink;

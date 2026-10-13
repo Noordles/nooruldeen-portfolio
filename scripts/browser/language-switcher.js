@@ -14,6 +14,53 @@
   }
 
   const entries = [
+    ["BEDSL / ID CARD DESIGN", "BEDSL / DESIGN DE LEGITIMAȚII", "BEDSL / تصميم البطاقات"],
+    ["Two directions,", "Două direcții,", "اتجاهان،"],
+    ["one lab identity.", "o identitate de laborator.", "وهوية واحدة للمختبر."],
+    ["Two ID card designs I made for the Business Economics Data Science Lab, shown as complete front-and-back pairs.", "Două modele de legitimație pe care le-am creat pentru Business Economics Data Science Lab, prezentate cu fața și verso-ul fiecăruia.", "تصميمان للبطاقات أعددتهما لمختبر علوم بيانات اقتصاد الأعمال، مع عرض الوجه الأمامي والخلفي لكل تصميم."],
+    ["DESIGN 01", "DESIGN 01", "التصميم 01"],
+    ["DESIGN 02", "DESIGN 02", "التصميم 02"],
+    ["STRUCTURED LAYOUT", "COMPOZIȚIE STRUCTURATĂ", "تنسيق منظم"],
+    ["CURVED LAYOUT", "COMPOZIȚIE CU LINII CURBE", "تنسيق بخطوط منحنية"],
+    ["A clear, structured signature.", "O semnătură clară și structurată.", "هوية واضحة ومنظمة."],
+    ["A softer, flowing direction.", "O direcție mai fluidă și mai delicată.", "اتجاه أكثر انسيابًا."],
+    ["FRONT", "FAȚĂ", "الوجه الأمامي"],
+    ["BACK", "VERSO", "الوجه الخلفي"],
+    ["Open BEDSL design 01, front", "Deschide designul BEDSL 01, față", "افتح الوجه الأمامي لتصميم BEDSL 01"],
+    ["Open BEDSL design 01, back", "Deschide designul BEDSL 01, verso", "افتح الوجه الخلفي لتصميم BEDSL 01"],
+    ["Open BEDSL design 02, front", "Deschide designul BEDSL 02, față", "افتح الوجه الأمامي لتصميم BEDSL 02"],
+    ["Open BEDSL design 02, back", "Deschide designul BEDSL 02, verso", "افتح الوجه الخلفي لتصميم BEDSL 02"],
+    ["BEDSL card design 01 front, with the lab logo, blue data bars, Noor’s name and portrait", "Fața designului BEDSL 01, cu logo-ul laboratorului, bare de date albastre, numele și portretul lui Noor", "الوجه الأمامي لتصميم BEDSL 01 مع شعار المختبر وأعمدة بيانات زرقاء واسم نور وصورته"],
+    ["BEDSL card design 01 back, with a navy layout, lab and ASE identities, contact information and a QR code", "Verso-ul designului BEDSL 01, pe fond bleumarin, cu identitățile laboratorului și ASE, date de contact și cod QR", "الوجه الخلفي لتصميم BEDSL 01 بتنسيق كحلي وهويتي المختبر والأكاديمية ومعلومات الاتصال ورمز QR"],
+    ["BEDSL card design 02 front, with a layered blue curve between the lab identity and Noor’s portrait", "Fața designului BEDSL 02, cu o curbă albastră în straturi între identitatea laboratorului și portretul lui Noor", "الوجه الأمامي لتصميم BEDSL 02 مع منحنى أزرق متعدد الطبقات بين هوية المختبر وصورة نور"],
+    ["BEDSL card design 02 back, with the lab mark, QR code, ASE emblem and a layered blue wave", "Verso-ul designului BEDSL 02, cu simbolul laboratorului, cod QR, emblema ASE și un val albastru în straturi", "الوجه الخلفي لتصميم BEDSL 02 مع علامة المختبر ورمز QR وشعار الأكاديمية وموجة زرقاء متعددة الطبقات"],
+
+    ["APPLICATIONS","APLICAȚII","التطبيقات"],
+    ["IDENTITY / IN USE","IDENTITATE / ÎN UTILIZARE","الهوية / في الاستخدام"],
+    ["An identity","O identitate","هوية"],
+    ["beyond the screen.","dincolo de ecran.","تتجاوز الشاشة."],
+    ["My hoodie and tote concepts show how the IDRL mark and its teal, coral and white palette carry onto physical objects.","Conceptele mele de hanorac și sacoșă arată cum se aplică simbolul IDRL și paleta sa de turcoaz, coral și alb pe obiecte fizice.","توضح تصاميم السترات والحقائب كيف تنتقل علامة IDRL وألوانها الفيروزية والمرجانية والبيضاء إلى الأشياء المادية."],
+    ["Open the IDRL hoodie concepts","Deschide conceptele de hanorac IDRL","افتح تصاميم سترات IDRL"],
+    ["Two IDRL hoodie concepts with light and dark bodies, teal sleeves and coral hoods and pockets","Două concepte de hanorac IDRL, deschis și închis, cu mâneci turcoaz și glugi și buzunare coral","تصميمان لسترات IDRL بلونين فاتح وداكن وأكمام فيروزية وأغطية رأس وجيوب مرجانية"],
+    ["01 / APPAREL CONCEPT","01 / CONCEPT VESTIMENTAR","01 / تصميم الملابس"],
+    ["The identity, worn.","Identitatea, purtată.","هوية ترتديها."],
+    ["Light and dark hoodie variations using the lab’s colours and logo.","Variante de hanorac deschis și închis, folosind culorile și logo-ul laboratorului.","نسختان فاتحة وداكنة للسترة باستخدام ألوان المختبر وشعاره."],
+    ["Open the IDRL tote concept","Deschide conceptul de sacoșă IDRL","افتح تصميم حقيبة IDRL"],
+    ["An organic cotton tote concept with teal handles and the IDRL logo on its white front","Un concept de sacoșă din bumbac organic cu mânere turcoaz și logo-ul IDRL pe partea frontală albă","تصميم حقيبة من القطن العضوي بمقابض فيروزية وشعار IDRL على واجهتها البيضاء"],
+    ["02 / TOTE CONCEPT","02 / CONCEPT DE SACOȘĂ","02 / تصميم الحقيبة"],
+    ["A mark to carry.","Un simbol de purtat.","علامة تحملها."],
+    ["A simple bag application with teal handles and a clear IDRL signature.","O aplicație simplă pe o sacoșă cu mânere turcoaz și o semnătură IDRL clară.","تطبيق بسيط على حقيبة بمقابض فيروزية وعلامة IDRL واضحة."],
+    ["Explore my IDRL website and identity work","Descoperă lucrările mele de web și identitate IDRL","استكشف عملي على موقع IDRL وهويته"],
+    ["Explore my thesis","Descoperă lucrarea mea de licență","استكشف مشروع تخرجي"],
+    ["MY THESIS / IRAQ","LUCRAREA MEA / IRAK","مشروع تخرجي / العراق"],
+    ["DATA · ECONOMICS · CODE","DATE · ECONOMIE · COD","بيانات · اقتصاد · برمجة"],
+    ["04 — ECONOMIC INFORMATICS / THESIS","04 — INFORMATICĂ ECONOMICĂ / LICENȚĂ","04 — المعلوماتية الاقتصادية / مشروع التخرج"],
+    ["ASE BUCHAREST","ASE BUCUREȘTI","أكاديمية بوخارست للدراسات الاقتصادية"],
+    ["Iraq’s Economic","Perspectivele economice","الآفاق الاقتصادية"],
+    ["Outlook","ale Irakului","للعراق"],
+    ["Building an Economic Analysis System with Iraq as a Case Study","Construirea unui sistem de analiză economică, cu Irakul ca studiu de caz","بناء نظام للتحليل الاقتصادي باستخدام العراق كدراسة حالة"],
+    ["I’m building a Python application to explore Iraq’s economy, trace the data and compare forecasts and scenarios. Follow my bachelor’s thesis as the research and the system take shape.","Construiesc o aplicație Python pentru a explora economia Irakului, a urmări proveniența datelor și a compara prognoze și scenarii. Urmărește dezvoltarea lucrării mele de licență și a sistemului.","أبني تطبيقًا بلغة Python لاستكشاف اقتصاد العراق وتتبع مصادر البيانات ومقارنة التنبؤات والسيناريوهات. تابع مشروع تخرجي مع تطور البحث والنظام."],
+    ["READ MY RESEARCH PLAN","CITEȘTE PLANUL MEU DE CERCETARE","اقرأ خطة بحثي"],
     ["404 / PAGE NOT FOUND","404 / PAGINĂ NEGĂSITĂ","404 / الصفحة غير موجودة"],
     ["LOCATION UNKNOWN","LOCAȚIE NECUNOSCUTĂ","المكان غير معروف"],
     ["A WRONG TURN. A NEW PLACE TO START.","UN DRUM GREȘIT. UN NOU PUNCT DE PLECARE.","منعطف خاطئ. بداية جديدة."],
@@ -1728,6 +1775,12 @@
     window.noorCmsApply?.(language);
     updateNameDirections(language);
     updateSwitcher();
+    document.querySelectorAll('a[href*="/thesis/"]').forEach((link) => {
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin || !url.pathname.startsWith("/thesis/")) return;
+      url.searchParams.set("lang", language);
+      link.href = url.pathname + url.search + url.hash;
+    });
     if (persist) {
       try { window.localStorage.setItem(STORAGE_KEY, language); } catch (_) {}
     }
