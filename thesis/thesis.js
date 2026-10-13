@@ -11,7 +11,15 @@
   const exactNumber = value => value.toLocaleString(locale(), {maximumFractionDigits:12});
   const finite = value => typeof value === "number" && Number.isFinite(value);
   const periodLabel = period => new Date(period + "-01T12:00:00Z").toLocaleDateString(locale(), {month:"short", year:"numeric",timeZone:"UTC"});
-  const controls = [...document.querySelectorAll(".demo-shell select, .demo-shell input, #export-scenario, #show-all-countries")];
+  const controls = [...document.querySelectorAll(".demo-shell select, .demo-shell input, #export-scenario, #show-all-countries, #reset-scenario, #reset-weights")];
+  const ranges = ["oil-price","oil-share","oil-weight","income-weight","manufacturing-weight"].map($);
+  function syncRanges() {
+    ranges.forEach(input => {
+      const fill = 100 * (Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min));
+      input.style.setProperty("--range-fill", fill + "%");
+      input.setAttribute("aria-valuetext", Number(input.value).toLocaleString(locale()) + (input.id === "oil-price" || input.id === "oil-share" ? "%" : ""));
+    });
+  }
 
   function validate(payload) {
     if (!payload?.annual || !Array.isArray(payload.annual.years) || !payload.annual.years.length ||
@@ -240,7 +248,7 @@
   function peers() {
     if (!data) return;
     const ids = ["oil","income","manufacturing"], weights = ids.map(id => Number($(id + "-weight").value));
-    ids.forEach((id,index) => $(id + "-weight-label").value = String(weights[index]));
+    ids.forEach((id,index) => $(id + "-weight-label").value = weights[index].toLocaleString(locale()));
     const sum = weights.reduce((a,b) => a+b,0);
     $("peer-warning").textContent = t(sum ? "I put the three features on a common scale so that their different units do not decide the ranking." :
       "Choose at least one positive weight to calculate a ranking. All loaded countries are still listed below.");
@@ -255,6 +263,7 @@
 
   function render() {
     if (!data) return;
+    syncRanges();
     ({history,forecasts,scenarios,peers}[activePanel])();
   }
   $("selected-only").addEventListener("change",render);
@@ -281,6 +290,12 @@
   });
   ["indicator","forecast-model"].forEach(id => $(id).addEventListener("change", render));
   ["oil-price","oil-share","oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id).addEventListener("input", render));
+  $("reset-weights").addEventListener("click", () => {
+    ["oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id).value = "1"); render();
+  });
+  $("reset-scenario").addEventListener("click", () => {
+    $("oil-price").value = "-10"; $("oil-share").value = "90"; render();
+  });
   $("export-scenario").addEventListener("click", () => {
     if (!data) return;
     scenarios();
