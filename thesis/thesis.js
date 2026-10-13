@@ -11,13 +11,13 @@
   const exactNumber = value => value.toLocaleString(locale(), {maximumFractionDigits:12});
   const finite = value => typeof value === "number" && Number.isFinite(value);
   const periodLabel = period => new Date(period + "-01T12:00:00Z").toLocaleDateString(locale(), {month:"short", year:"numeric",timeZone:"UTC"});
-  const controls = [...document.querySelectorAll(".demo-shell select, .demo-shell input, #export-scenario, #show-all-countries, #reset-scenario, #reset-weights")];
-  const ranges = ["oil-price","oil-share","oil-weight","income-weight","manufacturing-weight"].map($);
+  const controls = [...document.querySelectorAll(".demo-shell select, .demo-shell input, [data-v2-control], #export-scenario, #show-all-countries, #reset-scenario, #reset-weights")];
+  const ranges = ["oil-price","oil-share","oil-volume","other-revenue","spending-change","oil-weight","income-weight","manufacturing-weight"].map($).filter(input=>input&&input.min!==undefined);
   function syncRanges() {
     ranges.forEach(input => {
       const fill = 100 * (Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min));
       input.style.setProperty("--range-fill", fill + "%");
-      input.setAttribute("aria-valuetext", Number(input.value).toLocaleString(locale()) + (input.id === "oil-price" || input.id === "oil-share" ? "%" : ""));
+      input.setAttribute("aria-valuetext", Number(input.value).toLocaleString(locale()) + (input.id.endsWith("-weight") ? "" : "%"));
     });
   }
 
@@ -41,6 +41,7 @@
         throw new Error("The saved preview has an unexpected data format.");
       outlookKeys.add(key);
     }
+    if(!payload.research_v2||payload.research_v2.schema_version!=="website-v2.0"||!Array.isArray(payload.research_v2.events)||payload.research_v2.events.length!==6||payload.research_v2.outlook?.rows?.length!==30||payload.research_v2.annual_money_flow?.rows?.length!==4)throw Error("The saved preview has an unexpected data format.");
     for (const row of payload.scenario_baseline) {
       if (!finite(row.year) || !finite(row.revenue_billion_iqd) || !finite(row.expenditure_billion_iqd) ||
           !finite(row.gdp_billion_iqd) || row.gdp_billion_iqd <= 0) {
@@ -107,6 +108,7 @@
         escape(options.periods ? periodLabel(x[index]) : x[index]) + "</text>";
     }
     if (low < 0 && high > 0) svg += '<line x1="' + left + '" y1="' + Y(0) + '" x2="' + (width - right) + '" y2="' + Y(0) + '" class="chart-zero"/>';
+    if(options.context){for(const event of options.context){const first=Math.max(x[0],Number(event.period_start.slice(0,4))),last=Math.min(x.at(-1),Number(event.period_end.slice(0,4)));if(first>last)continue;const a=X(x.indexOf(first)),b=X(x.indexOf(last));svg+='<rect x="'+Math.max(left,a-5)+'" y="'+top+'" width="'+Math.max(10,b-a+10)+'" height="'+(height-top-bottom)+'" fill="#d18b98" opacity=".09"><title>'+escape(t(event.title))+'</title></rect>';}}
     if (options.band) {
       let segment = [];
       const finishBand = () => {
@@ -231,7 +233,7 @@
     const visible = selectedOnly ? series.filter(item => selectedCountries.has(item.code)) : series;
     drawChart("history-chart", years, visible, {title:t("{label} in {units}",{label:t(definition.label),units:t(definition.units)}),units:t(definition.units),
       axisLabel:key==="gdp_per_capita" ? t("USD per person · 2015 prices") : t(definition.units),percent:key!=="gdp_per_capita",nonNegative:key!=="growth",
-      legendSeries:series,initialPointer,onCountrySelect:(country,exclusive,pointer) => {
+      legendSeries:series,initialPointer,context:window.noorResearchV2?.events(data,years[0],years.at(-1),selectedCountries.size?[...selectedCountries]:["IRQ"]),onCountrySelect:(country,exclusive,pointer) => {
         if(exclusive) { selectedCountries.clear(); selectedCountries.add(country); }
         else if(selectedCountries.has(country)) selectedCountries.delete(country);
         else selectedCountries.add(country);
@@ -248,6 +250,7 @@
 
   function forecasts() {
     if (!data) return;
+    if(window.noorResearchV2){window.noorResearchV2.forecasts(data,drawChart);return;}
     const model = $("forecast-model").value, rows = data.monthly_forecasts.filter(row => row.model === model);
     drawChart("forecast-chart", rows.map(row => row.period), [{name:model,color:"#d18b98",y:rows.map(row => row.prediction_trillion_iqd),dash:true}],
       {title:t("Saved monthly revenue forecast in nominal trillion IQD"),units:t("nominal trillion IQD"),axisLabel:t("Revenue · trillion IQD"),periods:true,band:{low:rows.map(row => row.pi95_low),high:rows.map(row => row.pi95_high)}});
@@ -257,14 +260,15 @@
     if (!data) return;
     const price = Number($("oil-price").value) / 100, share = Number($("oil-share").value) / 100;
     $("price-label").value = number(price * 100, 0) + "%"; $("share-label").value = number(share * 100, 0) + "%";
-    latestScenario = data.scenario_baseline.map(row => {
+    latestScenario = window.NoorV2Rules?window.NoorV2Rules.scenarioRows(data.scenario_baseline,price,share,Number($("oil-volume").value)/100,Number($("other-revenue").value)/100,Number($("spending-change").value)/100):data.scenario_baseline.map(row => {
       const revenue = row.revenue_billion_iqd * (share * (1 + price) + (1 - share));
       const baseline = 100 * (row.revenue_billion_iqd - row.expenditure_billion_iqd) / row.gdp_billion_iqd;
       const scenario = 100 * (revenue - row.expenditure_billion_iqd) / row.gdp_billion_iqd;
       return {year:row.year,baseline_balance_pct_gdp:baseline,scenario_balance_pct_gdp:scenario,change_percentage_points:scenario-baseline,
         scenario_revenue_billion_iqd:revenue,fixed_expenditure_billion_iqd:row.expenditure_billion_iqd,fixed_gdp_billion_iqd:row.gdp_billion_iqd};
     });
-    const first = latestScenario[0];
+    ["oil-volume","other-revenue","spending-change"].forEach((id,i)=>{if($(id))$( ["volume-label","other-label","spending-label"][i]).value=number(Number($(id).value),0)+"%";});
+    const first = latestScenario.find(r=>r.year===Number($("scenario-year").value))||latestScenario[0];
     $("scenario-stats").innerHTML = '<div><small>' + escape(t("{year} baseline balance",{year:first.year})) + '</small><strong>' + number(first.baseline_balance_pct_gdp) +
       '%</strong><small>'+escape(t("of baseline GDP"))+'</small></div><div><small>' + escape(t("{year} scenario balance",{year:first.year})) + '</small><strong>' + number(first.scenario_balance_pct_gdp) +
       '%</strong><small>'+escape(t("of fixed baseline GDP"))+'</small></div><div><small>'+escape(t("Change in balance"))+'</small><strong>' + number(first.change_percentage_points) +
@@ -319,23 +323,24 @@
       tabs[next].focus(); tabs[next].click();
     });
   });
-  ["indicator","forecast-model"].forEach(id => $(id).addEventListener("change", render));
+  ["indicator","forecast-model","forecast-stage","scenario-year","international-release"].forEach(id => $(id).addEventListener("change", render));
   ["history-start","history-end"].forEach(id=>$(id).addEventListener("change",()=>{
     if(Number($("history-start").value)>Number($("history-end").value)) $(id==="history-start"?"history-end":"history-start").value=$(id).value;
     render();
   }));
-  ["oil-price","oil-share","oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id).addEventListener("input", render));
+  ["oil-price","oil-share","oil-volume","other-revenue","spending-change","oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id)?.addEventListener("input", render));
   $("reset-weights").addEventListener("click", () => {
     ["oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id).value = "1"); render();
   });
   $("reset-scenario").addEventListener("click", () => {
-    $("oil-price").value = "-10"; $("oil-share").value = "90"; render();
+    $("oil-price").value = "-10"; $("oil-share").value = "90";["oil-volume","other-revenue","spending-change"].forEach(id=>{if($(id))$(id).value="0";});render();
   });
+  $("forecast-horizon")?.addEventListener("change",()=>{if(data&&window.noorResearchV2){$("forecast-model").value=data.research_v2.forecasts.selection.find(r=>r.horizon===Number($("forecast-horizon").value)).selected_model;}render();});
   $("export-scenario").addEventListener("click", () => {
     if (!data) return;
     scenarios();
     const result = {baseline_vintage:"IMF WEO April 2026",source_snapshot_dates:data.metadata?.snapshot_dates,source_commit:data.metadata?.source_commit,
-      assumptions:{price_change:Number($("oil-price").value)/100,price_sensitive_share:Number($("oil-share").value)/100,volume_change:0,non_oil_change:0,spending_change:0,GDP_and_FX_held_fixed:true},
+      assumptions:{price_change:Number($("oil-price").value)/100,price_sensitive_share:Number($("oil-share").value)/100,volume_change:Number($("oil-volume").value)/100,non_oil_change:Number($("other-revenue").value)/100,spending_change:Number($("spending-change").value)/100,GDP_and_FX_held_fixed:true},
       interpretation:"Conditional accounting sensitivity; no assigned probability and no debt dynamics.",results:latestScenario};
     const blob = new Blob([JSON.stringify(result,null,2)], {type:"application/json"}), url = URL.createObjectURL(blob), link = document.createElement("a");
     link.href = url; link.download = "my-iraq-fiscal-scenario.json"; document.body.appendChild(link); link.click(); link.remove();
@@ -357,6 +362,7 @@
       data = validate(await response.json());
       ["history-start","history-end"].forEach(id=>$(id).innerHTML=data.annual.years.map(year=>'<option value="'+year+'">'+year+'</option>').join(""));
       $("history-start").value=String(data.annual.years[0]);$("history-end").value=String(data.annual.years.at(-1));
+      if(window.noorResearchV2)$("forecast-model").value=data.research_v2.forecasts.selection.find(r=>r.horizon===Number($("forecast-horizon").value)).selected_model;
       controls.forEach(control => control.disabled = false);
       $("demo-status").hidden = true;
       render();

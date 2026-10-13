@@ -13,12 +13,14 @@
     return Object.fromEntries(Object.entries(values).map(([key,value])=>{
       if(numeric.has(key)&&typeof value==="string"&&/^-?[\d,]+\.\d+$/.test(value))return [key,n(Number(value.replaceAll(",","")))];
       if(["origin","target"].includes(key)&&/^\d{4}-\d{2}$/.test(value))return [key,new Date(value+"-01T12:00:00Z").toLocaleDateString(locale(),{month:"short",year:"numeric",timeZone:"UTC"})];
-      return [key,typeof value==="string"?(["model","best_mae","best_rmse"].includes(key)?"\u2068"+value+"\u2069":t(value)):value];
+      return [key,typeof value==="string"?(["model","chosen","best_mae","best_rmse"].includes(key)?"\u2068"+value+"\u2069":t(value)):value];
     }));
   }
   function text(note,part) {return t(note[part+"_key"],localValues({...note.values,...note.title_values}));}
+  function questions(note){const q=window.NoorV2Rules.decorate(note);return {what_changed:text(q,'body'),meaning:t(q.question_keys.meaning),look_into:t(q.question_keys.look_into),certainty:q.question_keys.certainty.map(s=>t(s)).join(' ')};}
   function evidenceNote(note) {
-    return '<article class="insight-note"><span class="insight-kind">'+esc(t({observation:"Reported data",comparison:"Comparison",scenario:"Scenario calculation",uncertainty:"Saved model result",data_quality:"Data availability"}[note.kind]))+'</span><h4>'+esc(text(note,"title"))+'</h4><p>'+esc(text(note,"body"))+'</p><details><summary>'+esc(t("Limits and calculation details"))+'</summary><ul>'+note.limits.map(limit=>'<li>'+esc(t(limit))+'</li>').join("")+'</ul><p class="evidence-label">'+esc(t("Calculation record (JSON)"))+'</p><pre dir="ltr">'+esc(JSON.stringify(note.evidence,null,2))+'</pre></details></article>';
+    const q=questions(note);
+    return '<article class="insight-note"><span class="insight-kind">'+esc(t({observation:"Reported data",comparison:"Comparison",scenario:"Scenario calculation",uncertainty:"Saved model result",data_quality:"Data availability"}[note.kind]))+'</span><h4>'+esc(text(note,"title"))+'</h4><dl class="four-questions"><dt>'+esc(t('What changed?'))+'</dt><dd>'+esc(q.what_changed)+'</dd></dl><details><summary>'+esc(t('Meaning, next checks and confidence'))+'</summary><dl class="four-questions"><dt>'+esc(t('What does it mean?'))+'</dt><dd>'+esc(q.meaning)+'</dd><dt>'+esc(t('What should I look into?'))+'</dt><dd>'+esc(q.look_into)+'</dd><dt>'+esc(t('How certain is this?'))+'</dt><dd>'+esc(q.certainty)+'</dd></dl><p class="evidence-label">'+esc(t("Calculation record (JSON)"))+'</p><pre dir="ltr">'+esc(JSON.stringify(note.evidence,null,2))+'</pre></details></article>';
   }
   function notes(id,list) {
     const target=$(id);if(!target)return;
@@ -26,7 +28,7 @@
     const first=list.slice(0,2),more=list.slice(2);
     target.innerHTML='<h4 class="insight-heading">'+esc(t("What this selection shows"))+'</h4><p class="insight-intro">'+esc(t("Calculated from the current selection."))+'</p><div class="insight-grid">'+first.map(evidenceNote).join("")+'</div>'+(more.length?'<details class="more-insights"><summary>'+esc(t("More notes ({count})",{count:more.length}))+'</summary><div class="insight-grid">'+more.map(evidenceNote).join("")+'</div></details>':'')+'<button type="button" class="insight-export">'+esc(t("Download these notes"))+' ↓</button>';
     target.querySelector('.insight-export').addEventListener('click',()=>{
-      const record={rule_version:"1.0",source_commit:current.metadata.source_commit,source_snapshot_dates:current.metadata.snapshot_dates,international_vintage:current.international.vintage,language:window.noorThesisI18n.language,insights:list.map(note=>({...note,title:text(note,"title"),body:text(note,"body"),limits:note.limits.map(limit=>t(limit))}))};
+      const record={rule_version:"2.0",selected_source_sha256:current.research_v2.selected_source_sha256,core_commit:current.research_v2.core_commit,source_commit:current.metadata.source_commit,source_snapshot_dates:current.metadata.snapshot_dates,international_vintage:current.international.vintage,language:window.noorThesisI18n.language,insights:list.map(note=>({...note,title:text(note,"title"),body:text(note,"body"),limits:note.limits.map(limit=>t(limit)),questions:questions(note)}))};
       const url=URL.createObjectURL(new Blob([JSON.stringify(record,null,2)],{type:"application/json"})),link=document.createElement('a');link.href=url;link.download='iraq-'+id+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     });
   }
@@ -56,38 +58,33 @@
     const countries=options.selectedCountries.size?[...options.selectedCountries]:["IRQ"],first=Number($("history-start").value),last=Number($("history-end").value);
     const start=data.annual.years.includes(first)?first:data.annual.years[0],end=data.annual.years.includes(last)?last:data.annual.years.at(-1);
     notes('history-insights',window.NoorInsights.annual(data.annual,$('indicator').value,start,end,countries));
-    const model=$('forecast-model').value,forecastNotes=window.NoorInsights.forecast(data.metrics,data.monthly_forecasts,model,data.metadata.forecast_origin);
+    const model=$('forecast-model').value,forecastNotes=window.noorResearchV2?window.NoorV2Rules.forecast(data.research_v2.forecasts,model,Number($('forecast-horizon').value),$('forecast-stage').value):window.NoorInsights.forecast(data.metrics,data.monthly_forecasts,model,data.metadata.forecast_origin);
     notes('forecast-insights',forecastNotes);
-    const price=Number($('oil-price').value)/100,share=Number($('oil-share').value)/100,scenarioNotes=window.NoorInsights.scenario(data.scenario_baseline,price,share);
+    const price=Number($('oil-price').value)/100,share=Number($('oil-share').value)/100,volume=Number($('oil-volume').value)/100,other=Number($('other-revenue').value)/100,spending=Number($('spending-change').value)/100,baseline=data.scenario_baseline.filter(r=>r.year===Number($('scenario-year').value)),scenarioNotes=window.NoorV2Rules.scenario(baseline,price,share,volume,other,spending);
     notes('scenario-insights',scenarioNotes);
     const weights=['oil','income','manufacturing'].map(id=>Number($(id+'-weight').value)),peerNotes=window.NoorInsights.peers(data.peers,weights);
     notes('peer-insights',peerNotes);
-    const metric=data.metrics.find(r=>r.model===model),prediction=data.monthly_forecasts.filter(r=>r.model===model).sort((a,b)=>a.period.localeCompare(b.period))[0],s=scenarioNotes[0]?.evidence,p=peerNotes[0]?.evidence;
+    const f=window.noorResearchV2.forecastSelection(data),metric=f.metric,prediction=f.point,s=scenarioNotes[0]?.evidence,p=peerNotes[0]?.evidence;
     $("result-cards").innerHTML=
-      card('Saved model result','Monthly revenue forecast',n(prediction.prediction_trillion_iqd),t('trillion IQD')+' · '+new Date(prediction.period+'-01T12:00:00Z').toLocaleDateString(locale(),{month:'short',year:'numeric',timeZone:'UTC'}),t("Saved {model} · MAE {mae} over {months} test months. History ends in {origin}.",{model,mae:n(metric.MAE_trillion_iqd),months:metric.successful_forecasts,origin:data.metadata.forecast_origin}),route('forecasts','Inspect the saved models'))+
-      card('Scenario calculation','Budget balance under my assumptions',n(s.scenario_balance_pct_gdp)+'%',t('% of fixed baseline GDP')+' · '+s.year,t("Oil-price change {price}%; sensitive revenue share {share}%. The baseline balance is {baseline}%.",{price:n(price*100,0),share:n(share*100,0),baseline:n(s.baseline_balance_pct_gdp)}),route('scenarios','Change the assumptions'))+
+      card('Saved model result','Monthly revenue forecast',n(prediction.prediction_trillion_iqd),t('trillion IQD')+' · '+new Date(prediction.period+'-01T12:00:00Z').toLocaleDateString(locale(),{month:'short',year:'numeric',timeZone:'UTC'}),t("Saved {model} · MAE {mae} over {months} test months. History ends in {origin}.",{model,mae:n(metric.MAE_trillion_iqd),months:metric.successful_forecasts,origin:data.research_v2.forecasts.origin}),route('forecasts','Inspect the saved models'))+
+      card('Scenario calculation','Budget balance under my assumptions',n(s.scenario_balance_pct_gdp)+'%',t('% of fixed baseline GDP')+' · '+s.year,t("Price {price}%; quantity {volume}%; other revenue {other}%; spending {spending}%. Baseline balance {baseline}%.",{price:n(price*100,0),volume:n(volume*100,0),other:n(other*100,0),spending:n(spending*100,0),baseline:n(s.baseline_balance_pct_gdp)}),route('scenarios','Change the assumptions'))+
       card('Comparison','Nearest baseline match',p.country_name?t(p.country_name):'—',p.country_name?t("Distance {distance} · unitless",{distance:n(p.distance,3)}):t('Choose at least one positive weight'),t('The comparison uses the fixed 2003–2007 baseline and the weights currently selected.'),route('peers','Inspect the comparison'))+
-      card('Research in progress','Growth-model investigation','GDP',t('Dataset and model checks'),t('I am investigating a multivariate growth model. A longer, consistent GDP dataset and model diagnostics come first.'),'<a href="/thesis/research-plan/?lang='+window.noorThesisI18n.language+'">'+esc(t('Read my research plan'))+' ↗</a>');
-    const code=$('international-indicator').value,year=Number($('international-year').value),def=data.international.indicators[code];
-    const rows=data.international.rows.filter(r=>r.indicator===code).sort((a,b)=>a.year-b.year),point=rows.find(r=>r.year===year&&r.status==='IMF_projection');
-    if(!point||!finite(point.value))throw Error('The saved preview has an unexpected data format.');
-    $("international-value").innerHTML='<strong dir="ltr">'+n(point.value)+'%</strong><div><h4>'+esc(t(def.label))+'</h4><p>'+esc(t('IMF projection'))+' · '+year+' · '+esc(t(def.units))+'</p></div>';
-    options.drawChart('international-chart',rows.map(r=>r.year),[
-      {name:t('Historical / estimated'),color:'#30c4a0',y:rows.map(r=>r.status==='historical_or_estimate'?r.value:null)},
-      {name:t('IMF projections · April 2026'),color:'#d18b98',dash:true,y:rows.map(r=>r.status==='IMF_projection'?r.value:null)}
-    ],{title:t(def.label)+' · '+t('IMF WEO · April 2026'),units:t(def.units),axisLabel:t(def.units),percent:true,highlightPeriod:year});
+      card('Saved model result','Annual GDP growth model',n(data.research_v2.growth.summary.next_year.growth_percent)+'%',t('Saved 2026 estimate · conditional'),t('Revised 2025 inputs, saved October 2026; new 2026 developments are not included. Conditional 95% interval {low}% to {high}%. The model did not beat the mean benchmark.',{low:n(data.research_v2.growth.summary.next_year.pi95_low),high:n(data.research_v2.growth.summary.next_year.pi95_high)}),'<a href="#growth-model">'+esc(t('Inspect the growth model'))+' ↗</a>');
+    window.noorResearchV2.international(data,options.drawChart);
+    document.querySelectorAll('[data-v2-control]').forEach(e=>e.disabled=false);
+    window.noorResearchV2.render(data,options);
     document.querySelectorAll('[data-open-panel]').forEach(link=>link.addEventListener('click',()=>{
       if(link.dataset.indicator){options.selectedCountries.clear();options.selectedCountries.add('IRQ');$('selected-only').checked=false;$('indicator').value=link.dataset.indicator;$('history-start').value=String(data.annual.years[0]);$('history-end').value=String(data.annual.years.at(-1));}
       $('tab-'+link.dataset.openPanel).click();
     },{once:true}));
   }
   function clear(error) {
-    current=null;currentOptions=null;
+    current=null;currentOptions=null;window.noorResearchV2?.clear();
     ['portrait-cards','result-cards','international-value','international-chart','history-insights','forecast-insights','scenario-insights','peer-insights'].forEach(id=>{if($(id)){$(id).innerHTML='';if(id.endsWith('-insights'))$(id).hidden=true;}});
     ['international-indicator','international-year'].forEach(id=>{if($(id))$(id).disabled=true;});
     if($('overview-status')){$('overview-status').hidden=false;$('overview-status').textContent=t(error??'Loading the saved research preview…');}
   }
-  ['international-indicator','international-year'].forEach(id=>$(id)?.addEventListener('change',()=>{if(current)render(current,currentOptions);}));
-  window.noorResearchOverview={render,clear};
+  ['international-indicator','international-year','international-release'].forEach(id=>$(id)?.addEventListener('change',()=>{if(current)render(current,currentOptions);}));
+  window.noorResearchOverview={render,clear,notes};
   clear();
 })();

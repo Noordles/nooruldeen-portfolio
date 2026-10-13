@@ -9,7 +9,7 @@
   const image = find("image"), count = find("count"), title = find("title"), copy = find("copy");
   const previous = find("previous"), next = find("next"), progress = find("progress");
   const track = presentation.querySelector(".presentation-progress");
-  let active = 0;
+  let active = 0, seeker;
   function show(index) {
     active = Math.max(0, Math.min(slides.length - 1, index));
     const slide = slides[active];
@@ -20,6 +20,7 @@
     progress.style.width = `${100 * (active + 1) / slides.length}%`;
     track.setAttribute("aria-valuenow", String(active + 1));
     track.setAttribute("aria-valuemax", String(slides.length));
+    seeker?.update(active);
     const upcoming = slides[active + 1];
     if (upcoming) { const preload = new Image(); preload.src = upcoming.image; }
   }
@@ -32,5 +33,6 @@
     show(active + (event.key === "ArrowRight" ? direction : -direction));
   });
   window.addEventListener("noor-thesis-language", () => show(active));
+  seeker=window.NoorPresentationSeek?.attach(track,slides.length,show,()=>active,{language:()=>window.noorThesisI18n?.language||"en"});
   show(0);
 })();

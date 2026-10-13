@@ -346,3 +346,9 @@ body>footer details p{font-size:12px;line-height:1.9}
 @media(max-width:640px){.thesis-sections a{font-size:10px;padding:10px 12px}}
 
 @media(max-width:390px){.language-switcher button{min-width:21px;padding:5px 3px}}
+
+/* Match the portfolio display lettering and clearly mark unavailable public actions. */
+.hero h1{font-weight:800;text-transform:uppercase;text-shadow:7px 9px 0 #0c0807e0,10px 12px 0 #74263cd1;-webkit-text-stroke:.4px var(--paper)}
+html[dir=rtl] .hero h1{text-transform:none;-webkit-text-stroke:0;text-shadow:2px 3px 0 #080d0b,3px 4px 0 #74263c40}
+.application-launch{margin-top:28px}.application-launch .app-unavailable{display:inline-flex;align-items:center;gap:18px;min-height:52px;padding:14px 18px;color:#b7b9b3;background:#282d29;border:1px solid #737b74;box-shadow:none;cursor:not-allowed;font:12px/1.7 Plex,monospace;transform:none}.application-launch>p{font:12px/1.8 Plex,monospace;color:var(--muted);margin-top:12px}.download-unavailable{background:#1b201c;border-color:#626a63;box-shadow:none;transform:none;cursor:default}.download-unavailable h3{color:#b7b9b3}.download-unavailable .download-action{color:#a5aca6}.download-unavailable:hover{transform:none;border-color:#626a63}
+html[dir=rtl] .application-launch .app-unavailable,html[dir=rtl] .application-launch>p{font-family:"Noto Sans Arabic",sans-serif;letter-spacing:0}
