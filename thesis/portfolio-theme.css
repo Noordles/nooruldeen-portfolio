@@ -356,11 +356,12 @@ html[dir=rtl] .hero h1{text-transform:none;-webkit-text-stroke:0;text-shadow:2px
 .application-launch{margin-top:28px}.application-launch .app-unavailable{display:inline-flex;align-items:center;gap:18px;min-height:52px;padding:14px 18px;color:#b7b9b3;background:#282d29;border:1px solid #737b74;box-shadow:none;cursor:not-allowed;font:12px/1.7 Plex,monospace;transform:none}.application-launch>p{font:12px/1.8 Plex,monospace;color:var(--muted);margin-top:12px}.download-unavailable{background:#1b201c;border-color:#626a63;box-shadow:none;transform:none;cursor:default}.download-unavailable h3{color:#b7b9b3}.download-unavailable .download-action{color:#a5aca6}.download-unavailable:hover{transform:none;border-color:#626a63}
 html[dir=rtl] .application-launch .app-unavailable,html[dir=rtl] .application-launch>p{font-family:"Noto Sans Arabic",sans-serif;letter-spacing:0}
 
-/* Blend the source and project sections into the page background; use a direct app entry instead of a framed screenshot. */
+/* Keep section edges open against the page background and use a direct app entry instead of a framed screenshot. */
+.evidence-section,.prototype,.work-section{border:0;outline:0;background:transparent;box-shadow:none}
 .work-section{border:0}
-.application-entry{min-width:0;padding:25px 0 25px 28px;border-inline-start:2px solid var(--pink);background:radial-gradient(ellipse at 0 50%,rgba(116,38,60,.2),transparent 72%)}
+.application-entry{min-width:0;padding:25px 0;border:0;background:none}
 .application-entry .card-index{display:block;color:var(--pink)}
 .application-entry h3{margin:16px 0 10px;font:700 clamp(24px,2.5vw,34px)/1.3 Slab,Georgia,serif;color:var(--paper)}
 .application-entry>p{max-width:35ch;color:var(--muted);font-size:19px;line-height:1.7}
 .application-entry .application-launch{margin-top:22px}
-@media(max-width:900px){.application-entry{padding:22px 0 0;border-inline-start:0;border-block-start:2px solid var(--pink);background:radial-gradient(ellipse at 50% 0,rgba(116,38,60,.18),transparent 70%)}}
+@media(max-width:900px){.application-entry{padding:22px 0 0;border:0;background:none}}
