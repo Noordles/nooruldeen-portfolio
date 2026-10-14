@@ -1,0 +1,22 @@
+.hosted-app-page{min-height:100vh;min-height:100dvh}
+.hosted-app-main{min-height:calc(100vh - 72px);min-height:calc(100dvh - 72px);display:flex;flex-direction:column}
+.hosted-app-workspace{width:100%;max-width:none;margin:0;padding:clamp(16px,2.2vw,32px) clamp(16px,2.7vw,42px) 18px;display:flex;flex:1;flex-direction:column;min-height:0}
+.hosted-app-heading{width:100%;max-width:1800px;margin:0 auto 20px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.hosted-app-copy{min-width:0}
+.hosted-app-copy .eyebrow{margin-bottom:10px;color:var(--pink)}
+.hosted-app-heading h1{max-width:980px;margin:0 0 7px;font:700 clamp(30px,3.2vw,48px)/1.13 Slab,Georgia,serif;letter-spacing:-.035em;text-shadow:2px 3px 0 rgba(8,11,9,.86),4px 5px 0 rgba(116,38,60,.32)}
+.hosted-app-description{max-width:780px;font-size:17px;line-height:1.5;color:#c8c5b8}
+.hosted-app-actions{display:flex;align-items:center;justify-content:flex-end;gap:15px;flex:none}
+.hosted-app-actions .text-link,.hosted-app-actions .button{min-height:46px;display:inline-flex;align-items:center;justify-content:center;gap:14px;white-space:nowrap}
+.hosted-app-actions .button{text-transform:uppercase}
+.hosted-app-frame{position:relative;isolation:isolate;width:100%;max-width:1800px;min-height:360px;height:calc(100vh - 205px);height:calc(100dvh - 205px);max-height:1300px;flex:1 1 auto;margin:0 auto;border:1px solid rgba(209,139,152,.45);border-radius:4px;background:#101714;box-shadow:6px 7px 0 rgba(116,38,60,.29),9px 10px 0 rgba(38,126,148,.2);overflow:hidden}
+.hosted-app-frame iframe{display:block;width:100%;height:100%;min-height:inherit;border:0;background:#101714}
+.hosted-app-footnote{width:100%;max-width:1800px;margin:15px auto 0;color:var(--muted);font:10px/1.6 Plex,monospace}
+.hosted-app-footnote a{color:var(--paper);text-decoration-color:var(--pink);text-underline-offset:3px}
+.hosted-app-frame:fullscreen{width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;min-height:0;margin:0;border:0;border-radius:0;box-shadow:none;background:#101714}
+.hosted-app-frame:fullscreen iframe{min-height:100vh;min-height:100dvh}
+.hosted-app-page:has(.hosted-app-frame:fullscreen) .topline,.hosted-app-page:has(.hosted-app-frame:fullscreen) .side-rail{visibility:hidden}
+@media(max-width:900px){.hosted-app-heading{align-items:flex-start;flex-direction:column;gap:15px}.hosted-app-actions{justify-content:flex-start}.hosted-app-frame{height:calc(100dvh - 250px)}}
+@media(max-width:640px){.hosted-app-main{min-height:calc(100dvh - 140px)}.hosted-app-workspace{padding:18px 14px 20px}.hosted-app-heading{margin-bottom:15px}.hosted-app-heading h1{font-size:clamp(28px,8vw,39px)}.hosted-app-description{font-size:16px}.hosted-app-actions{width:100%;gap:12px}.hosted-app-actions .button,.hosted-app-actions .text-link{flex:1;min-width:0;padding:11px 9px;font-size:8px;letter-spacing:.02em}.hosted-app-frame{height:calc(100dvh - 300px);min-height:340px}.hosted-app-footnote{font-size:9px;line-height:1.6}}
+@media(max-width:380px){.hosted-app-actions{flex-direction:column;align-items:stretch}.hosted-app-actions .button,.hosted-app-actions .text-link{width:100%}.hosted-app-frame{min-height:320px}}
+@media(prefers-reduced-motion:reduce){.hosted-app-page *{scroll-behavior:auto}}
