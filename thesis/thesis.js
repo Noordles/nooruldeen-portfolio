@@ -1,8 +1,14 @@
 /* Browser preview of saved results. New model fits remain in the Python app. */
 (() => {
   "use strict";
-  let data = null, activePanel = "history", latestScenario = [], loadController, errorMessage = null;
+  let data = null, activePanel = "history", latestScenario = [], loadController, errorMessage = null, peerSelectedCountries = null;
   const selectedCountries = new Set();
+  const countryPalette = ["#74263c", "#30c4a0", "#e9e0cf", "#d7aa58", "#659eb5", "#a7b097", "#c87945", "#737ec1", "#b4b4b4", "#557d60", "#ab905a", "#497e8a"];
+  const colorForCountry = code => {
+    if (!data) return countryPalette[0];
+    const ordered = ["IRQ", ...Object.keys(data.annual.countries).filter(country => country !== "IRQ").sort()];
+    return countryPalette[Math.max(0, ordered.indexOf(code)) % countryPalette.length];
+  };
   const t = (source, values = {}) => window.noorThesisI18n?.t(source,values) ?? source.replace(/\{([a-z_]+)\}/g, (_,key) => String(values[key] ?? "{"+key+"}"));
   const locale = () => window.noorThesisI18n?.locale || "en-GB";
   const $ = id => document.getElementById(id);
@@ -108,7 +114,7 @@
         escape(options.periods ? periodLabel(x[index]) : x[index]) + "</text>";
     }
     if (low < 0 && high > 0) svg += '<line x1="' + left + '" y1="' + Y(0) + '" x2="' + (width - right) + '" y2="' + Y(0) + '" class="chart-zero"/>';
-    if(options.context){for(const event of options.context){const first=Math.max(x[0],Number(event.period_start.slice(0,4))),last=Math.min(x.at(-1),Number(event.period_end.slice(0,4)));if(first>last)continue;const a=X(x.indexOf(first)),b=X(x.indexOf(last));svg+='<rect x="'+Math.max(left,a-5)+'" y="'+top+'" width="'+Math.max(10,b-a+10)+'" height="'+(height-top-bottom)+'" fill="#d18b98" opacity=".09"><title>'+escape(t(event.title))+'</title></rect>';}}
+    if(options.context){for(const [eventIndex,event] of options.context.entries()){const first=Math.max(x[0],Number(event.period_start.slice(0,4))),last=Math.min(x.at(-1),Number(event.period_end.slice(0,4)));if(first>last)continue;const a=X(x.indexOf(first)),b=X(x.indexOf(last)),markYear=Math.max(first,Math.min(last,Math.round((first+last)/2))),markX=X(x.indexOf(markYear)),markY=top+12+(eventIndex%3)*20,label=String(eventIndex+1).padStart(2,"0"),period=event.period_start===event.period_end?event.period_start:event.period_start+"–"+event.period_end;svg+='<rect x="'+Math.max(left,a-5)+'" y="'+top+'" width="'+Math.max(10,b-a+10)+'" height="'+(height-top-bottom)+'" fill="#74263c" opacity=".08"><title>'+escape(period+" · "+t(event.title))+'</title></rect><g class="chart-event-marker"><title>'+escape(label+" · "+period+" · "+t(event.title)+" · "+t(event.source_publisher))+'</title><circle cx="'+markX+'" cy="'+markY+'" r="9"/><text x="'+markX+'" y="'+(markY+3)+'" text-anchor="middle">'+label+'</text></g>';}}
     if (options.band) {
       let segment = [];
       const finishBand = () => {
@@ -126,7 +132,8 @@
       finishBand();
     }
     series.forEach((item,index) => {
-      svg += '<path data-series-index="' + index + '" class="chart-series' + (item.reference ? ' chart-reference' : '') + (selectedCountries.has(item.code) ? ' is-selected' : '') + '" d="' + path(item.y) + '" fill="none" stroke="' + item.color + '"' +
+      const selectedSet = options.selectedCountries || selectedCountries;
+      svg += '<path data-series-index="' + index + '" class="chart-series' + (item.reference ? ' chart-reference' : '') + (selectedSet.has(item.code) ? ' is-selected' : '') + '" d="' + path(item.y) + '" fill="none" stroke="' + item.color + '"' +
         (item.dash ? ' stroke-dasharray="7 5"' : "") + "/>";
       if (x.length <= 6) for (const point of points(item.y).filter(Boolean)) {
         svg += '<circle cx="' + point[0] + '" cy="' + point[1] + '" r="3.5" fill="' + item.color + '"/>';
@@ -139,7 +146,7 @@
     svg += '<g class="chart-focus" hidden><line x1="0" y1="' + top + '" x2="0" y2="' + (height-bottom) + '"/><circle r="5"/></g></svg>';
     const legendSeries = options.legendSeries || series;
     const legend = '<div class="chart-legend">' + [...legendSeries].sort((a,b) => Number(!!b.reference)-Number(!!a.reference)).map(item => options.onCountrySelect
-      ? '<button type="button" data-country="'+escape(item.code)+'" aria-pressed="'+String(selectedCountries.has(item.code))+'" aria-label="'+escape(t("Select {country}",{country:item.name}))+'"><i style="--series-color:'+item.color+'"></i>'+escape(item.name)+'</button>'
+      ? '<button type="button" data-country="'+escape(item.code)+'" aria-pressed="'+String((options.selectedCountries || selectedCountries).has(item.code))+'" aria-label="'+escape(t("Select {country}",{country:item.name}))+'"><i style="--series-color:'+item.color+'"></i>'+escape(item.name)+'</button>'
       : '<span><i style="--series-color:' + item.color + '"></i>' + escape(item.name) + "</span>").join("") +
       (options.band ? '<span class="interval-key"><i></i>'+escape(t("95% prediction interval"))+'</span>' : "") + "</div>";
     const headings = series.map(item => "<th scope=\"col\">" + escape(item.name) + "</th>").join("") +
@@ -147,10 +154,12 @@
     const cell = value => "<td>" + (finite(value) ? escape(exactNumber(value)) : "—") + "</td>";
     const rows = x.map((value, index) => '<tr><th scope="row">' + escape(options.periods ? periodLabel(value) : value) + "</th>" +
       series.map(item => cell(item.y[index])).join("") + (options.band ? cell(options.band.low[index]) + cell(options.band.high[index]) : "") + "</tr>").join("");
-    target.classList.toggle("chart-has-selection",!!options.onCountrySelect && selectedCountries.size>0);
+    target.classList.toggle("chart-has-selection",!!options.onCountrySelect && (options.selectedCountries || selectedCountries).size>0);
     target.innerHTML = legend + svg + '<p class="sr-only" id="' + id + '-help">'+escape(t("Hover or tap a line for its saved value. With the chart focused, use left and right arrows for periods, up and down for series, and Escape to close the details."))+'</p><div class="chart-tooltip" role="tooltip" hidden></div><details class="chart-data"><summary>'+escape(t("View chart values"))+'</summary><div class="table-scroll"><table><caption>' +
       escape(title) + '</caption><thead><tr><th scope="col">'+escape(t("Period"))+'</th>' + headings + "</tr></thead><tbody>" + rows + "</tbody></table></div></details>";
     target.querySelectorAll("button[data-country]").forEach(button => button.addEventListener("click",() => options.onCountrySelect(button.dataset.country,false)));
+    const dataTable = target.querySelector(".chart-data"), tableSlot = target.closest?.(".demo-panel")?.querySelector("[data-exact-tables]");
+    if (dataTable && tableSlot) tableSlot.append(dataTable);
     const chart = target.querySelector("svg"), tooltip = target.querySelector(".chart-tooltip"), focus = chart.querySelector(".chart-focus");
     const focusLine = focus.querySelector("line"), focusPoint = focus.querySelector("circle");
     let selectedIndex = highlightedIndex>=0?highlightedIndex:x.length-1, selectedSeries = highlightedSeries>=0?highlightedSeries:0;
@@ -227,7 +236,7 @@
     const years = data.annual.years.filter(year=>(data.annual.years.includes(first)?year>=first:true)&&(data.annual.years.includes(last)?year<=last:true));
     const countries = Object.keys(data.annual.countries).filter(country => country!=="IRQ").sort((a,b) => data.annual.countries[a].localeCompare(data.annual.countries[b]));
     countries.push("IRQ");
-    const series = countries.map(country => ({code:country,name:t(data.annual.countries[country]),color:country==="IRQ"?"#d18b98":"#30c4a0",reference:country==="IRQ",
+    const series = countries.map(country => ({code:country,name:t(data.annual.countries[country]),color:colorForCountry(country),reference:country==="IRQ",
       y:years.map(year => data.annual.rows.find(row => row.country===country && row.year===year)?.[key] ?? null)}));
     const selectedOnly = $("selected-only").checked && selectedCountries.size>0;
     const visible = selectedOnly ? series.filter(item => selectedCountries.has(item.code)) : series;
@@ -252,7 +261,7 @@
     if (!data) return;
     if(window.noorResearchV2){window.noorResearchV2.forecasts(data,drawChart);return;}
     const model = $("forecast-model").value, rows = data.monthly_forecasts.filter(row => row.model === model);
-    drawChart("forecast-chart", rows.map(row => row.period), [{name:model,color:"#d18b98",y:rows.map(row => row.prediction_trillion_iqd),dash:true}],
+    drawChart("forecast-chart", rows.map(row => row.period), [{name:model,color:"#74263c",y:rows.map(row => row.prediction_trillion_iqd),dash:true}],
       {title:t("Saved monthly revenue forecast in nominal trillion IQD"),units:t("nominal trillion IQD"),axisLabel:t("Revenue · trillion IQD"),periods:true,band:{low:rows.map(row => row.pi95_low),high:rows.map(row => row.pi95_high)}});
   }
 
@@ -279,8 +288,29 @@
       {title:t("Conditional annual fiscal balance as percent of fixed GDP"),units:t("% of fixed baseline GDP"),axisLabel:t("Budget balance · % of GDP"),percent:true});
   }
 
+  function peerCodes() { return Object.keys(data.annual.countries).sort((a,b)=>data.annual.countries[a].localeCompare(data.annual.countries[b])); }
+  function drawPeerScatter() {
+    const target=$("peer-scatter-chart"),profiles=peerCodes().map(code=>{const rows=data.annual.rows.filter(r=>r.country===code&&r.year>=2003&&r.year<=2021&&finite(r.oil_rents)&&finite(r.growth));if(rows.length<3)return null;const mean=rows.reduce((s,r)=>s+r.oil_rents,0)/rows.length,avg=rows.reduce((s,r)=>s+r.growth,0)/rows.length,sd=Math.sqrt(rows.reduce((s,r)=>s+(r.growth-avg)**2,0)/(rows.length-1));return{code,name:t(data.annual.countries[code]),mean,sd,count:rows.length};}).filter(Boolean);
+    if(!profiles.length){target.innerHTML='<p class="chart-note">'+escape(t('No countries have enough paired observations for this plot.'))+'</p>';return;}
+    const w=Math.max(240,Math.round(target.clientWidth)),h=w<600?300:360,l=w<600?56:74,r=20,top=28,b=58,minX=Math.min(...profiles.map(p=>p.mean)),maxX=Math.max(...profiles.map(p=>p.mean)),minY=Math.min(...profiles.map(p=>p.sd)),maxY=Math.max(...profiles.map(p=>p.sd)),px=(maxX-minX||1)*.08,py=(maxY-minY||1)*.12,x0=Math.max(0,minX-px),x1=maxX+px,y0=Math.max(0,minY-py),y1=maxY+py,X=v=>l+(w-l-r)*(v-x0)/(x1-x0),Y=v=>top+(h-top-b)*(y1-v)/(y1-y0),fmt=v=>number(v,1);
+    let svg='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-labelledby="peer-scatter-title peer-scatter-desc"><title id="peer-scatter-title">'+escape(t('Oil-rent exposure and growth volatility'))+'</title><desc id="peer-scatter-desc">'+escape(t('Each point is one country. The horizontal axis is mean oil rents as percent of GDP; the vertical axis is the sample standard deviation of annual real GDP growth, in percentage points.'))+'</desc><text x="'+l+'" y="15" class="chart-axis-title">'+escape(t('Mean oil rents · % of GDP'))+'</text>';
+    for(let i=0;i<=4;i++){const xv=x0+(x1-x0)*i/4,yv=y0+(y1-y0)*i/4,xx=X(xv),yy=Y(yv);svg+='<line x1="'+l+'" y1="'+yy+'" x2="'+(w-r)+'" y2="'+yy+'" class="chart-gridline"/><text x="'+(l-8)+'" y="'+(yy+4)+'" text-anchor="end" class="chart-axis-label">'+fmt(yv)+'</text><text x="'+xx+'" y="'+(h-13)+'" text-anchor="middle" class="chart-axis-label">'+fmt(xv)+'</text>';}
+    svg+='<text x="'+((l+w-r)/2)+'" y="'+(h-2)+'" text-anchor="middle" class="chart-axis-title">'+escape(t('Mean oil rents · % of GDP'))+'</text>';
+    profiles.forEach(p=>{const selected=peerSelectedCountries.has(p.code),xx=X(p.mean),yy=Y(p.sd),label=t('{country}: mean oil rents {oil} percent of GDP; growth volatility {sd} percentage points; {count} years',{country:p.name,oil:fmt(p.mean),sd:fmt(p.sd),count:p.count});svg+='<g class="peer-scatter-point'+(selected?' is-selected':'')+'" data-country="'+escape(p.code)+'" role="button" tabindex="0" aria-pressed="'+selected+'" aria-label="'+escape(label)+'" style="--peer-color:'+colorForCountry(p.code)+'"><title>'+escape(p.name+' · '+fmt(p.mean)+'% · '+fmt(p.sd)+' pp · n='+p.count)+'</title><circle cx="'+xx+'" cy="'+yy+'" r="7"/><text x="'+xx+'" y="'+(yy-10)+'" text-anchor="middle">'+escape(p.name)+'</text></g>';});
+    svg+='</svg><details class="chart-data"><summary>'+escape(t('View chart values'))+'</summary><div class="table-scroll"><table><caption>'+escape(t('Oil-rent exposure and growth volatility'))+'</caption><thead><tr><th>'+escape(t('Country'))+'</th><th>'+escape(t('Mean oil rents · % of GDP'))+'</th><th>'+escape(t('Growth volatility · percentage points'))+'</th><th>'+escape(t('Paired years'))+'</th></tr></thead><tbody>'+profiles.map(p=>'<tr><th>'+escape(p.name)+'</th><td>'+exactNumber(p.mean)+'</td><td>'+exactNumber(p.sd)+'</td><td>'+p.count+'</td></tr>').join('')+'</tbody></table></div></details>';
+    target.innerHTML=svg;target.querySelectorAll('.peer-scatter-point').forEach(point=>{const toggle=()=>{const code=point.dataset.country;peerSelectedCountries.has(code)?peerSelectedCountries.delete(code):peerSelectedCountries.add(code);render();};point.addEventListener('click',toggle);point.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});});const table=target.querySelector('.chart-data'),slot=target.closest?.('.demo-panel')?.querySelector('[data-exact-tables]');if(table&&slot)slot.append(table);
+  }
+  function renderPeerPaths() {
+    if(!data)return;const codes=peerCodes(),years=data.annual.years;let indicator=$("peer-indicator").value;if(!data.annual.indicators[indicator])indicator="growth";const firstValue=Number($("peer-start").value),lastValue=Number($("peer-end").value),first=years.includes(firstValue)?firstValue:years[0],last=years.includes(lastValue)?lastValue:years.at(-1),shownYears=years.filter(y=>y>=first&&y<=last);
+    $("peer-country-list").innerHTML=codes.map(code=>'<label class="peer-country-chip" style="--peer-color:'+colorForCountry(code)+'"><input type="checkbox" value="'+escape(code)+'" '+(peerSelectedCountries.has(code)?'checked':'')+'><i aria-hidden="true"></i><span>'+escape(t(data.annual.countries[code]))+'</span></label>').join('');
+    $("peer-country-list").querySelectorAll('input[type="checkbox"]').forEach(input=>input.addEventListener('change',()=>{input.checked?peerSelectedCountries.add(input.value):peerSelectedCountries.delete(input.value);render();}));
+    const all=codes.map(code=>({code,name:t(data.annual.countries[code]),color:colorForCountry(code),y:shownYears.map(y=>data.annual.rows.find(row=>row.country===code&&row.year===y)?.[indicator]??null)})),series=all.filter(item=>peerSelectedCountries.has(item.code)),def=data.annual.indicators[indicator],units=indicator==='gdp_per_capita'?t('USD per person · 2015 prices'):t(def.units);
+    drawChart('peer-history-chart',shownYears,series,{title:t('{label} by country',{label:t(def.label)}),units,axisLabel:units,percent:indicator!=='gdp_per_capita',nonNegative:indicator!=='growth',legendSeries:all,selectedCountries:peerSelectedCountries,onCountrySelect:(code,exclusive)=>{if(exclusive){peerSelectedCountries.clear();peerSelectedCountries.add(code);}else peerSelectedCountries.has(code)?peerSelectedCountries.delete(code):peerSelectedCountries.add(code);render();}});drawPeerScatter();
+  }
   function peers() {
     if (!data) return;
+    if(peerSelectedCountries===null)peerSelectedCountries=new Set(peerCodes());
+    if(!$('peer-start').options?.length){$('peer-start').innerHTML=data.annual.years.map(y=>'<option>'+y+'</option>').join('');$('peer-end').innerHTML=data.annual.years.map(y=>'<option>'+y+'</option>').join('');$('peer-start').value=String(data.annual.years[0]);$('peer-end').value=String(data.annual.years.at(-1));}
     const ids = ["oil","income","manufacturing"], weights = ids.map(id => Number($(id + "-weight").value));
     ids.forEach((id,index) => $(id + "-weight-label").value = weights[index].toLocaleString(locale()));
     const sum = weights.reduce((a,b) => a+b,0);
@@ -290,9 +320,10 @@
       .sort((a,b) => sum ? a.distance - b.distance || a.country.localeCompare(b.country) : t(a.country_name).localeCompare(t(b.country_name),locale()));
     const max = Math.max(...ranked.map(row => row.distance ?? 0), .001);
     $("peer-results").innerHTML = '<div class="peer-row peer-reference"><span class="rank">'+escape(t('REF'))+'</span><span>'+escape(t('Iraq'))+' <small>'+escape(t('reference country'))+'</small></span><div class="peer-bar"><span style="width:0%"></span></div><span class="distance">'+number(0,3)+'</span></div>' +
-      ranked.map((row,index) => '<div class="peer-row"><span class="rank">' + (sum ? String(index + 1).padStart(2,"0") : "—") +
+      ranked.map((row,index) => '<div class="peer-row" style="--peer-color:'+colorForCountry(row.country)+'"><span class="rank">' + (sum ? String(index + 1).padStart(2,"0") : "—") +
       '</span><span>' + escape(t(row.country_name)) + '</span><div class="peer-bar"><span style="width:' + (sum ? Math.max(3,row.distance / max * 100) : 0) +
       '%"></span></div><span class="distance">' + (sum ? number(row.distance,3) : "—") + "</span></div>").join("");
+    renderPeerPaths();
   }
 
   function render() {
@@ -332,6 +363,9 @@
   $("reset-weights").addEventListener("click", () => {
     ["oil-weight","income-weight","manufacturing-weight"].forEach(id => $(id).value = "1"); render();
   });
+  $("peer-select-all")?.addEventListener("click",()=>{if(data)peerSelectedCountries=new Set(peerCodes());render();});
+  $("peer-clear-all")?.addEventListener("click",()=>{if(data)peerSelectedCountries.clear();render();});
+  ["peer-indicator","peer-start","peer-end"].forEach(id=>$(id)?.addEventListener("change",()=>{if(Number($("peer-start").value)>Number($("peer-end").value))$(id==="peer-start"?"peer-end":"peer-start").value=$(id).value;render();}));
   $("reset-scenario").addEventListener("click", () => {
     $("oil-price").value = "-10"; $("oil-share").value = "90";["oil-volume","other-revenue","spending-change"].forEach(id=>{if($(id))$(id).value="0";});render();
   });
@@ -360,6 +394,7 @@
       const response = await fetch("/thesis/data.json", {cache:"no-cache",signal:controller.signal});
       if (!response.ok) throw new Error("The saved preview could not load.");
       data = validate(await response.json());
+      window.noorThesisData = data;
       ["history-start","history-end"].forEach(id=>$(id).innerHTML=data.annual.years.map(year=>'<option value="'+year+'">'+year+'</option>').join(""));
       $("history-start").value=String(data.annual.years[0]);$("history-end").value=String(data.annual.years.at(-1));
       if(window.noorResearchV2)$("forecast-model").value=data.research_v2.forecasts.selection.find(r=>r.horizon===Number($("forecast-horizon").value)).selected_model;

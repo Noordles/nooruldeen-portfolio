@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 330" role="img" aria-labelledby="title desc">
+<title id="title">Iraq, oil and the public budget</title><desc id="desc">An illustrated oil derrick, the national outline of Iraq, coins and an abstract chart connected by a dotted line. The diagram introduces the study; it contains no measured values.</desc>
+<defs>
+ <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#30c4a0" stroke-opacity=".09"/></pattern>
+ <radialGradient id="wine"><stop stop-color="#74263c" stop-opacity=".7"/><stop offset="1" stop-color="#74263c" stop-opacity="0"/></radialGradient>
+ <radialGradient id="cyan"><stop stop-color="#30c4a0" stop-opacity=".22"/><stop offset="1" stop-color="#30c4a0" stop-opacity="0"/></radialGradient>
+ <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#30c4a0"/></marker>
+</defs>
+<rect width="1200" height="330" fill="#101514"/><rect width="1200" height="330" fill="url(#grid)"/>
+<ellipse cx="395" cy="165" rx="310" ry="210" fill="url(#wine)"/><ellipse cx="930" cy="170" rx="280" ry="200" fill="url(#cyan)"/>
+<g stroke="#e9e0cf" stroke-width="4" fill="none" stroke-linejoin="round">
+ <path d="M100 254L145 68L196 254ZM116 191H179M126 144H166M136 101H156M111 214L180 160M127 145L192 227M94 254H206"/>
+ <path d="M140 69V47H215V58H146M201 54V182M188 182H214"/>
+ <rect x="218" y="190" width="48" height="64" rx="4" fill="#74263c"/><path d="M219 205H265M219 238H265"/>
+</g>
+<text x="98" y="292" fill="#e9e0cf" font-family="sans-serif" font-size="17" font-weight="700" letter-spacing="3">OIL</text>
+<g transform="translate(310 6) scale(.76)">
+ <path d="M46.96,209.79 L35,166.72 L100.67,129.91 L111.88,87.15 L109.09,61.31 L125.32,52.57 L140.53,30.50 L153.27,25 L187.78,29.56 L198.19,38.57 L212.41,32.60 L231.63,74.79 L251.08,85.41 L253.32,106.07 L238.39,118.28 L231.52,145.88 L252.06,179.50 L288.41,198.89 L303.68,225.78 L298.81,251.40 L308.29,251.39 L308.58,270.23 L325,288.82 L307.39,287.09 L287.46,284.14 L265.69,318.10 L210.54,315.28 L126.89,244.14 L82.69,219.38 Z" transform="translate(9 9)" fill="#30c4a0" opacity=".22"/>
+ <path d="M46.96,209.79 L35,166.72 L100.67,129.91 L111.88,87.15 L109.09,61.31 L125.32,52.57 L140.53,30.50 L153.27,25 L187.78,29.56 L198.19,38.57 L212.41,32.60 L231.63,74.79 L251.08,85.41 L253.32,106.07 L238.39,118.28 L231.52,145.88 L252.06,179.50 L288.41,198.89 L303.68,225.78 L298.81,251.40 L308.29,251.39 L308.58,270.23 L325,288.82 L307.39,287.09 L287.46,284.14 L265.69,318.10 L210.54,315.28 L126.89,244.14 L82.69,219.38 Z" fill="#74263c" stroke="#e9e0cf" stroke-width="3"/>
+ <circle cx="205" cy="180" r="6" fill="#30c4a0"/><path d="M177 85Q153 150 205 180T245 258" fill="none" stroke="#30c4a0" stroke-width="2" stroke-dasharray="5 7"/>
+</g>
+<text x="405" y="292" fill="#e9e0cf" font-family="sans-serif" font-size="17" font-weight="700" letter-spacing="3">IRAQ</text>
+<path d="M276 169H323M569 169H643M800 169H851" fill="none" stroke="#30c4a0" stroke-width="2" stroke-dasharray="5 7" marker-end="url(#arrow)"/>
+<g stroke="#e9e0cf" stroke-width="3" fill="#74263c">
+ <path d="M671 221V248Q698 262 725 248V221M671 206V233Q698 247 725 233V206M671 191V218Q698 232 725 218V191"/>
+ <ellipse cx="698" cy="191" rx="27" ry="11"/><path d="M737 183V251Q764 265 791 251V183M737 216Q764 230 791 216M737 234Q764 248 791 234M737 199Q764 213 791 199"/>
+ <ellipse cx="764" cy="183" rx="27" ry="11"/>
+</g>
+<text x="670" y="292" fill="#e9e0cf" font-family="sans-serif" font-size="17" font-weight="700" letter-spacing="3">BUDGET</text>
+<g transform="translate(873 74)">
+ <rect width="228" height="180" rx="3" fill="#191d1b" stroke="#e9e0cf" stroke-width="2"/>
+ <path d="M24 35H205M24 75H205M24 115H205M24 150H205" stroke="#e9e0cf" opacity=".15"/>
+ <path d="M33 150V120H60V150M80 150V91H107V150M127 150V108H154V150M174 150V52H201V150" fill="#74263c" stroke="#e9e0cf" stroke-width="1.5"/>
+ <path d="M33 95L92 63L140 81L191 24" fill="none" stroke="#30c4a0" stroke-width="4"/>
+ <g fill="#30c4a0"><circle cx="33" cy="95" r="4"/><circle cx="92" cy="63" r="4"/><circle cx="140" cy="81" r="4"/><circle cx="191" cy="24" r="4"/></g>
+</g>
+<text x="895" y="292" fill="#e9e0cf" font-family="sans-serif" font-size="17" font-weight="700" letter-spacing="3">EVIDENCE</text>
+</svg>
