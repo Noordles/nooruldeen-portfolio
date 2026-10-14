@@ -152,11 +152,13 @@
     const headings = series.map(item => "<th scope=\"col\">" + escape(item.name) + "</th>").join("") +
       (options.band ? '<th scope="col">'+escape(t("95% lower"))+'</th><th scope="col">'+escape(t("95% upper"))+'</th>' : "");
     const cell = value => "<td>" + (finite(value) ? escape(exactNumber(value)) : "—") + "</td>";
-    const rows = x.map((value, index) => '<tr><th scope="row">' + escape(options.periods ? periodLabel(value) : value) + "</th>" +
-      series.map(item => cell(item.y[index])).join("") + (options.band ? cell(options.band.low[index]) + cell(options.band.high[index]) : "") + "</tr>").join("");
+    const panel = target.closest?.(".demo-panel"), showValueTable = panel?.id !== "panel-history";
+    const rows = showValueTable ? x.map((value, index) => '<tr><th scope="row">' + escape(options.periods ? periodLabel(value) : value) + "</th>" +
+      series.map(item => cell(item.y[index])).join("") + (options.band ? cell(options.band.low[index]) + cell(options.band.high[index]) : "") + "</tr>").join("") : "";
     target.classList.toggle("chart-has-selection",!!options.onCountrySelect && (options.selectedCountries || selectedCountries).size>0);
-    target.innerHTML = legend + svg + '<p class="sr-only" id="' + id + '-help">'+escape(t("Hover or tap a line for its saved value. With the chart focused, use left and right arrows for periods, up and down for series, and Escape to close the details."))+'</p><div class="chart-tooltip" role="tooltip" hidden></div><details class="chart-data"><summary>'+escape(t("View chart values"))+'</summary><div class="table-scroll"><table><caption>' +
-      escape(title) + '</caption><thead><tr><th scope="col">'+escape(t("Period"))+'</th>' + headings + "</tr></thead><tbody>" + rows + "</tbody></table></div></details>";
+    target.innerHTML = legend + svg + '<p class="sr-only" id="' + id + '-help">'+escape(t("Hover or tap a line for its saved value. With the chart focused, use left and right arrows for periods, up and down for series, and Escape to close the details."))+'</p><div class="chart-tooltip" role="tooltip" hidden></div>' +
+      (showValueTable ? '<details class="chart-data"><summary>'+escape(t("View chart values"))+'</summary><div class="table-scroll"><table><caption>' +
+      escape(title) + '</caption><thead><tr><th scope="col">'+escape(t("Period"))+'</th>' + headings + "</tr></thead><tbody>" + rows + "</tbody></table></div></details>" : "");
     target.querySelectorAll("button[data-country]").forEach(button => button.addEventListener("click",() => options.onCountrySelect(button.dataset.country,false)));
     const dataTable = target.querySelector(".chart-data"), tableSlot = target.closest?.(".demo-panel")?.querySelector("[data-exact-tables]");
     if (dataTable && tableSlot) tableSlot.append(dataTable);

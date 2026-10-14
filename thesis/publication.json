@@ -1,6 +1,6 @@
 {
-  "source_commit": "1db69ee97e3fa5f7616fe913d09803508e48469f",
-  "published_utc": "2026-10-14T16:16:42+00:00",
+  "source_commit": "888aa0405c32cd44cb3a6066cc8570cb3b207e4c",
+  "published_utc": "2026-10-14T16:26:00+00:00",
   "route": "/thesis/",
   "source_repository_private": true,
   "public_files": {
@@ -48,8 +48,8 @@
     "assets/pitch/slide-18.webp": "f7c8f776f54eace641e05ac4ac6cd4480a27666b0bc23358e4b98ba6480513b2",
     "assets/pitch/slide-19.webp": "12276069ee6ce6f132de727f77524f6a098022b0ca1570d9f781ade5df3a39c3",
     "assets/samarra-minaret.jpg": "51ed9674661ceaf5b4f2552fd412db3c676e251cdee11f05fcf86f028864c8de",
-    "data.json": "0bea411daeed69f75907fc8afefe5351e2104a5701dd40343b68de0f0c4cf009",
-    "index.html": "ac13bc9ea714c7e79a4b56fbed31e455253141c750becec95d10326080cb439e",
+    "data.json": "4869a3993cfda9e22e00e5e0348f27c38cf82412d70f8a9e0820295c6b74a16b",
+    "index.html": "41cf18bffac0241c90fc4f35cfb2491e46b82485f33fbc52910ca9e933aec37e",
     "interpretation.js": "f0d7ebe1cd4007f2f4c253a7e70847211ff909b13fae2e7ee10b51d72e3bc975",
     "language.js": "df01c931eae0a1a9658d8cdede906905b534b5f29b137e501554fad6c792a699",
     "pitch-player.css": "0451737dfb1f949053ed882125f78c8e5bc4b8ac20a50ab72236885a9f272f1f",
@@ -58,13 +58,13 @@
     "presentation-seek.js": "9702c38d015414eb87a9a352cd9cf017bae5602f52bc251d9744bc5fd3cda16c",
     "presentations/Noor_Iraq_Thesis_Pitch.pdf": "ebb6ea37b1f539b70c0aa2e715e21dc92dcff38e679b0240c9d1638c9b7b51bc",
     "presentations/Noor_Iraq_Thesis_Pitch.pptx": "e4514f452d0efe441ee96c7f5fd3bcb66c71e6c345ef88a60e74fc52ebbf45d4",
-    "research-overview.css": "fff79f104324bd80ac680c79fe1dd097fe73b1efe8f058ac1b6c5eef6967e34f",
+    "research-overview.css": "b87f38f690ad3e12dc8e7401e01f3329bdf956a869f7aa0e6751d5265328838f",
     "research-overview.js": "0c7533afcf2ca08ee86e6b07a1d1f95817915cd96ea83855efdbbdfa606f5931",
     "research-plan/index.html": "73242a247d6d8f91d0779a78cea87e9da1b1d3a04b75c7ce96329a4f361010b8",
     "research-rules.js": "356e845a70faa22ce9b70db34a086672826b1839f883213edf0470defa347687",
     "research-v2.js": "1a6bb1a342a21557d844f41d9803f57723275057ab394a1a0fc78ad3a65907d9",
     "thesis.css": "cd08558627eaebbcb6473a35950f888a5cd5fdd45c19f914301a32fea32cd707",
-    "thesis.js": "2c5bf9dd77f8717671651843ddf1930d2a33797c04caeca205be6eef18ef9980",
+    "thesis.js": "b13d065d016f80b047482340a327d1665eb2da6349b1f43dba4b32bf6f6c506b",
     "workbench-ui.css": "88f5ca972b30ac45e83a79c6679f8fbe9a6fa90733ae1b2d435258524fa2d9af"
   }
 }

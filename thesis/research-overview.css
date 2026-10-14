@@ -29,7 +29,12 @@ html[dir=rtl] .country-outline h3{font-family:"Noto Sans Arabic",sans-serif;font
 
 html[dir=rtl] .result-card>.result-text-value{font-family:"Noto Sans Arabic",sans-serif;font-size:28px;line-height:1.65;letter-spacing:0}
 
-.insight-toggle{font-family:inherit}
+.insight-heading{margin:0 0 14px;border-bottom:1px solid rgba(209,139,152,.26)}
+.insight-toggle{display:flex;width:100%;min-height:54px;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;border:1px solid rgba(209,139,152,.38);border-inline-start:3px solid var(--pink);border-radius:3px;background:linear-gradient(100deg,rgba(116,38,60,.2),rgba(15,25,20,.48));color:var(--paper);font:inherit;text-align:start;cursor:pointer;transition:border-color .16s ease,background .16s ease}
+.insight-toggle:hover,.insight-toggle[aria-expanded="true"]{border-color:var(--pink);background:linear-gradient(100deg,rgba(116,38,60,.3),rgba(15,25,20,.66))}
+.insight-toggle:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.insight-toggle-mark{display:grid;width:30px;height:30px;flex:none;place-items:center;border:1px solid rgba(209,139,152,.55);border-radius:50%;background:rgba(116,38,60,.3);color:var(--pink);font:700 20px/1 Plex,monospace}
+.insight-note:nth-child(even){border-inline-start-color:var(--pink)}.insight-note:nth-child(even) .insight-kind{color:var(--pink)}
 .insight-note>.main-finding strong{display:inline-block;padding:0 .18em;border-radius:2px;background:rgba(116,38,60,.32);color:var(--pink);font-weight:700;font-variant-numeric:tabular-nums}
 .insight-content{transition:opacity .18s ease}
 @media(prefers-reduced-motion:reduce){.insight-content{transition:none}}
