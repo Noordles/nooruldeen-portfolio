@@ -29,6 +29,11 @@ html[dir=rtl] .country-outline h3{font-family:"Noto Sans Arabic",sans-serif;font
 
 html[dir=rtl] .result-card>.result-text-value{font-family:"Noto Sans Arabic",sans-serif;font-size:28px;line-height:1.65;letter-spacing:0}
 
+.insight-toggle{font-family:inherit}
+.insight-note>.main-finding strong{display:inline-block;padding:0 .18em;border-radius:2px;background:rgba(116,38,60,.32);color:var(--pink);font-weight:700;font-variant-numeric:tabular-nums}
+.insight-content{transition:opacity .18s ease}
+@media(prefers-reduced-motion:reduce){.insight-content{transition:none}}
+
 @media(max-width:640px){html[dir=rtl] .country-outline h3{font-size:28px}.international-value{flex-direction:column;gap:12px}.international-value>div{min-width:0}}
 
 /* Research v2 reuses the workbench controls, palette and measured typography. */
