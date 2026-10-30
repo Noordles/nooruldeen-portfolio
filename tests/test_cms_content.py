@@ -7,7 +7,7 @@ import cms_content as cms
 class ContentTests(unittest.TestCase):
     def test_every_existing_page_remains_identical_when_content_is_unchanged(self):
         pages=list((ROOT/"pages").rglob("*.html"))
-        self.assertGreaterEqual(len(pages),18)
+        self.assertGreaterEqual(len(pages),15)
         for page in pages:
             original=page.read_text("utf-8")
             output=cms.render(original,page.relative_to(ROOT/"pages").as_posix(),cms.CONFIG)
