@@ -56,3 +56,33 @@ html[dir=rtl] :is(.four-questions dt,.four-questions dd,.v2-details summary,.v2-
 @media(max-width:640px){.v2-block,.v2-details{padding:20px 16px}.growth-summary{grid-template-columns:1fr}.growth-summary article{padding:22px}.money-flow-grid{grid-template-columns:1fr;gap:12px}.flow-arrow{text-align:center;transform:rotate(90deg)}html[dir=rtl] .flow-arrow{transform:rotate(90deg)}.money-flow-grid strong{font-size:36px}.survey-row{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) 52px;gap:10px;font-size:18px}.survey-row strong{font-size:11px}.four-questions dd{font-size:17px}.timeline-card,.context-evidence-card{padding:20px}}
 .main-finding-label{margin:18px 0 4px!important;color:var(--teal);font:10px/1.8 Plex,monospace!important;letter-spacing:.08em;text-transform:uppercase}.insight-note>.main-finding{margin:0 0 16px;font-size:20px;font-weight:600;color:var(--paper)}.optional-data{margin-top:24px}.optional-data>.chart-data{margin:0;padding:0 16px;border:1px solid var(--rule);background:#0d1511}.optional-data>.chart-data summary{min-height:48px;padding:14px 0;color:var(--teal)}.optional-data .table-scroll{margin:12px 0 18px}.analysis-download{margin:0 0 22px}.dataset-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:26px}.dataset-summary-grid article{min-width:0;padding:24px;border:1px solid var(--rule);border-top:2px solid var(--teal);background:linear-gradient(145deg,#13221b,#0f1713)}.dataset-summary-grid article:nth-child(2){border-top-color:var(--wine)}.dataset-summary-grid article:nth-child(3){border-top-color:var(--muted)}.dataset-summary-grid .card-index{display:block}.dataset-summary-grid strong{display:block;margin:14px 0 8px;font:700 clamp(23px,3vw,34px)/1.3 Slab,Georgia,serif;color:var(--pink)}.dataset-summary-grid p{margin:0;color:var(--muted);font-size:17px;line-height:1.65}html[dir=rtl] .dataset-summary-grid strong,html[dir=rtl] .dataset-summary-grid p{font-family:"Noto Sans Arabic",Tahoma,sans-serif}
 @media(max-width:700px){.dataset-summary-grid{grid-template-columns:1fr}.dataset-summary-grid article{padding:20px}.insight-note>.main-finding{font-size:18px}}
+
+
+/* Current thesis record: editorial updates keep their source periods visible. */
+.research-current .overview-heading,.latest-findings .overview-heading,.research-roadmap .overview-heading{align-items:start}
+.research-current .overview-heading h2,.latest-findings .overview-heading h2,.research-roadmap .overview-heading h2{max-width:13ch;font-size:clamp(36px,4.5vw,64px);line-height:1.12;text-wrap:balance}
+.current-release{display:flex;align-items:center;justify-content:space-between;gap:22px;margin:28px 0;border-block:1px solid var(--rule);padding:20px 0}
+.current-release p{display:flex;align-items:center;gap:12px;margin:0;color:var(--muted);font:12px/1.8 Plex,monospace}
+.current-release .signal-dot{flex:none}.current-release .button{flex-shrink:0}
+.current-work-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.current-work-grid article,.research-ideas-grid article{min-width:0;border-top:2px solid var(--teal);padding:22px 0 12px}
+.current-work-grid article:nth-child(2),.research-ideas-grid article:nth-child(even){border-top-color:var(--wine)}
+.current-work-grid h3,.research-ideas-grid h3,.research-finding h3{margin:14px 0;font:600 clamp(21px,2vw,27px)/1.35 Slab,Georgia,serif;text-wrap:balance}
+.current-work-grid article>p:last-child,.research-ideas-grid article>p:last-child,.research-finding>p:not(.card-index):not(.finding-result){color:var(--muted);font-size:17px;line-height:1.75}
+.current-question{margin-top:32px;padding:26px 30px;border-inline-start:3px solid var(--wine);background:rgba(150,50,70,.07)}
+.current-question h3{max-width:58ch;margin:12px 0;font:500 clamp(22px,2.5vw,30px)/1.5 Slab,Georgia,serif;text-wrap:pretty}.current-question>p:last-child{max-width:90ch;color:var(--muted);font-size:16px;line-height:1.8}
+.findings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:28px;align-items:start}
+.research-finding{min-width:0;padding:28px;border:1px solid var(--rule);border-top:2px solid var(--teal);background:rgba(255,255,255,.015);scroll-margin-top:36px}
+.research-finding:nth-child(2n){border-top-color:var(--wine)}
+.finding-result{margin:22px 0 16px;color:var(--pink);font:500 clamp(24px,3vw,36px)/1.35 Slab,Georgia,serif;overflow-wrap:anywhere}
+.finding-numeric{direction:ltr;unicode-bidi:isolate}
+.finding-evidence{margin-top:24px;padding-top:16px;border-top:1px solid var(--rule)}
+.finding-evidence summary{cursor:pointer;color:var(--paper);font:12px/1.8 Plex,monospace;padding:8px 0;min-height:40px}
+.finding-evidence p{color:var(--muted);font-size:16px;line-height:1.85}.finding-evidence .finding-limit{padding-inline-start:16px;border-inline-start:2px solid var(--wine)}
+.finding-sources{display:flex;flex-direction:column;align-items:start;gap:12px;margin-top:20px}.finding-sources a{color:var(--teal);font-size:14px;line-height:1.7;text-decoration:underline;text-underline-offset:4px;overflow-wrap:anywhere}
+.research-ideas-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 40px;margin-top:28px}
+.research-current a:focus-visible,.latest-findings summary:focus-visible,.latest-findings a:focus-visible{outline:2px solid var(--teal);outline-offset:5px}
+html[dir=rtl] :is(.current-work-grid h3,.research-ideas-grid h3,.research-finding h3,.current-question h3,.finding-result,.current-release p,.finding-evidence summary){font-family:"Noto Sans Arabic",Tahoma,sans-serif;letter-spacing:0}
+html[dir=rtl] :is(.research-current,.latest-findings,.research-roadmap) p{line-height:1.95}
+@media(max-width:1000px){.current-work-grid{grid-template-columns:1fr}.current-work-grid article{padding-bottom:4px}.current-release{align-items:start;flex-direction:column}}
+@media(max-width:700px){.findings-grid,.research-ideas-grid{grid-template-columns:1fr;gap:20px}.research-finding{padding:22px 18px}.current-question{padding:22px 18px}.current-release .button{max-width:100%;white-space:normal}.research-current .section-line{align-items:start;gap:12px;flex-wrap:wrap}.research-current .overview-heading h2,.latest-findings .overview-heading h2,.research-roadmap .overview-heading h2{font-size:36px}.finding-result{font-size:29px}}
